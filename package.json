@@ -1,5 +1,5 @@
 {
-  "name": "Harmony3",
+  "name": "harmony3",
   "private": true,
   "scripts": {
     "build": "turbo build",

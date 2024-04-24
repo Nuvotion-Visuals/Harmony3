@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Harmony</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        background: #121212;
+      }
+
+      .title-bar {
+        -webkit-app-region: drag;
+        -webkit-user-select: none;
+        position: fixed;
+        top: 0;
+        z-index: 99;
+        left: 600px;
+        right: 0;
+        height: 20px;
+        background: none;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        cursor: move;
+      }
+
+      .window-control {
+        position: relative;
+        z-index: 1;
+        -webkit-app-region: no-drag;
+        width: 1.5rem;
+        height: 1rem;
+        padding-left: 8px;
+        cursor: pointer;
+        fill: hsl(0, 0%, 73%);
+        background: #0d0d0d;
+      }
+      .window-control * {
+        fill: hsl(0, 0%, 73%);
+      }
+      .window-control:hover * {
+        fill: hsl(0, 0%, 88%);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="title-bar">
+      <div class="window-control minimize" onclick="minimizeWindow()">
+        <svg xmlns="http://www.w3.org/2000/svg" height=".7em" viewBox="0 0 512 512"><path d="M16 448c-8.8 0-16 7.2-16 16s7.2 16 16 16H496c8.8 0 16-7.2 16-16s-7.2-16-16-16H16z"/></svg>
+      </div>
+      <div class="window-control maximize" onclick="maximizeWindow()">
+        <svg xmlns="http://www.w3.org/2000/svg" height=".7em" viewBox="0 0 512 512"><path d="M64 64C46.3 64 32 78.3 32 96v96H480V96c0-17.7-14.3-32-32-32H64zM32 224V416c0 17.7 14.3 32 32 32H448c17.7 0 32-14.3 32-32V224H32zM0 96C0 60.7 28.7 32 64 32H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96z"/></svg>
+      </div>
+      <div class="window-control close" onclick="closeWindow()">
+        <svg xmlns="http://www.w3.org/2000/svg" height=".7em" viewBox="0 0 448 512"><path d="M420.7 36.7c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6L246.6 256 443.3 452.7c6.2 6.2 6.2 16.4 0 22.6s-16.4 6.2-22.6 0L224 278.6 27.3 475.3c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6L201.4 256 4.7 59.3c-6.2-6.2-6.2-16.4 0-22.6s16.4-6.2 22.6 0L224 233.4 420.7 36.7z"/></svg>
+      </div>
+      <!-- start: dynamic -->
+      <script type="module" crossorigin src="./assets/app/dist/assets/index-858ae4cc.js"></script>
+      <link rel="stylesheet" href="./assets/app/dist/assets/index-a89466da.css">
+      <!-- end: dynamic -->
+    </div>
+
+    <!-- <div id="root"></div> -->
+
+    <iframe src="http://localhost:5175" style="width: 100vw; height: 100vh;">
+
+    </iframe>
+
+    <script async>
+      const { ipcRenderer } = require('electron')
+
+      function minimizeWindow() {
+        ipcRenderer.send('minimize-app')
+      }
+
+      function maximizeWindow() {
+        ipcRenderer.send('maximize-app')
+      }
+
+      function closeWindow() {
+        window.close()
+      }
+
+      // window.addEventListener('message', event => {
+      //   switch (event.data.type) {
+      //     case 'request-desktop-sources':
+      //       ipcRenderer.invoke('get-desktop-sources').then(sources => {
+      //         event.source.postMessage({ type: 'desktop-sources', payload: sources }, '*')
+      //       })
+      //       break
+
+      //     case 'select-desktop-source':
+      //       const selectedSourceId = event.data.payload.sourceId
+      //       ipcRenderer.send('select-source', selectedSourceId)
+      //       break
+
+      //     // Add more cases as needed
+      //   }
+      // })
+    </script>
+  </body>
+</html>
