@@ -9,13 +9,21 @@ interface HarmonyState {
   groups: CollectionResponses['groups'][]
   threads: CollectionResponses['threads'][]
   messages: CollectionResponses['messages'][]
+  activeSpaceId: string | null
+  activeGroupId: string | null
+  activeThreadId: string | null
+  activeMessageId: string | null
 }
 
 const INITIAL_STATE: HarmonyState = {
   spaces: [],
   groups: [],
   threads: [],
-  messages: []
+  messages: [],
+  activeSpaceId: null,
+  activeGroupId: null,
+  activeThreadId: null,
+  activeMessageId: null
 }
 
 export const fetchSpacesAsync = createAsyncThunk(
@@ -54,6 +62,10 @@ const harmonySlice = createSlice({
   name: 'harmony',
   initialState: INITIAL_STATE,
   reducers: {
+    setActiveSpaceId: (state, action: PayloadAction<string | null>) => {
+      state.activeSpaceId = action.payload
+    },
+   
     setSpaces: (state, action: PayloadAction<CollectionResponses['spaces'][]>) => {
       state.spaces = action.payload
     },
@@ -70,6 +82,9 @@ const harmonySlice = createSlice({
       state.spaces = state.spaces.filter(space => space.id !== action.payload)
     },
 
+    setActiveGroupId: (state, action: PayloadAction<string | null>) => {
+      state.activeGroupId = action.payload
+    },
     setGroups: (state, action: PayloadAction<CollectionResponses['groups'][]>) => {
       state.groups = action.payload
     },
@@ -86,6 +101,9 @@ const harmonySlice = createSlice({
       state.groups = state.groups.filter(group => group.id !== action.payload)
     },
 
+    setActiveThreadId: (state, action: PayloadAction<string | null>) => {
+      state.activeThreadId = action.payload
+    },
     setThreads: (state, action: PayloadAction<CollectionResponses['threads'][]>) => {
       state.threads = action.payload
     },
@@ -102,6 +120,9 @@ const harmonySlice = createSlice({
       state.threads = state.threads.filter(thread => thread.id !== action.payload)
     },
     
+    setActiveMessageId: (state, action: PayloadAction<string | null>) => {
+      state.activeMessageId = action.payload
+    },
     setMessages: (state, action: PayloadAction<CollectionResponses['messages'][]>) => {
       state.messages = action.payload
     },

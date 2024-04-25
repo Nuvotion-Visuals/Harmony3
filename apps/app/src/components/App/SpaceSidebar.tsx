@@ -1,36 +1,22 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
-import { AspectRatio, Box, SpacesSidebar, Item, Dropdown, Gap, Button, LineBreak, Label, Spacer, ItemProps } from '@avsync.live/formation'
+import { SpacesSidebar, ItemProps } from '@avsync.live/formation'
 import { Groups } from './Groups'
 import { SpaceCard } from './SpaceCard'
 import { Logo } from './Logo'
+import { useHarmony_spaces } from 'redux-tk/harmony/hooks'
+import { Link } from 'components/Util/Link'
 
 const SpacesSidebarComponent = () => {
 
-  const spacesInfo = [
-    {
-      name: 'Space One',
-      guid: 'space-one',
-      previewSrc: 'https://api.avsync.live/uploads/medium_Hero_ab87aace42.jpg'
-    },
-    {
-      name: 'Space Two',
-      guid: 'space-two',
-      previewSrc: 'https://api.avsync.live/uploads/medium_scenes_12e25f0362.png'
-    },
-    {
-      name: 'Space Three',
-      guid: 'space-three',
-      previewSrc: 'https://api.avsync.live/uploads/medium_Hero_ab87aace42.jpg'
-    }
-  ];
+  const spacesInfo = useHarmony_spaces()
 
   const spaces = [
     ...spacesInfo.map(space => ({
       name: space.name,
-      href: `/spaces/${space.guid}`,
-      src: space.previewSrc
+      href: `/spaces/${space.id}`,
+      // src: ''
     })),
     {
       icon: 'plus',
@@ -45,7 +31,9 @@ const SpacesSidebarComponent = () => {
       onClickIndex={() => {}}
       spaces={spaces}
     >
-      <Logo />
+      <Link href={'/'}>
+        <Logo />
+      </Link>
     </SpacesSidebar>
   )
 }

@@ -21,6 +21,8 @@ import About from './pages/about.page'
 import './index.css'
 import '@avsync.live/formation/dist/index.dark.css'
 import { App } from './App'
+import { Linker } from '@avsync.live/formation'
+import { Link } from 'components/Util/Link'
 
 library.add(
    // regular
@@ -63,16 +65,18 @@ library.add(
 
 const Main = ({ }) => {
   return (
-    <Provider store={store}>
-      <App>
+      <Provider store={store}>
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-          </Routes>
+          <Linker CustomLink={Link}> 
+            <App>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+              </Routes>
+            </App>
+          </Linker>
         </BrowserRouter>
-      </App>
-    </Provider>
+      </Provider>
   )
 }
 
