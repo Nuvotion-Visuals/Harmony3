@@ -6,6 +6,7 @@ import type PocketBase from 'pocketbase'
 import type { RecordService } from 'pocketbase'
 
 export enum Collections {
+	Channels = "channels",
 	Groups = "groups",
 	Messages = "messages",
 	Spaces = "spaces",
@@ -37,6 +38,12 @@ export type AuthSystemFields<T = never> = {
 
 // Record types for each collection
 
+export type ChannelsRecord = {
+	description?: HTMLString
+	groupid?: RecordIdString
+	name?: string
+}
+
 export type GroupsRecord = {
 	description?: HTMLString
 	name?: string
@@ -57,8 +64,8 @@ export type SpacesRecord = {
 }
 
 export type ThreadsRecord = {
+	channelid?: RecordIdString
 	description?: HTMLString
-	groupid?: RecordIdString
 	name?: string
 	userid?: RecordIdString
 }
@@ -69,6 +76,7 @@ export type UsersRecord = {
 }
 
 // Response types include system fields and match responses from the PocketBase API
+export type ChannelsResponse<Texpand = unknown> = Required<ChannelsRecord> & BaseSystemFields<Texpand>
 export type GroupsResponse<Texpand = unknown> = Required<GroupsRecord> & BaseSystemFields<Texpand>
 export type MessagesResponse<Texpand = unknown> = Required<MessagesRecord> & BaseSystemFields<Texpand>
 export type SpacesResponse<Texpand = unknown> = Required<SpacesRecord> & BaseSystemFields<Texpand>
@@ -78,6 +86,7 @@ export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSyste
 // Types containing all Records and Responses, useful for creating typing helper functions
 
 export type CollectionRecords = {
+	channels: ChannelsRecord
 	groups: GroupsRecord
 	messages: MessagesRecord
 	spaces: SpacesRecord
@@ -86,6 +95,7 @@ export type CollectionRecords = {
 }
 
 export type CollectionResponses = {
+	channels: ChannelsResponse
 	groups: GroupsResponse
 	messages: MessagesResponse
 	spaces: SpacesResponse
@@ -97,6 +107,7 @@ export type CollectionResponses = {
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
 export type TypedPocketBase = PocketBase & {
+	collection(idOrName: 'channels'): RecordService<ChannelsResponse>
 	collection(idOrName: 'groups'): RecordService<GroupsResponse>
 	collection(idOrName: 'messages'): RecordService<MessagesResponse>
 	collection(idOrName: 'spaces'): RecordService<SpacesResponse>

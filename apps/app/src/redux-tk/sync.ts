@@ -35,6 +35,22 @@ export const init = () => {
     }
   })
 
+  pb.collection('channels').subscribe('*', (event) => {
+    switch (event.action) {
+      case 'create':
+        store.dispatch(harmonyActions.createChannel(event.record))
+        break
+      case 'update':
+        store.dispatch(harmonyActions.updateChannel(event.record))
+        break
+      case 'delete':
+        store.dispatch(harmonyActions.deleteChannel(event.record.id))
+        break
+      default:
+        break
+    }
+  })
+
   pb.collection('threads').subscribe('*', (event) => {
     switch (event.action) {
       case 'create':

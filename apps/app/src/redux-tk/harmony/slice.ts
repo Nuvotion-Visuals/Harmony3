@@ -8,21 +8,25 @@ interface HarmonyState {
   spaces: CollectionResponses['spaces'][]
   groups: CollectionResponses['groups'][]
   threads: CollectionResponses['threads'][]
+  channels: CollectionResponses['channels'][]
   messages: CollectionResponses['messages'][]
   activeSpaceId: string | null
+  activeSpaceIndex: number | null
   activeGroupId: string | null
   activeThreadId: string | null
+  activeChannelId: string | null
   activeMessageId: string | null
-  activeSpaceIndex: number | null
 }
 
 const INITIAL_STATE: HarmonyState = {
   spaces: [],
   groups: [],
   threads: [],
+  channels: [],
   messages: [],
   activeSpaceId: null,
   activeGroupId: null,
+  activeChannelId: null,
   activeThreadId: null,
   activeMessageId: null,
   activeSpaceIndex: null
@@ -41,6 +45,14 @@ export const fetchGroupsAsync = createAsyncThunk(
   async () => {
     const fetchedGroups = await pb.collection('groups').getFullList()
     return fetchedGroups as CollectionResponses['groups'][]
+  }
+)
+
+export const fetchChannelsAsync = createAsyncThunk(
+  'harmony/fetchChannels',
+  async () => {
+    const fetchedChannels = await pb.collection('channels').getFullList()
+    return fetchedChannels as CollectionResponses['channels'][]
   }
 )
 
@@ -106,6 +118,25 @@ const harmonySlice = createSlice({
       state.groups = state.groups.filter(group => group.id !== action.payload)
     },
 
+    setActiveChannelId: (state, action: PayloadAction<string | null>) => {
+      state.activeChannelId = action.payload;
+    },
+    setChannels: (state, action: PayloadAction<CollectionResponses['channels'][]>) => {
+      state.channels = action.payload;
+    },
+    createChannel: (state, action: PayloadAction<CollectionRecords['channels']>) => {
+      state.channels.push(action.payload as CollectionResponses['channels']);
+    },
+    updateChannel: (state, action: PayloadAction<RecordModel>) => {
+      const index = state.channels.findIndex(channel => channel.id === action.payload.id);
+      if (index !== -1) {
+        state.channels[index] = action.payload as CollectionResponses['channels'];
+      }
+    },
+    deleteChannel: (state, action: PayloadAction<string>) => {
+      state.channels = state.channels.filter(channel => channel.id !== action.payload);
+    },
+
     setActiveThreadId: (state, action: PayloadAction<string | null>) => {
       state.activeThreadId = action.payload
     },
@@ -152,6 +183,9 @@ const harmonySlice = createSlice({
       .addCase(fetchGroupsAsync.fulfilled, (state, action) => {
         state.groups = action.payload
       })
+      .addCase(fetchChannelsAsync.fulfilled, (state, action) => {
+        state.channels = action.payload
+      })
       .addCase(fetchThreadsAsync.fulfilled, (state, action) => {
         state.threads = action.payload
       })
@@ -165,6 +199,7 @@ export const harmonyActions = {
   ...harmonySlice.actions,
   fetchSpacesAsync,
   fetchGroupsAsync,
+  fetchChannelsAsync,
   fetchThreadsAsync,
   fetchMessagesAsync,
 }

@@ -25,6 +25,9 @@ export const useHarmony_activeSpace = (): CollectionResponses['spaces'] | undefi
 export const useHarmony_activeGroup = (): CollectionResponses['groups'] | undefined => 
   useSelector(selectors.selectActiveGroup)
 
+export const useHarmony_activeChannel = (): CollectionResponses['channels'] | undefined => 
+  useSelector(selectors.selectActiveChannel)
+
 export const useHarmony_activeThread = (): CollectionResponses['threads'] | undefined => 
   useSelector(selectors.selectActiveThread)
 
@@ -49,6 +52,10 @@ export const useHarmony_setActiveSpaceId = () => {
 export const useHarmony_setActiveGroupId = () => {
   const dispatch = useDispatch()
   return useCallback((payload: string | null) => dispatch(harmonyActions.setActiveGroupId(payload)), [dispatch])
+}
+export const useHarmony_setActiveChannelId = () => {
+  const dispatch = useDispatch()
+  return useCallback((payload: string | null) => dispatch(harmonyActions.setActiveChannelId(payload)), [dispatch])
 }
 export const useHarmony_setActiveThreadId = () => {
   const dispatch = useDispatch()

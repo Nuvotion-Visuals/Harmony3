@@ -5,12 +5,14 @@ import { CreateMessage } from './Create/CreateMessage'
 import { CreateThread } from './Create/CreateThread'
 import { CreateGroup } from './Create/CreateGroup'
 import { CreateSpace } from './Create/CreateSpace'
+import { CreateChannel } from './Create/CreateChannel'
 
 const pb = new PocketBase('http://127.0.0.1:8090')
 
 export function Realtime() {
   const [spacesData, setSpacesData] = useState([])
   const [groupsData, setGroupsData] = useState([])
+  const [channelsData, setChannelsData] = useState([])
   const [threadsData, setThreadsData] = useState([])
   const [messagesData, setMessagesData] = useState([])
 
@@ -33,27 +35,30 @@ export function Realtime() {
     (async () => {
       try {
         // Authenticate as needed
-
+  
         // Fetch all collections independently
         const fetchedSpaces = await pb.collection('spaces').getFullList()
         const fetchedGroups = await pb.collection('groups').getFullList()
+        const fetchedChannels = await pb.collection('channels').getFullList()
         const fetchedThreads = await pb.collection('threads').getFullList()
         const fetchedMessages = await pb.collection('messages').getFullList()
-
+  
         // Set data for all collections
         setSpacesData(fetchedSpaces)
         setGroupsData(fetchedGroups)
+        setChannelsData(fetchedChannels)
         setThreadsData(fetchedThreads)
         setMessagesData(fetchedMessages)
-
+  
         // Subscribe to changes for real-time updates (logic for handling the updates is omitted)
       } catch (error) {
         console.error('Failed to fetch data:', error)
       }
     })()
   }, [])
-
+  
   useEffect(() => {
+    // Subscriptions for spaces
     pb.collection('spaces').subscribe('*', (event) => {
       setSpacesData(prevSpaces => {
         switch (event.action) {
@@ -69,6 +74,7 @@ export function Realtime() {
       })
     })
   
+    // Subscriptions for groups
     pb.collection('groups').subscribe('*', (event) => {
       setGroupsData(prevGroups => {
         switch (event.action) {
@@ -84,6 +90,23 @@ export function Realtime() {
       })
     })
   
+    // Subscriptions for channels
+    pb.collection('channels').subscribe('*', (event) => {
+      setChannelsData(prevChannels => {
+        switch (event.action) {
+          case 'create':
+            return [...prevChannels, event.record]
+          case 'update':
+            return prevChannels.map(channel => channel.id === event.record.id ? event.record : channel)
+          case 'delete':
+            return prevChannels.filter(channel => channel.id !== event.record.id)
+          default:
+            return prevChannels
+        }
+      })
+    })
+  
+    // Subscriptions for threads
     pb.collection('threads').subscribe('*', (event) => {
       setThreadsData(prevThreads => {
         switch (event.action) {
@@ -99,6 +122,7 @@ export function Realtime() {
       })
     })
   
+    // Subscriptions for messages
     pb.collection('messages').subscribe('*', (event) => {
       setMessagesData(prevMessages => {
         switch (event.action) {
@@ -114,26 +138,29 @@ export function Realtime() {
       })
     })
   
-    
   }, [])
-
-  // Assemble nested data structure
+  
+  // Assemble nested data structure including channels
   const nestedSpaces = spacesData.map(space => ({
     ...space,
     groups: groupsData
       .filter(group => group.spaceid === space.id)
       .map(group => ({
         ...group,
-        threads: threadsData
-          .filter(thread => thread.groupid === group.id)
-          .map(thread => ({
-            ...thread,
-            messages: messagesData.filter(message => message.threadid === thread.id),
+        channels: channelsData
+          .filter(channel => channel.groupid === group.id)
+          .map(channel => ({
+            ...channel,
+            threads: threadsData
+              .filter(thread => thread.channelid === channel.id)
+              .map(thread => ({
+                ...thread,
+                messages: messagesData.filter(message => message.threadid === thread.id),
+              })),
           })),
       })),
   }))
 
-  // Render the nested structure
   const renderNestedData = (nestedSpaces) => {
     return nestedSpaces.map(space => (
       <StyledSpace key={space.id}>
@@ -141,26 +168,34 @@ export function Realtime() {
         {space.groups.map(group => (
           <StyledGroup key={group.id}>
             Group: {group.name}
-            {group.threads.map(thread => (
-              <StyledThread key={thread.id}>
-                Thread: {thread.name}
-                {thread.messages.map(message => (
-                  <StyledMessage key={message.id}>
-                    Message: {message.text}
-                    
-                  </StyledMessage>
+            {group.channels?.map(channel => (
+              <StyledChannel key={channel.id}>
+                Channel: {channel.name}
+                {channel.threads.map(thread => (
+                  <StyledThread key={thread.id}>
+                    Thread: {thread.name}
+                    {thread.messages.map(message => (
+                      <StyledMessage key={message.id}>
+                        Message: {message.text}
+                      </StyledMessage>
+                    ))}
+                    <CreateMessage
+                      userId={userId}
+                      threadId={thread.id}
+                      pb={pb}
+                    />
+                  </StyledThread>
                 ))}
-                <CreateMessage
+                <CreateThread
                   userId={userId}
-                  threadId={thread.id}
+                  channelId={channel.id}
                   pb={pb}
                 />
-              </StyledThread>
-              
+              </StyledChannel>
             ))}
-            <CreateThread
-              userId={userId}
+            <CreateChannel
               groupId={group.id}
+              userId={userId}
               pb={pb}
             />
           </StyledGroup>
@@ -193,10 +228,14 @@ const StyledGroup = styled.div`
   margin-left: 2rem;
 `
 
-const StyledThread = styled.div`
+const StyledChannel = styled.div`
   margin-left: 3rem;
 `
 
-const StyledMessage = styled.div`
+const StyledThread = styled.div`
   margin-left: 4rem;
+`
+
+const StyledMessage = styled.div`
+  margin-left: 5rem;
 `
