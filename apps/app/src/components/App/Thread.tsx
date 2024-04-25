@@ -10,7 +10,7 @@ export const Thread = ({ thread, active, onToggle, onReply }) => {
   const [expanded, setExpanded] = useState(active)
 
   const [edit, setEdit] = useState(false)
-  const [editName, setEditName] = useState(thread?.name)
+  const [editName, setEditName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
   const [editDescription, setEditDescription] = useState(thread?.description)
 
   const handleDelete = async () => {

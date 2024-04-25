@@ -20,7 +20,7 @@ export const Channel = () => {
   useEffect(() => {
     const updateHeight = () => {
       if (textBoxRef.current) {
-        const newHeight = window.innerHeight - textBoxRef.current.clientHeight - 26
+        const newHeight = window.innerHeight - textBoxRef.current.clientHeight - 26 - 16
         setTextBoxHeight(newHeight)
       }
     }
@@ -101,70 +101,72 @@ export const Channel = () => {
   }
 
   return (<>
-    <Item
-      text={`${activeSpace?.name} > ${activeGroup?.name} > ${activeChannel?.name}`}
-      absoluteRightChildren
-      onClick={toggleAll}
-    >
-      <Box>
-        <Button
-          icon={'arrow-up'}
-          iconPrefix='fas'
-          compact
-          square
-          minimal
-          onClick={(e) => {
-            e.stopPropagation()
-            scrollToElementById('top', { behavior: 'smooth' })
-          }}
-        />
-        <Button
-          icon={'arrow-down'}
-          iconPrefix='fas'
-          compact
-          square
-          minimal
-          onClick={(e) => {
-            e.stopPropagation()
-            scrollToElementById('bottom', { behavior: 'smooth' })}
-          }
-        />
-        <Button
-          icon={anyExpanded ? 'chevron-up' : 'chevron-down'}
-          iconPrefix='fas'
-          compact
-          square
-          minimal
-        />
-        <Dropdown
-          icon='ellipsis-h'
-          iconPrefix='fas'
-          compact
-          square
-          minimal
-          items={[
-            {
-              icon: 'edit',
-              iconPrefix: 'fas',
-              compact: true,
-              text: 'Edit',
-              onClick: () => {
-
-              }
-            },
-            {
-              icon: 'trash-alt',
-              iconPrefix: 'fas',
-              compact: true,
-              text: 'Delete',
-              onClick: () => {
-
-              }
+    <Box py={.5}>
+      <Item
+        text={`${activeSpace?.name} > ${activeGroup?.name} > ${activeChannel?.name}`}
+        absoluteRightChildren
+        onClick={toggleAll}
+      >
+        <Box>
+          <Button
+            icon={'arrow-up'}
+            iconPrefix='fas'
+            compact
+            square
+            minimal
+            onClick={(e) => {
+              e.stopPropagation()
+              scrollToElementById('top', { behavior: 'smooth' })
+            }}
+          />
+          <Button
+            icon={'arrow-down'}
+            iconPrefix='fas'
+            compact
+            square
+            minimal
+            onClick={(e) => {
+              e.stopPropagation()
+              scrollToElementById('bottom', { behavior: 'smooth' })}
             }
-          ]}
-        />
-      </Box>
-    </Item>
+          />
+          <Button
+            icon={anyExpanded ? 'chevron-up' : 'chevron-down'}
+            iconPrefix='fas'
+            compact
+            square
+            minimal
+          />
+          <Dropdown
+            icon='ellipsis-h'
+            iconPrefix='fas'
+            compact
+            square
+            minimal
+            items={[
+              {
+                icon: 'edit',
+                iconPrefix: 'fas',
+                compact: true,
+                text: 'Edit',
+                onClick: () => {
+
+                }
+              },
+              {
+                icon: 'trash-alt',
+                iconPrefix: 'fas',
+                compact: true,
+                text: 'Delete',
+                onClick: () => {
+
+                }
+              }
+            ]}
+          />
+        </Box>
+      </Item>
+    </Box>
     <S.Content height={textBoxHeight}>
       <div id='top' />
       <Page>
