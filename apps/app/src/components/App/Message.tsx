@@ -2,6 +2,7 @@ import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, RichT
 import { useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { MessagesResponse } from 'redux-tk/pocketbase-types'
+import { speak } from '../../speech/speech'
 import styled from 'styled-components'
 
 const formatDate = (date: string): string => {
@@ -72,12 +73,8 @@ export const Message = ({ message }: Props) => {
     }
   ] as ItemProps[]
   
-  return <ContextMenu
-    dropdownProps={{
-      items: dropdownItems
-    }}
-  >
-    <S.Message onMouseDown={onScrollWheelClick(() => handleDelete())}>
+  return <>
+    <S.Message onMouseDown={onScrollWheelClick(() => handleDelete())} id={`message_${message.id}`}>
       <S.Left>
         <Avatar
           name={message.userid}
@@ -90,17 +87,31 @@ export const Message = ({ message }: Props) => {
           disablePadding
           disableBreak
         >
-          <S.Sender>
-            { formatDate(message.created) }
-          </S.Sender>
-          <Dropdown
-            icon='ellipsis-h'
-            iconPrefix='fas'
-            compact
-            square
-            minimal
-            items={dropdownItems}
-          />
+          <Gap autoWidth>
+            <S.Sender>
+              { formatDate(message.created) }
+            </S.Sender>
+            <Box>
+              <Button
+                icon='play'
+                iconPrefix='fas'
+                compact
+                minimal
+                square
+                onClick={() => {
+                  speak(message.text, `message_${message.id}`, () => {}, )
+                }}
+              />
+              <Dropdown
+                icon='ellipsis-h'
+                iconPrefix='fas'
+                compact
+                square
+                minimal
+                items={dropdownItems}
+              />
+            </Box>
+          </Gap>
         </Item>
         <S.Container>
           {
@@ -136,14 +147,14 @@ export const Message = ({ message }: Props) => {
                   </Gap>
                 </Box>
               : <StyleHTML>
-                  <div dangerouslySetInnerHTML={{ __html: message.text || '' }} />
+                  <div dangerouslySetInnerHTML={{ __html: message.text || '' }} className='message' />
                 </StyleHTML>
           }
           
         </S.Container>
       </S.Right>
     </S.Message>
-  </ContextMenu>
+  </>
 }
 
 const S = {

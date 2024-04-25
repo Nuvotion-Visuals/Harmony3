@@ -12,7 +12,9 @@ import { store } from 'redux-tk/store'
 import {
   BrowserRouter,
   Routes,
-  Route
+  Route,
+  useLocation,
+  useParams
 } from 'react-router-dom'
 
 import Home from './pages/index.page'
@@ -23,6 +25,7 @@ import { App } from './App'
 import { Linker, Ripple } from '@avsync.live/formation'
 import { Link } from 'components/Util/Link'
 import { RouteTracker } from 'components/App/RouteTracker'
+import { useEffect } from 'react'
 
 library.add(
    // regular
@@ -61,6 +64,7 @@ library.add(
    fas.faBold, fas.faItalic, fas.faUnderline, fas.faListOl, fas.faListUl, fas.faLink,
    fas.faImage, fas.faVideo, fas.faCode, fas.faEraser, fas.faFileVideo, fas.faFileCode,
    fas.faTerminal, fas.faQuoteRight, fas.faEllipsisH, fas.faReply, fas.faSave,
+   fas.faDiagramProject
 )
 
 const Main = ({ }) => {
@@ -93,11 +97,11 @@ const init = async () => {
   ReactDOM.createRoot(document.getElementById('root')!).render(<Main />)
 }
 
-document.addEventListener('contextmenu', event => event.preventDefault())
-document.addEventListener('mousedown', event => {
-  if (event.button === 1) {
-    event.preventDefault()
-  }
-})
+// document.addEventListener('contextmenu', event => event.preventDefault())
+// document.addEventListener('mousedown', event => {
+//   if (event.button === 1) {
+//     event.preventDefault()
+//   }
+// })
 
 init()

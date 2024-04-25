@@ -4,6 +4,7 @@ import styled from 'styled-components'
 interface Props {
   children: React.ReactNode
   href: string
+  expandVertical?: boolean
 }
 
 export const Link = ({ children, href }: Props) => {

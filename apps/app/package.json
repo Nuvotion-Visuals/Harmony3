@@ -24,6 +24,7 @@
     "react-router-dom": "6",
     "redux": "^5.0.1",
     "redux-logger": "^3.0.6",
+    "sentence-splitter": "^5.0.0",
     "styled-components": "^6.1.8"
   },
   "devDependencies": {

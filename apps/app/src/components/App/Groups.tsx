@@ -126,12 +126,17 @@ export const Groups = React.memo(() => {
             list: [
               ...expandableList.value.list.map(listItem => ({
               ...listItem,
+              absoluteRightChildren: true,
               children: <Dropdown
                 icon='ellipsis-h'
                 iconPrefix='fas'
                 compact
                 minimal
                 square
+                onClick={(e) => {
+                  e.preventDefault()
+                }
+                }
                 items={[
                   {
                     icon: 'edit',
@@ -153,7 +158,6 @@ export const Groups = React.memo(() => {
                   }
                 ]}
               />
-              
             })),
             {
               children: <CreateChannel
@@ -166,9 +170,11 @@ export const Groups = React.memo(() => {
         }))}
         onExpand={index => setGroupsList(groupsList.map((item, i) => i === index ? ({...item, expanded: !item.expanded}) : item))}
       />
-      <CreateGroup
-        spaceId={activeSpace?.id}
-      />
+      <Box height='var(--F_Input_Height)'>
+        <CreateGroup
+          spaceId={activeSpace?.id}
+        />
+      </Box>
     </>
   )
 })

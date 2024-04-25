@@ -83,6 +83,13 @@ const harmonySlice = createSlice({
     },
     setActiveSpaceId: (state, action: PayloadAction<string | null>) => {
       state.activeSpaceId = action.payload
+      if (action.payload === null) {
+        state.activeSpaceIndex = null
+      } 
+      else {
+        const index = state.spaces.findIndex(space => space.id === action.payload)
+        state.activeSpaceIndex = index !== -1 ? index : 0
+      }
     },
    
     setSpaces: (state, action: PayloadAction<CollectionResponses['spaces'][]>) => {
