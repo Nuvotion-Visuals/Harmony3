@@ -8,7 +8,8 @@ import {
 import { CreateChannel } from 'components/Create/CreateChannel'
 import { CreateGroup } from 'components/Create/CreateGroup'
 import React, { useEffect, useState } from 'react'
-import { useHarmony_activeChannelId, useHarmony_activeGroupId, useHarmony_activeSpace, useHarmony_activeSpaceGroups } from 'redux-tk/harmony/hooks'
+import { useHarmony_activeChannelId, useHarmony_activeSpace, useHarmony_activeSpaceGroups } from 'redux-tk/harmony/hooks'
+import { pb } from 'redux-tk/pocketbase'
 
 type List = {
   id: string
@@ -21,11 +22,10 @@ type List = {
     list: {
       subtitle: string,
       href: string
+      id: string
     }[]
   }
 }
-
-type Lists = List[]
 
 const generateGroupsList = (groups, activeSpaceId, activeChannelId) => {
   return groups.map(group => ({
@@ -39,6 +39,7 @@ const generateGroupsList = (groups, activeSpaceId, activeChannelId) => {
       list: group.channels.map(channel => ({
         subtitle: `${channel.name}`, // Use the real channel name
         active: channel.id === activeChannelId,
+        id: channel.id,
         compact: true,
         href: `/spaces/${activeSpaceId}/groups/${group.id}/channels/${channel.id}`
       }))
@@ -49,7 +50,6 @@ const generateGroupsList = (groups, activeSpaceId, activeChannelId) => {
 export const Groups = React.memo(() => {
   const activeSpace = useHarmony_activeSpace()
   const activeSpaceGroups = useHarmony_activeSpaceGroups()
-  const activeGroupId = useHarmony_activeGroupId()
   const activeChannelId = useHarmony_activeChannelId()
 
   const [groupsList, setGroupsList] = useState<List[]>(() => generateGroupsList(activeSpaceGroups, activeSpace?.id, activeChannelId))
@@ -59,6 +59,26 @@ export const Groups = React.memo(() => {
       setGroupsList(generateGroupsList(activeSpaceGroups, activeSpace.id, activeChannelId))
     }
   }, [activeSpaceGroups, activeSpace?.id, activeChannelId])
+
+  const handleDeleteGroup = async (groupId: string) => {
+    try {
+      await pb.collection('groups').delete(groupId)
+    } 
+    catch (error) {
+      console.error('Failed to delete message:', error)
+      alert('Failed to delete message')
+    }
+  }
+
+  const handleDeleteChannel = async (channelId: string) => {
+    try {
+      await pb.collection('channels').delete(channelId)
+    } 
+    catch (error) {
+      console.error('Failed to delete message:', error)
+      alert('Failed to delete message')
+    }
+  }
 
   return (
     <>
@@ -95,8 +115,8 @@ export const Groups = React.memo(() => {
                         compact: true,
                         text: 'Delete',
                         onClick: () => {
-
-                        }
+                          handleDeleteGroup(expandableList.id)
+                        } 
                       }
                     ]}
                   />
@@ -128,7 +148,7 @@ export const Groups = React.memo(() => {
                     compact: true,
                     text: 'Delete',
                     onClick: () => {
-
+                      handleDeleteChannel(listItem.id)
                     }
                   }
                 ]}

@@ -16,12 +16,11 @@ import {
 } from 'react-router-dom'
 
 import Home from './pages/index.page'
-import About from './pages/about.page'
 
 import './index.css'
 import '@avsync.live/formation/dist/index.dark.css'
 import { App } from './App'
-import { Linker } from '@avsync.live/formation'
+import { Linker, Ripple } from '@avsync.live/formation'
 import { Link } from 'components/Util/Link'
 import { RouteTracker } from 'components/App/RouteTracker'
 
@@ -61,7 +60,7 @@ library.add(
    fas.faRepeat, fas.faCopy, fas.faSync,
    fas.faBold, fas.faItalic, fas.faUnderline, fas.faListOl, fas.faListUl, fas.faLink,
    fas.faImage, fas.faVideo, fas.faCode, fas.faEraser, fas.faFileVideo, fas.faFileCode,
-   fas.faTerminal, fas.faQuoteRight, fas.faEllipsisH, fas.faReply
+   fas.faTerminal, fas.faQuoteRight, fas.faEllipsisH, fas.faReply, fas.faSave,
 )
 
 const Main = ({ }) => {
@@ -70,6 +69,7 @@ const Main = ({ }) => {
         <BrowserRouter>
           <Linker CustomLink={Link}> 
             <App>
+              <Ripple />
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/spaces/:spaceid" element={<RouteTracker />}>
@@ -92,5 +92,12 @@ const Main = ({ }) => {
 const init = async () => {
   ReactDOM.createRoot(document.getElementById('root')!).render(<Main />)
 }
+
+document.addEventListener('contextmenu', event => event.preventDefault())
+document.addEventListener('mousedown', event => {
+  if (event.button === 1) {
+    event.preventDefault()
+  }
+})
 
 init()

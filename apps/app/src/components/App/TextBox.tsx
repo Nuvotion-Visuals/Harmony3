@@ -6,13 +6,14 @@ import { pb } from 'redux-tk/pocketbase'
 
 interface Props {
   onNewThreadId: (threadId: string) => void
+  activeThreadId?: string
 }
 
 export const TextBox = ({
-  onNewThreadId
+  onNewThreadId,
+  activeThreadId
 }: Props) => {
   const [text, setText] = useState('')
-  const activeThreadId = useHarmony_activeThreadId()
   const setActiveThreadId = useHarmony_setActiveThreadId()
   const activeChannelId = useHarmony_activeChannelId()
   const activeThread = useHarmony_activeThread()
@@ -64,8 +65,9 @@ export const TextBox = ({
 
   useEffect(() => {
     if (activeThreadId) {
-      scrollToElementById(`thread_${activeThreadId}`, { behavior: 'smooth', block: 'end' })
-      
+      const id = `thread_${activeThreadId}`
+      if (document.getElementById(id))
+      scrollToElementById(id, { behavior: 'smooth', block: 'end' })
     }
     setAutoFocus(!!activeThreadId)
     setTimeout(() => {
@@ -79,7 +81,7 @@ export const TextBox = ({
         activeThreadId &&
           <Item
             icon='reply'
-            text={`Replying to ${activeThread.name}`}
+            text={`Replying to ${activeThread?.name}`}
             absoluteRightChildren
             onClick={() => scrollToElementById(`thread_${activeThreadId}`, { behavior: 'smooth' })}
             compact

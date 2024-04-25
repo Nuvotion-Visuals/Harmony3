@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useHarmony_activeChannelThreads, useHarmony_activeThreadId, useHarmony_activeChannel, useHarmony_activeGroup, useHarmony_activeSpace, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
 import { Box, Button, Dropdown, Item, Page, scrollToElementById } from '@avsync.live/formation'
 import { TextBox } from './TextBox'
-import { Message } from './Message'
+import { Thread } from './Thread'
 
 export const Channel = () => {
   const activeChannelThreads = useHarmony_activeChannelThreads()
@@ -203,103 +203,26 @@ export const Channel = () => {
             ]}
           />
         </Item>
-        {
-          activeChannelThreads.map((thread, index) => (
-            <S.Thread key={thread.id} active={thread.id === activeThreadId}>
-              <Item
-                headingText={thread.name}
-                onClick={() => toggleThread(index)}
-              >
-                {
-                  thread.id === activeThreadId
-                    ? <Button
-                        icon='times'
-                        iconPrefix='fas'
-                        minimal
-                        compact
-                        square
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setActiveThreadId(null)
-                        }}
-                      />
-                    : <Button
-                        icon='reply'
-                        iconPrefix='fas'
-                        minimal
-                        compact
-                        square
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          console.log('hi')
-                          setActiveThreadId(thread.id)
-                        }}
-                      />
-                }
-                <Dropdown
-                  icon='ellipsis-h'
-                  iconPrefix='fas'
-                  compact
-                  minimal
-                  square
-                  items={[
-                    {
-                      icon: 'edit',
-                      iconPrefix: 'fas',
-                      compact: true,
-                      text: 'Edit',
-                      onClick: (e) => {
-                        e.stopPropagation()
-                      }
-                    },
-                    {
-                      icon: 'trash-alt',
-                      iconPrefix: 'fas',
-                      compact: true,
-                      text: 'Delete',
-                      onClick: (e) => {
-                        e.stopPropagation()
-
-                      }
-                    }
-                  ]}
-                />
-              </Item>
-              <S.Bottom />
-              {
-                expandedStates[index] && <>
-                  {
-                    thread.messages.map(message =>
-                      <Message
-                        message={message}
-                        key={message.id}
-                      />
-                    )
-                  }
-                  {
-                    thread.id !== activeThreadId &&
-                      <Box py={.25} px={.5}>
-                        <Button
-                          expand
-                          text='Reply'
-                          onClick={() => setActiveThreadId(thread.id)}
-                          secondary
-                        />
-                      </Box>
-                  }
-                </>
-              }
-             
-              <div id={`thread_${thread.id}`} />
-            </S.Thread>
-          ))
-        }
+        <>
+          {
+            activeChannelThreads.map((thread, index) => (
+              <Thread
+                key={thread.id}
+                thread={thread}
+                active={thread.id === activeThreadId}
+                onToggle={() => toggleThread(index)}
+                onReply={() => setActiveThreadId(thread.id)}
+              />
+            ))
+          }
+        </>
       </Page>
       <div id='bottom' />
     </S.Content>
     <S.TextBoxContainer ref={textBoxRef}>
       <TextBox 
         onNewThreadId={handleNewThreadId}
+        activeThreadId={activeThreadId}
       />
     </S.TextBoxContainer>
   </>)
