@@ -6,6 +6,15 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import * as far from '@fortawesome/free-regular-svg-icons'
 import * as fas from '@fortawesome/free-solid-svg-icons'
 
+import {
+  BrowserRouter,
+  Routes,
+  Route
+} from 'react-router-dom'
+
+import Home from './pages/index.page'
+import About from './pages/about.page'
+
 import './index.css'
 import '@avsync.live/formation/dist/index.dark.css'
 import { App } from './App'
@@ -46,12 +55,21 @@ library.add(
    fas.faRepeat, fas.faCopy, fas.faSync,
    fas.faBold, fas.faItalic, fas.faUnderline, fas.faListOl, fas.faListUl, fas.faLink,
    fas.faImage, fas.faVideo, fas.faCode, fas.faEraser, fas.faFileVideo, fas.faFileCode,
-   fas.faTerminal, fas.faQuoteRight
+   fas.faTerminal, fas.faQuoteRight, fas.faEllipsisH
 )
 
 const Main = ({ }) => {
   return (
-    <App />
+    <App>
+
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </BrowserRouter>
+    </App>
+
   )
 }
 
