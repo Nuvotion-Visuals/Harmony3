@@ -61,7 +61,7 @@ library.add(
    fas.faRepeat, fas.faCopy, fas.faSync,
    fas.faBold, fas.faItalic, fas.faUnderline, fas.faListOl, fas.faListUl, fas.faLink,
    fas.faImage, fas.faVideo, fas.faCode, fas.faEraser, fas.faFileVideo, fas.faFileCode,
-   fas.faTerminal, fas.faQuoteRight, fas.faEllipsisH
+   fas.faTerminal, fas.faQuoteRight, fas.faEllipsisH, fas.faReply
 )
 
 const Main = ({ }) => {

@@ -33,7 +33,6 @@ const generateGroupsList = (groups, activeSpaceId, activeChannelId) => {
     id: group.id,
     value: {
       item: {
-        compact: true,
         label: group.name, // Using 'name' as the label for the group
         labelColor: 'none' as LabelColor, // Type assertion for 'LabelColor'
       },
@@ -77,21 +76,27 @@ export const Groups = React.memo(() => {
                   <Dropdown
                     icon='ellipsis-h'
                     iconPrefix='fas'
+                    compact
                     minimal
-                    minimalIcon
-                    circle
+                    square
                     items={[
                       {
-                        text: 'Edit',
                         icon: 'edit',
                         iconPrefix: 'fas',
-                        href: `/groups/${i}/edit`
+                        compact: true,
+                        text: 'Edit',
+                        onClick: () => {
+
+                        }
                       },
                       {
-                        text: 'Remove',
                         icon: 'trash-alt',
                         iconPrefix: 'fas',
-                        onClick: () => console.log('Remove group')
+                        compact: true,
+                        text: 'Delete',
+                        onClick: () => {
+
+                        }
                       }
                     ]}
                   />
@@ -101,40 +106,34 @@ export const Groups = React.memo(() => {
             list: [
               ...expandableList.value.list.map(listItem => ({
               ...listItem,
-              children: <div onClick={e => {
-                e.stopPropagation()
-                e.preventDefault()
-              }}>
-                <Box height={1.65}>
-                  <Dropdown
-                    icon={'ellipsis-h'}
-                    iconPrefix='fas'
-                    key={`dropdown_${i}`}
-                    minimal
-                    minimalIcon
-                    items={[
-                      {
-                        text: 'Edit',
-                        icon: 'edit',
-                        iconPrefix: 'fas',
-                        href: `/groups/${i}/channels/edit`
-                      },
-                      {
-                        text: 'Suggest emoji',
-                        icon: 'lightbulb',
-                        iconPrefix: 'fas',
-                        onClick: () => console.log('Suggest emoji')
-                      },
-                      {
-                        text: 'Remove',
-                        icon: 'trash-alt',
-                        iconPrefix: 'fas',
-                        onClick: () => console.log('Remove channel')
-                      }
-                    ]}
-                  />
-                </Box>
-              </div>
+              children: <Dropdown
+                icon='ellipsis-h'
+                iconPrefix='fas'
+                compact
+                minimal
+                square
+                items={[
+                  {
+                    icon: 'edit',
+                    iconPrefix: 'fas',
+                    compact: true,
+                    text: 'Edit',
+                    onClick: () => {
+
+                    }
+                  },
+                  {
+                    icon: 'trash-alt',
+                    iconPrefix: 'fas',
+                    compact: true,
+                    text: 'Delete',
+                    onClick: () => {
+
+                    }
+                  }
+                ]}
+              />
+              
             })),
             {
               children: <CreateChannel

@@ -32,7 +32,7 @@ export function CreateGroup({ spaceId }: CreateGroupProps) {
         value={groupName}
         onChange={val => setGroupName(val)}
         compact
-        secondaryIcon='arrow-right'
+        secondaryIcon={groupName ? 'arrow-right' : undefined}
         iconPrefix='fas'
         secondaryOnClick={handleCreateGroup}
         onEnter={handleCreateGroup}

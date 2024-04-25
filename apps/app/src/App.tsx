@@ -23,26 +23,22 @@ export const App = ({ children }: Props) => {
   }
 
   return (
-    <>
-      <NavSpaces
-        dropdownOptions={[]}
-        disableTablet
-        activeSwipeIndex={0}
-        onSwipe={index => console.log(index)}
-        spaces={[]}
-        activeSpaceIndex={0}
-        onSetActiveSpacesIndex={index => console.log(index)}
-        channels={[]}
-        sidebarWidth='380px'
-        firstPage={<FirstPage />}
-        secondPage={<Channel />}
-        thirdPage={<>{children}</>}
-        navsPrimary={[
-       
-        ]}
-      />
-     
-      {/* <Realtime /> */}
-    </>
+    <NavSpaces
+      dropdownOptions={[]}
+      disableTablet
+      activeSwipeIndex={0}
+      onSwipe={index => console.log(index)}
+      spaces={[]}
+      activeSpaceIndex={0}
+      onSetActiveSpacesIndex={index => console.log(index)}
+      channels={[]}
+      sidebarWidth='380px'
+      firstPage={<FirstPage />}
+      secondPage={<Channel />}
+      thirdPage={<>{children}</>}
+      navsPrimary={[
+      
+      ]}
+    />
   )
 }

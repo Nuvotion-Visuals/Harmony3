@@ -1,6 +1,7 @@
 import { Box, TextInput } from '@avsync.live/formation'
 import React, { useState } from 'react'
-import { useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
+import { useNavigate } from 'react-router-dom'
+import { useHarmony_activeSpaceId, useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
 import { pb } from 'redux-tk/pocketbase'
 
 interface CreatechannelProps {
@@ -9,6 +10,8 @@ interface CreatechannelProps {
 
 export function CreateChannel({ groupId }: CreatechannelProps) {
   const userId = useHarmony_currentUserId()
+  const navigate = useNavigate()
+  const activeSpaceId = useHarmony_activeSpaceId()
   
   const [channelName, setChannelName] = useState('')
   const [channelDescription, setChannelDescription] = useState('')
@@ -18,7 +21,8 @@ export function CreateChannel({ groupId }: CreatechannelProps) {
     setChannelName('')
     const data = { name: channelName, content: channelDescription, userid: userId, groupid: groupId }
     try {
-      await pb.collection('channels').create(data)
+      const response = await pb.collection('channels').create(data)
+      navigate(`/spaces/${activeSpaceId}/groups/${groupId}/channels/${response.id}`)
     } 
     catch (error) {
       console.error('Failed to create channel:', error)
@@ -32,7 +36,7 @@ export function CreateChannel({ groupId }: CreatechannelProps) {
         value={channelName}
         onChange={val => setChannelName(val)}
         compact
-        secondaryIcon='arrow-right'
+        secondaryIcon={channelName ? 'arrow-right' : undefined}
         iconPrefix='fas'
         secondaryOnClick={handleCreatechannel}
         onEnter={handleCreatechannel}

@@ -1,3 +1,27 @@
 :root {
   --F_Background: black !important;
 }
+
+html, body {
+  overflow: hidden;
+}
+
+@font-face {
+  font-family: 'Onest';
+  src: url('/fonts/Onest.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Onest';
+  src: url('/fonts/Onest-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: block;
+}
+
+body, html, * {
+  font-family: 'Onest' !important;
+}
