@@ -5,10 +5,12 @@ import { SpacesSidebar, ItemProps } from '@avsync.live/formation'
 import { Groups } from './Groups'
 import { SpaceCard } from './SpaceCard'
 import { Logo } from './Logo'
-import { useHarmony_spaces } from 'redux-tk/harmony/hooks'
+import { useHarmony_activeSpaceIndex, useHarmony_setActiveSpaceIndex, useHarmony_spaces } from 'redux-tk/harmony/hooks'
 import { Link } from 'components/Util/Link'
 
 const SpacesSidebarComponent = () => {
+  const activeSpaceIndex = useHarmony_activeSpaceIndex()
+  const setActiveSpaceIndex = useHarmony_setActiveSpaceIndex()
 
   const spacesInfo = useHarmony_spaces()
 
@@ -27,8 +29,8 @@ const SpacesSidebarComponent = () => {
 
   return (
     <SpacesSidebar
-      activeSpaceIndex={0}
-      onClickIndex={() => {}}
+      activeSpaceIndex={activeSpaceIndex}
+      onClickIndex={(index) => setActiveSpaceIndex(index)}
       spaces={spaces}
     >
       <Link href={'/'}>
@@ -47,8 +49,8 @@ export const SpaceSidebar = React.memo(({ }: Props) => {
     <SpacesSidebarComponent />
     <S.SidebarContainer>
       <SpaceCard
-        previewSrc="https://api.avsync.live/uploads/medium_jive_djs_d7e9e4490a.jpg"
-        name="Jive DJs"
+        previewSrc='https://api.avsync.live/uploads/medium_jive_djs_d7e9e4490a.jpg'
+        name='Jive DJs'
         groupsCount={5}
         channelsCount={15}
         threadsCount={30}
@@ -63,7 +65,9 @@ const S = {
   GroupsSidebar: styled.div`
     display: flex;
     height: 100%;
+    width: 100%;
     align-items: flex-start;
+    border-right: 1px solid var(--F_Surface);
   `,
   SidebarContainer: styled.div`
     height: calc(calc(100vh - calc(1 * var(--F_Header_Height))) - .25rem);

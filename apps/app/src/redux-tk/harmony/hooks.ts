@@ -2,13 +2,46 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useCallback } from 'react'
 import { harmonyActions } from './slice'
 import * as selectors from './selectors'
+import { CollectionResponses } from 'redux-tk/pocketbase-types'
 
-export const useHarmony_activeSpaceId = () => useSelector(selectors.selectActiveSpaceId)
-export const useHarmony_activeGroupId = () => useSelector(selectors.selectActiveGroupId)
-export const useHarmony_activeThreadId = () => useSelector(selectors.selectActiveThreadId)
-export const useHarmony_activeMessageId = () => useSelector(selectors.selectActiveMessageId)
-export const useHarmony_spaces = () => useSelector(selectors.selectSpaces)
+export const useHarmony_activeSpaceId = (): string | null => 
+  useSelector(selectors.selectActiveSpaceId)
 
+export const useHarmony_activeGroupId = (): string | null => 
+  useSelector(selectors.selectActiveGroupId)
+
+export const useHarmony_activeThreadId = (): string | null => 
+  useSelector(selectors.selectActiveThreadId)
+
+export const useHarmony_activeMessageId = (): string | null => 
+  useSelector(selectors.selectActiveMessageId)
+
+export const useHarmony_spaces = (): CollectionResponses['spaces'][] => 
+  useSelector(selectors.selectSpaces)
+
+export const useHarmony_activeSpace = (): CollectionResponses['spaces'] | undefined => 
+  useSelector(selectors.selectActiveSpace)
+
+export const useHarmony_activeGroup = (): CollectionResponses['groups'] | undefined => 
+  useSelector(selectors.selectActiveGroup)
+
+export const useHarmony_activeThread = (): CollectionResponses['threads'] | undefined => 
+  useSelector(selectors.selectActiveThread)
+
+export const useHarmony_activeMessage = (): CollectionResponses['messages'] | undefined => 
+  useSelector(selectors.selectActiveMessage)
+
+export const useHarmony_activeSpaceIndex = (): number | null => 
+  useSelector(selectors.selectActiveSpaceIndex)
+
+export const useHarmony_activeSpaceGroups = (): CollectionResponses['groups'][] => {
+  return useSelector(selectors.selectActiveSpaceGroups)
+}
+
+export const useHarmony_setActiveSpaceIndex = () => {
+  const dispatch = useDispatch()
+  return useCallback((index: number | null) => dispatch(harmonyActions.setActiveSpaceIndex(index)), [dispatch])
+}
 export const useHarmony_setActiveSpaceId = () => {
   const dispatch = useDispatch()
   return useCallback((payload: string | null) => dispatch(harmonyActions.setActiveSpaceId(payload)), [dispatch])

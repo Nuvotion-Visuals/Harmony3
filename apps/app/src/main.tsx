@@ -23,6 +23,7 @@ import '@avsync.live/formation/dist/index.dark.css'
 import { App } from './App'
 import { Linker } from '@avsync.live/formation'
 import { Link } from 'components/Util/Link'
+import { RouteTracker } from 'components/App/RouteTracker'
 
 library.add(
    // regular
@@ -72,6 +73,7 @@ const Main = ({ }) => {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/spaces/:spaceid" element={<RouteTracker />} />
               </Routes>
             </App>
           </Linker>

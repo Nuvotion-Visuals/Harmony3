@@ -13,6 +13,7 @@ interface HarmonyState {
   activeGroupId: string | null
   activeThreadId: string | null
   activeMessageId: string | null
+  activeSpaceIndex: number | null
 }
 
 const INITIAL_STATE: HarmonyState = {
@@ -23,7 +24,8 @@ const INITIAL_STATE: HarmonyState = {
   activeSpaceId: null,
   activeGroupId: null,
   activeThreadId: null,
-  activeMessageId: null
+  activeMessageId: null,
+  activeSpaceIndex: null
 }
 
 export const fetchSpacesAsync = createAsyncThunk(
@@ -62,6 +64,9 @@ const harmonySlice = createSlice({
   name: 'harmony',
   initialState: INITIAL_STATE,
   reducers: {
+    setActiveSpaceIndex: (state, action: PayloadAction<number | null>) => {
+      state.activeSpaceIndex = action.payload
+    },
     setActiveSpaceId: (state, action: PayloadAction<string | null>) => {
       state.activeSpaceId = action.payload
     },

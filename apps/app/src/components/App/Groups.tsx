@@ -5,7 +5,8 @@ import {
   Dropdown,
   LabelColor,
 } from '@avsync.live/formation'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useHarmony_activeSpaceGroups } from 'redux-tk/harmony/hooks'
 
 type List = {
   expanded: boolean,
@@ -23,52 +24,35 @@ type List = {
 
 type Lists = List[]
 
-export const Groups = React.memo(() => {
-  const [value, set_value] = useState<Lists>([
-    {
-      expanded: true,
-      value: {
-        item: {
-          label: 'Group 1',
-          labelColor: 'none',
-        },
-        list: [
-          {
-            subtitle: 'Channel 1',
-            href: '/group1/channel1'
-          },
-          {
-            subtitle: 'Channel 2',
-            href: '/group1/channel2'
-          }
-        ],
+const generateGroupsList = (groups) => {
+  return groups.map(group => ({
+    expanded: true,
+    value: {
+      item: {
+        label: group.name, // Assuming 'name' is the label for the group
+        labelColor: 'none' as LabelColor,
       },
-    },
-    {
-      expanded: false,
-      value: {
-        item: {
-          label: 'Group 2',
-          labelColor: 'none',
-        },
-        list: [
-          {
-            subtitle: 'Channel 1',
-            href: '/group2/channel1'
-          },
-          {
-            subtitle: 'Channel 2',
-            href: '/group2/channel2'
-          }
-        ],
-      },
+      list: [
+        { subtitle: 'Channel 1', href: `/group/${group.id}/channel1` },
+        { subtitle: 'Channel 2', href: `/group/${group.id}/channel2` }
+      ]
     }
-  ])
+  }))
+}
+
+export const Groups = React.memo(() => {
+  const activeSpaceGroups = useHarmony_activeSpaceGroups()
+
+  const [groupsList, setGroupsList] = useState<List[]>(() => generateGroupsList(activeSpaceGroups))
+
+  useEffect(() => {
+    setGroupsList(generateGroupsList(activeSpaceGroups))
+  }, [activeSpaceGroups])
 
   return (
     <>
       <ExpandableLists
-        value={value.map((expandableList, i) => ({
+        value={groupsList.map((expandableList, i) => ({
           reorderId: `list_${i}`,
           ...expandableList,
           value: {
@@ -141,8 +125,9 @@ export const Groups = React.memo(() => {
             }))
           }
         }))}
-        onExpand={index => set_value(value.map((item, i) => i === index ? ({...item, expanded: !item.expanded}) : item))}
+        onExpand={index => setGroupsList(groupsList.map((item, i) => i === index ? ({...item, expanded: !item.expanded}) : item))}
       />
+     
     </>
   )
 })

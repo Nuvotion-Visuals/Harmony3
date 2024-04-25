@@ -29,6 +29,7 @@ const createWindow = () => {
       backgroundThrottling: false
     },
     autoHideMenuBar: true,
+    fullscreen: false,
   })
 
   mainWindow.loadFile('index.html')
