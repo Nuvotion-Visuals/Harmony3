@@ -6,6 +6,9 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import * as far from '@fortawesome/free-regular-svg-icons'
 import * as fas from '@fortawesome/free-solid-svg-icons'
 
+import { Provider } from 'react-redux'
+import { store } from 'redux-tk/store'
+
 import {
   BrowserRouter,
   Routes,
@@ -60,16 +63,16 @@ library.add(
 
 const Main = ({ }) => {
   return (
-    <App>
-
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-      </Routes>
-    </BrowserRouter>
-    </App>
-
+    <Provider store={store}>
+      <App>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+          </Routes>
+        </BrowserRouter>
+      </App>
+    </Provider>
   )
 }
 
