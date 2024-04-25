@@ -105,7 +105,7 @@ export const Message = ({ message }: Props) => {
         <S.Container>
           {
             edit
-              ? <Box>
+              ? <Box mt={.5}>
                   <Gap disableWrap>
                     <RichTextEditor
                       outline
@@ -120,12 +120,14 @@ export const Message = ({ message }: Props) => {
                           icon='save'
                           iconPrefix='fas'
                           square
+                          compact
                           onClick={() => handleUpdate()}
                         />
                         <Button
                           icon='times'
                           iconPrefix='fas'
                           square
+                          compact
                           minimal
                           onClick={() => setEdit(false)}
                         />

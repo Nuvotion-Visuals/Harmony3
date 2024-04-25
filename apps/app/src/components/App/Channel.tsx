@@ -4,6 +4,7 @@ import { useHarmony_activeChannelThreads, useHarmony_activeThreadId, useHarmony_
 import { Box, Button, Dropdown, Item, Page, scrollToElementById } from '@avsync.live/formation'
 import { TextBox } from './TextBox'
 import { Thread } from './Thread'
+import { ChannelHeader } from './ChannelHeader'
 
 export const Channel = () => {
   const activeChannelThreads = useHarmony_activeChannelThreads()
@@ -46,20 +47,17 @@ export const Channel = () => {
   const [newThreadId, setNewThreadId] = useState(null)
 
   useEffect(() => {
-    // Map existing states to new threads array
     setExpandedStates(current => {
       const newState = activeChannelThreads.map(thread => {
         const index = current.findIndex((_, i) => activeChannelThreads[i]?.id === thread.id)
-        // Preserve existing states where possible
         return index !== -1 ? current[index] : false
       })
-      // Automatically expand the new thread if its ID is set
       if (newThreadId) {
         const newIndex = activeChannelThreads.findIndex(thread => thread.id === newThreadId)
         if (newIndex !== -1) {
           newState[newIndex] = true
         }
-        setNewThreadId(null)  // Reset newThreadId after handling it
+        setNewThreadId(null)
       }
       return newState
     })
@@ -98,7 +96,6 @@ export const Channel = () => {
     }
   }, [activeThreadId, activeChannelThreads])
 
-  // Handler for when a new thread ID is passed
   const handleNewThreadId = newThreadId => {
     setNewThreadId(newThreadId)
   }
@@ -171,51 +168,20 @@ export const Channel = () => {
     <S.Content height={textBoxHeight}>
       <div id='top' />
       <Page>
-        <Item
-          pageTitle={activeChannel?.name}
-          absoluteRightChildren
-        >
-          <Dropdown
-            icon='ellipsis-h'
-            iconPrefix='fas'
-            compact
-            square
-            minimal
-            items={[
-              {
-                icon: 'edit',
-                iconPrefix: 'fas',
-                compact: true,
-                text: 'Edit',
-                onClick: () => {
-
-                }
-              },
-              {
-                icon: 'trash-alt',
-                iconPrefix: 'fas',
-                compact: true,
-                text: 'Delete',
-                onClick: () => {
-
-                }
-              }
-            ]}
-          />
-        </Item>
-        <>
-          {
-            activeChannelThreads.map((thread, index) => (
-              <Thread
-                key={thread.id}
-                thread={thread}
-                active={thread.id === activeThreadId}
-                onToggle={() => toggleThread(index)}
-                onReply={() => setActiveThreadId(thread.id)}
-              />
-            ))
-          }
-        </>
+        <ChannelHeader
+          channel={activeChannel}
+        />
+        {
+          activeChannelThreads.map((thread, index) => (
+            <Thread
+              key={thread.id}
+              thread={thread}
+              active={thread.id === activeThreadId}
+              onToggle={() => toggleThread(index)}
+              onReply={() => setActiveThreadId(thread.id)}
+            />
+          ))
+        }
       </Page>
       <div id='bottom' />
     </S.Content>

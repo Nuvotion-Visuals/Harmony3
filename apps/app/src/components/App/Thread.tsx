@@ -97,12 +97,14 @@ export const Thread = ({ thread, active, onToggle, onReply }) => {
                     autoFocus
                     placeholder='Name'
                     onEnter={handleUpdate}
+                    compact
                   />
                   <TextInput
                     value={editDescription}
                     onChange={val => setEditDescription(val)}
                     placeholder='Description'
                     onEnter={handleUpdate}
+                    compact
                   />
                 </Gap>
                 <Box width='var(--F_Input_Height)' wrap>
@@ -112,6 +114,7 @@ export const Thread = ({ thread, active, onToggle, onReply }) => {
                       iconPrefix='fas'
                       square
                       onClick={() => handleUpdate()}
+                      compact
                     />
                     <Button
                       icon='times'
@@ -119,6 +122,7 @@ export const Thread = ({ thread, active, onToggle, onReply }) => {
                       square
                       minimal
                       onClick={() => setEdit(false)}
+                      compact
                     />
                   </Gap>
                 </Box>
@@ -130,7 +134,8 @@ export const Thread = ({ thread, active, onToggle, onReply }) => {
               }}
             >
               <Item
-                headingText={thread.name}
+                headingText={thread?.name}
+                subtitle={thread?.description}
                 onClick={toggleExpanded}
                 onMouseDown={onScrollWheelClick(() => handleDelete())}
               >
@@ -172,18 +177,22 @@ export const Thread = ({ thread, active, onToggle, onReply }) => {
           }
       
       <S.Bottom />
-      {expanded && (
+      {
+      expanded && 
         <>
-          {thread.messages.map(message => (
-            <Message message={message} key={message.id} />
-          ))}
-          {!active && (
-            <Box py={0.25} px={0.5}>
-              <Button expand text="Reply" onClick={handleReply} secondary />
-            </Box>
-          )}
+          {
+            thread.messages.map(message => (
+              <Message message={message} key={message.id} />
+            ))
+          }
+          {
+            !active && 
+              <Box py={0.25} px={0.5}>
+                <Button expand text='Reply' onClick={handleReply} secondary />
+              </Box>
+          }
         </>
-      )}
+      }
       <div id={`thread_${thread.id}`} />
     </S.Container>
   )
