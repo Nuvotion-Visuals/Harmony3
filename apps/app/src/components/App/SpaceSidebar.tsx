@@ -5,7 +5,7 @@ import { SpacesSidebar, ItemProps } from '@avsync.live/formation'
 import { Groups } from './Groups'
 import { SpaceCard } from './SpaceCard'
 import { Logo } from './Logo'
-import { useHarmony_activeSpaceIndex, useHarmony_setActiveSpaceIndex, useHarmony_spaces } from 'redux-tk/harmony/hooks'
+import { useHarmony_activeSpace, useHarmony_activeSpaceIndex, useHarmony_setActiveSpaceIndex, useHarmony_spaces } from 'redux-tk/harmony/hooks'
 import { Link } from 'components/Util/Link'
 
 const SpacesSidebarComponent = () => {
@@ -45,12 +45,13 @@ interface Props {
 }
 
 export const SpaceSidebar = React.memo(({ }: Props) => {
+  const activeSpace = useHarmony_activeSpace()
   return (<S.GroupsSidebar>
     <SpacesSidebarComponent />
     <S.SidebarContainer>
       <SpaceCard
         previewSrc='https://api.avsync.live/uploads/medium_jive_djs_d7e9e4490a.jpg'
-        name='Jive DJs'
+        name={activeSpace?.name}
         groupsCount={5}
         channelsCount={15}
         threadsCount={30}

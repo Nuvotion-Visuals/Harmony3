@@ -2,13 +2,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useCallback } from 'react'
 import { harmonyActions } from './slice'
 import * as selectors from './selectors'
-import { CollectionResponses } from 'redux-tk/pocketbase-types'
+import { CollectionResponses, UsersResponse } from 'redux-tk/pocketbase-types'
 
 export const useHarmony_activeSpaceId = (): string | null => 
   useSelector(selectors.selectActiveSpaceId)
 
 export const useHarmony_activeGroupId = (): string | null => 
   useSelector(selectors.selectActiveGroupId)
+
+export const useHarmony_activeChannelId = (): string | null => 
+  useSelector(selectors.selectActiveChannelId)
 
 export const useHarmony_activeThreadId = (): string | null => 
   useSelector(selectors.selectActiveThreadId)
@@ -37,9 +40,19 @@ export const useHarmony_activeMessage = (): CollectionResponses['messages'] | un
 export const useHarmony_activeSpaceIndex = (): number | null => 
   useSelector(selectors.selectActiveSpaceIndex)
 
+export const useHarmony_currentUser = (): UsersResponse | null => 
+  useSelector(selectors.selectCurrentUser)
+
 export const useHarmony_activeSpaceGroups = (): CollectionResponses['groups'][] => {
   return useSelector(selectors.selectActiveSpaceGroups)
 }
+
+export const useHarmony_activeChannelThreads = (): (CollectionResponses['threads'] & { messages: CollectionResponses['messages'][] })[] => {
+  return useSelector(selectors.selectActiveChannelThreads)
+}
+
+export const useHarmony_currentUserId = (): string | null => 
+  useSelector(selectors.selectCurrentUserId)
 
 export const useHarmony_setActiveSpaceIndex = () => {
   const dispatch = useDispatch()
@@ -64,4 +77,8 @@ export const useHarmony_setActiveThreadId = () => {
 export const useHarmony_setActiveMessageId = () => {
   const dispatch = useDispatch()
   return useCallback((payload: string | null) => dispatch(harmonyActions.setActiveMessageId(payload)), [dispatch])
+}
+export const useHarmony_setCurrentUser = () => {
+  const dispatch = useDispatch()
+  return useCallback((payload: UsersResponse | null) => dispatch(harmonyActions.setCurrentUser(payload)), [dispatch])
 }

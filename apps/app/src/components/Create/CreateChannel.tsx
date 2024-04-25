@@ -1,42 +1,60 @@
+import { Box, TextInput } from '@avsync.live/formation'
 import React, { useState } from 'react'
+import { useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
+import { pb } from 'redux-tk/pocketbase'
 
 interface CreatechannelProps {
-  userId: string | null
   groupId: string | null
-  pb: any
 }
 
-export function CreateChannel({ userId, groupId, pb }: CreatechannelProps) {
-  const [channelName, setchannelName] = useState('')
+export function CreateChannel({ groupId }: CreatechannelProps) {
+  const userId = useHarmony_currentUserId()
+  
+  const [channelName, setChannelName] = useState('')
   const [channelDescription, setChannelDescription] = useState('')
 
   async function handleCreatechannel() {
     if (!userId || !groupId) return
+    setChannelName('')
     const data = { name: channelName, content: channelDescription, userid: userId, groupid: groupId }
     try {
-      const channel = await pb.collection('channels').create(data)
-    } catch (error) {
+      await pb.collection('channels').create(data)
+    } 
+    catch (error) {
       console.error('Failed to create channel:', error)
       alert('Error creating channel. Check console for details.')
     }
   }
 
   return (
-    <div>
-      <input
-        type="text"
+    <Box width='100%'>
+      <TextInput
         value={channelName}
-        onChange={e => setchannelName(e.target.value)}
-        placeholder="channel Name"
-        disabled={!groupId}
+        onChange={val => setChannelName(val)}
+        compact
+        secondaryIcon='arrow-right'
+        iconPrefix='fas'
+        secondaryOnClick={handleCreatechannel}
+        onEnter={handleCreatechannel}
+        placeholder='Add channel'
+        hideOutline
       />
-      <textarea
-        value={channelDescription}
-        onChange={e => setChannelDescription(e.target.value)}
-        placeholder="Channel Description"
-        disabled={!groupId}
-      />
-      <button onClick={handleCreatechannel} disabled={!groupId}>Create channel</button>
-    </div>
+    </Box>
+    // <div>
+    //   <input
+    //     type="text"
+    //     value={channelName}
+    //     onChange={e => setChannelName(e.target.value)}
+    //     placeholder="channel Name"
+    //     disabled={!groupId}
+    //   />
+    //   <textarea
+    //     value={channelDescription}
+    //     onChange={e => setChannelDescription(e.target.value)}
+    //     placeholder="Channel Description"
+    //     disabled={!groupId}
+    //   />
+    //   <button onClick={} disabled={!groupId}>Create channel</button>
+    // </div>
   )
 }

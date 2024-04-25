@@ -1,6 +1,6 @@
 // harmonySlice.ts
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { CollectionRecords, CollectionResponses } from '../pocketbase-types'
+import { CollectionRecords, CollectionResponses, UsersResponse } from '../pocketbase-types'
 import { pb } from 'redux-tk/pocketbase'
 import { RecordModel } from 'pocketbase'
 
@@ -16,6 +16,7 @@ interface HarmonyState {
   activeThreadId: string | null
   activeChannelId: string | null
   activeMessageId: string | null
+  currentUser: UsersResponse | null
 }
 
 const INITIAL_STATE: HarmonyState = {
@@ -29,7 +30,8 @@ const INITIAL_STATE: HarmonyState = {
   activeChannelId: null,
   activeThreadId: null,
   activeMessageId: null,
-  activeSpaceIndex: null
+  activeSpaceIndex: null,
+  currentUser: null,
 }
 
 export const fetchSpacesAsync = createAsyncThunk(
@@ -174,6 +176,10 @@ const harmonySlice = createSlice({
     deleteMessage: (state, action: PayloadAction<string>) => {
       state.messages = state.messages.filter(message => message.id !== action.payload)
     },
+
+    setCurrentUser: (state, action: PayloadAction<UsersResponse | null>) => {
+      state.currentUser = action.payload
+    }
   },
   extraReducers: (builder) => {
     builder

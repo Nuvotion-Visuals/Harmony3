@@ -5,10 +5,13 @@ import {
   Dropdown,
   LabelColor,
 } from '@avsync.live/formation'
+import { CreateChannel } from 'components/Create/CreateChannel'
+import { CreateGroup } from 'components/Create/CreateGroup'
 import React, { useEffect, useState } from 'react'
-import { useHarmony_activeSpaceGroups } from 'redux-tk/harmony/hooks'
+import { useHarmony_activeChannelId, useHarmony_activeGroupId, useHarmony_activeSpace, useHarmony_activeSpaceGroups } from 'redux-tk/harmony/hooks'
 
 type List = {
+  id: string
   expanded: boolean,
   value: {
     item: {
@@ -24,30 +27,39 @@ type List = {
 
 type Lists = List[]
 
-const generateGroupsList = (groups) => {
+const generateGroupsList = (groups, activeSpaceId, activeChannelId) => {
   return groups.map(group => ({
     expanded: true,
+    id: group.id,
     value: {
       item: {
-        label: group.name, // Assuming 'name' is the label for the group
-        labelColor: 'none' as LabelColor,
+        compact: true,
+        label: group.name, // Using 'name' as the label for the group
+        labelColor: 'none' as LabelColor, // Type assertion for 'LabelColor'
       },
-      list: [
-        { subtitle: 'Channel 1', href: `/group/${group.id}/channel1` },
-        { subtitle: 'Channel 2', href: `/group/${group.id}/channel2` }
-      ]
+      list: group.channels.map(channel => ({
+        subtitle: `${channel.name}`, // Use the real channel name
+        active: channel.id === activeChannelId,
+        compact: true,
+        href: `/spaces/${activeSpaceId}/groups/${group.id}/channels/${channel.id}`
+      }))
     }
   }))
 }
 
 export const Groups = React.memo(() => {
+  const activeSpace = useHarmony_activeSpace()
   const activeSpaceGroups = useHarmony_activeSpaceGroups()
+  const activeGroupId = useHarmony_activeGroupId()
+  const activeChannelId = useHarmony_activeChannelId()
 
-  const [groupsList, setGroupsList] = useState<List[]>(() => generateGroupsList(activeSpaceGroups))
+  const [groupsList, setGroupsList] = useState<List[]>(() => generateGroupsList(activeSpaceGroups, activeSpace?.id, activeChannelId))
 
   useEffect(() => {
-    setGroupsList(generateGroupsList(activeSpaceGroups))
-  }, [activeSpaceGroups])
+    if (activeSpace?.id) {
+      setGroupsList(generateGroupsList(activeSpaceGroups, activeSpace.id, activeChannelId))
+    }
+  }, [activeSpaceGroups, activeSpace?.id, activeChannelId])
 
   return (
     <>
@@ -86,7 +98,8 @@ export const Groups = React.memo(() => {
                 </Box>
               </div>
             },
-            list: expandableList.value.list.map(listItem => ({
+            list: [
+              ...expandableList.value.list.map(listItem => ({
               ...listItem,
               children: <div onClick={e => {
                 e.stopPropagation()
@@ -122,12 +135,21 @@ export const Groups = React.memo(() => {
                   />
                 </Box>
               </div>
-            }))
+            })),
+            {
+              children: <CreateChannel
+                groupId={expandableList.id}
+              />,
+              disablePadding: true
+            }
+          ]
           }
         }))}
         onExpand={index => setGroupsList(groupsList.map((item, i) => i === index ? ({...item, expanded: !item.expanded}) : item))}
       />
-     
+      <CreateGroup
+        spaceId={activeSpace?.id}
+      />
     </>
   )
 })

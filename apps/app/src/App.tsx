@@ -1,12 +1,22 @@
 import { NavSpaces } from '@avsync.live/formation'
-import { Realtime } from './components/Realtime'
 import { SpaceSidebar } from './components/App/SpaceSidebar'
+import { Channel } from 'components/App/Channel'
+import { useHarmony_setCurrentUser } from 'redux-tk/harmony/hooks'
+import { useEffect } from 'react'
+import { pb } from 'redux-tk/pocketbase'
+import { UsersResponse } from 'redux-tk/pocketbase-types'
 
 interface Props {
   children: React.ReactNode
 }
 
 export const App = ({ children }: Props) => {
+
+  const setCurrentUser = useHarmony_setCurrentUser()
+
+  useEffect(() => {
+    setCurrentUser(pb.authStore.model as UsersResponse | null)
+  }, [])
 
   const FirstPage = () => {
     return <SpaceSidebar />
@@ -25,7 +35,7 @@ export const App = ({ children }: Props) => {
         channels={[]}
         sidebarWidth='380px'
         firstPage={<FirstPage />}
-        secondPage={<><Realtime /></>}
+        secondPage={<Channel />}
         thirdPage={<>{children}</>}
         navsPrimary={[
        

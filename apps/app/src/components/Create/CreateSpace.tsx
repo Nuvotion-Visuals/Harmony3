@@ -1,21 +1,27 @@
-import { Gap } from '@avsync.live/formation'
+import { Gap, TextInput, Button } from '@avsync.live/formation'
 import React, { useState } from 'react'
+import { useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
+import { pb } from 'redux-tk/pocketbase'
 
 interface CreateSpaceProps {
-  userId: string | null
-  pb: any
+  // empty props for now
 }
 
-export function CreateSpace({ userId, pb }: CreateSpaceProps) {
+export function CreateSpace({}: CreateSpaceProps) {
+  const userId = useHarmony_currentUserId()
   const [spaceName, setSpaceName] = useState('')
   const [spaceDescription, setSpaceDescription] = useState('')
 
   async function handleCreateSpace() {
     if (!userId) return
+    setSpaceName('')
+    setSpaceDescription('')
     const data = { name: spaceName, description: spaceDescription, userid: userId }
     try {
-      const space = await pb.collection('spaces').create(data)
-    } catch (error) {
+      await pb.collection('spaces').create(data)
+      
+    } 
+    catch (error) {
       console.error('Failed to create space:', error)
       alert('Error creating space. Check console for details.')
     }
@@ -23,18 +29,16 @@ export function CreateSpace({ userId, pb }: CreateSpaceProps) {
 
   return (
     <Gap>
-      <input
-        type="text"
+      <TextInput
         value={spaceName}
-        onChange={e => setSpaceName(e.target.value)}
+        onChange={val => setSpaceName(val)}
+        compact
         placeholder="Space Name"
+        secondaryIcon='arrow-right'
+        secondaryOnClick={handleCreateSpace}
+        onEnter={handleCreateSpace}
+        hideOutline
       />
-      <textarea
-        value={spaceDescription}
-        onChange={e => setSpaceDescription(e.target.value)}
-        placeholder="Space Description"
-      />
-      <button onClick={handleCreateSpace} disabled={!userId}>Create Space</button>
     </Gap>
   )
 }

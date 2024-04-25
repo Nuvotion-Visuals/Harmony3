@@ -1,42 +1,53 @@
+import { Box, TextInput } from '@avsync.live/formation'
 import React, { useState } from 'react'
+import { useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
+import { pb } from 'redux-tk/pocketbase'
 
 interface CreateThreadProps {
-  userId: string | null
   channelId: string | null
-  pb: any
 }
 
-export function CreateThread({ userId, channelId, pb }: CreateThreadProps) {
-  const [threadName, setthreadName] = useState('')
-  const [threadDescription, setthreadDescription] = useState('')
+export function CreateThread({ channelId }: CreateThreadProps) {
+  const userId = useHarmony_currentUserId()
+  const [threadName, setThreadName] = useState('')
+  const [threadDescription, setThreadDescription] = useState('')
 
   async function handleCreateThread() {
     if (!userId || !channelId) return
+    setThreadName('')
     const data = { name: threadName, content: threadDescription, userid: userId, channelid: channelId }
     try {
-      const thread = await pb.collection('threads').create(data)
-    } catch (error) {
+      await pb.collection('threads').create(data)
+      setThreadDescription('')
+    } 
+    catch (error) {
       console.error('Failed to create thread:', error)
       alert('Error creating thread. Check console for details.')
     }
   }
 
   return (
-    <div>
-      <input
-        type="text"
+    <Box width='100%'>
+      <TextInput
         value={threadName}
-        onChange={e => setthreadName(e.target.value)}
-        placeholder="Thread Name"
+        onChange={val => setThreadName(val)}
+        compact
+        secondaryIcon='arrow-right'
+        iconPrefix='fas'
+        secondaryOnClick={handleCreateThread}
+        placeholder='Thread Name'
+        hideOutline
         disabled={!channelId}
+        onEnter={handleCreateThread}
       />
+      {/* Temporarily commented out as per your previous example
       <textarea
         value={threadDescription}
-        onChange={e => setthreadDescription(e.target.value)}
+        onChange={e => setThreadDescription(e.target.value)}
         placeholder="Thread Description"
         disabled={!channelId}
       />
-      <button onClick={handleCreateThread} disabled={!channelId}>Create Thread</button>
-    </div>
+      */}
+    </Box>
   )
 }

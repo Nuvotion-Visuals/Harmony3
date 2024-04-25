@@ -72,8 +72,15 @@ const Main = ({ }) => {
             <App>
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/spaces/:spaceid" element={<RouteTracker />} />
+                <Route path="/spaces/:spaceid" element={<RouteTracker />}>
+                  <Route path="groups/:groupid" element={<RouteTracker />}>
+                    <Route path="channels/:channelid" element={<RouteTracker />}>
+                      <Route path="threads/:threadid" element={<RouteTracker />}>
+                        <Route path="messages/:messageid" element={<RouteTracker />} />
+                      </Route>
+                    </Route>
+                  </Route>
+                </Route>
               </Routes>
             </App>
           </Linker>

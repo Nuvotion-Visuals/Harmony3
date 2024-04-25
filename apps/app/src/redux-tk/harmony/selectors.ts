@@ -1,14 +1,31 @@
-import { CollectionResponses } from 'redux-tk/pocketbase-types'
+import { CollectionResponses, UsersResponse } from 'redux-tk/pocketbase-types'
 
 import { State } from '../store'
 export const selectActiveSpaceId = (state: State): string | null => state.harmony.activeSpaceId
 export const selectActiveGroupId = (state: State): string | null => state.harmony.activeGroupId
+export const selectActiveChannelId = (state: State): string | null => state.harmony.activeChannelId
 export const selectActiveThreadId = (state: State): string | null => state.harmony.activeThreadId
 export const selectActiveMessageId = (state: State): string | null => state.harmony.activeMessageId
 export const selectActiveSpaceIndex = (state: State): number | null => state.harmony.activeSpaceIndex
-export const selectActiveSpaceGroups = (state: State): CollectionResponses['groups'][] => {
+export const selectCurrentUser = (state: State): UsersResponse | null => state.harmony.currentUser
+export const selectCurrentUserId = (state: State): string | null => state.harmony.currentUser?.id || null
+
+export const selectActiveSpaceGroups = (state: State): (CollectionResponses['groups'] & { channels: CollectionResponses['channels'][] })[] => {
   const activeSpaceId = state.harmony.activeSpaceId
-  return state.harmony.groups.filter(group => group.spaceid === activeSpaceId)
+  const groups = state.harmony.groups.filter(group => group.spaceid === activeSpaceId)
+  return groups.map(group => ({
+    ...group,
+    channels: state.harmony.channels.filter(channel => channel.groupid === group.id)
+  }))
+}
+
+export const selectActiveChannelThreads = (state: State): (CollectionResponses['threads'] & { messages: CollectionResponses['messages'][] })[] => {
+  const activeChannelId = state.harmony.activeChannelId
+  const threads = state.harmony.threads.filter(thread => thread.channelid === activeChannelId)
+  return threads.map(thread => ({
+    ...thread,
+    messages: state.harmony.messages.filter(message => message.threadid === thread.id)
+  }))
 }
 
 export const selectSpaces = (state: State): CollectionResponses['spaces'][] => state.harmony.spaces;

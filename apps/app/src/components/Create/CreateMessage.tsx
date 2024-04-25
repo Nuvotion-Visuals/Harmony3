@@ -1,12 +1,14 @@
+import { Box, TextInput } from '@avsync.live/formation'
 import React, { useState } from 'react'
+import { useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
+import { pb } from 'redux-tk/pocketbase'
 
 interface CreateMessageProps {
-  userId: string | null
   threadId: string | null
-  pb: any
 }
 
-export function CreateMessage({ userId, threadId, pb }: CreateMessageProps) {
+export function CreateMessage({ threadId }: CreateMessageProps) {
+  const userId = useHarmony_currentUserId()
   const [messageText, setMessageText] = useState('')
 
   async function handleCreateMessage() {
@@ -14,6 +16,7 @@ export function CreateMessage({ userId, threadId, pb }: CreateMessageProps) {
     const data = { text: messageText, userid: userId, threadid: threadId }
     try {
       await pb.collection('messages').create(data)
+      setMessageText('') // Clear the input field after sending the message
     } catch (error) {
       console.error('Failed to create message:', error)
       alert('Error creating message. Check console for details.')
@@ -21,14 +24,19 @@ export function CreateMessage({ userId, threadId, pb }: CreateMessageProps) {
   }
 
   return (
-    <div>
-      <textarea
+    <Box width='100%'>
+      <TextInput
         value={messageText}
-        onChange={e => setMessageText(e.target.value)}
-        placeholder="Message Text"
+        onChange={val => setMessageText(val)}
+        compact
+        secondaryIcon='arrow-right'
+        iconPrefix='fas'
+        secondaryOnClick={handleCreateMessage}
+        onEnter={handleCreateMessage}
+        placeholder='Message Text'
+        hideOutline
         disabled={!threadId}
       />
-      <button onClick={handleCreateMessage} disabled={!threadId || !messageText.trim()}>Create Message</button>
-    </div>
+    </Box>
   )
 }
