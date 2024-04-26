@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo, useCallback } from 'react'
+import React, { useState, useEffect, memo, useCallback, useMemo } from 'react'
 import styled from 'styled-components'
 import { useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
 import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, TextInput, onScrollWheelClick } from '@avsync.live/formation'
@@ -8,15 +8,17 @@ import { pb } from 'redux-tk/pocketbase'
 interface Props {
   thread: any
   active: boolean
-  onToggle: () => void
-  onReply: () => void
+  index: number
+  onToggle: (index: number) => void
+  onReply: (id: string) => void
 }
 
 export const Thread = memo(({ 
   thread, 
   active, 
-  onToggle, 
-  onReply 
+  index,
+  onToggle,
+  onReply
 }: Props) => {
   const setActiveThreadId = useHarmony_setActiveThreadId()
   const [expanded, setExpanded] = useState(active)
@@ -35,6 +37,7 @@ export const Thread = memo(({
       alert('Failed to delete message')
     }
   }, [thread.id, setActiveThreadId])
+  
   const handleUpdate = useCallback(async () => {
     try {
       await pb.collection('threads').update(thread.id, {
@@ -52,17 +55,17 @@ export const Thread = memo(({
     setExpanded(active)
   }, [active])
 
-  const toggleExpanded = () => {
-    setExpanded(!expanded)
-    onToggle()
-  }
+  const toggleExpanded = useCallback(() => {
+    setExpanded(prevExpanded => !prevExpanded)
+    onToggle(index)
+  }, [index])
 
-  const handleReply = () => {
+  const handleReply = useCallback(() => {
     setActiveThreadId(thread.id)
-    onReply()
-  }
+    onReply(thread.id)
+  }, [thread.id])
 
-  const dropdownItems = [
+  const dropdownItems = useMemo(() => [
     {
       icon: 'reply',
       iconPrefix: 'fas',
@@ -93,7 +96,7 @@ export const Thread = memo(({
         handleDelete()
       },
     },
-  ] as ItemProps[]
+  ], []) as ItemProps[]
 
   return (
     <S.Container active={active}>
@@ -189,20 +192,20 @@ export const Thread = memo(({
       
       <S.Bottom />
       {
-      expanded && 
-        <>
-          {
-            thread.messages.map(message => (
-              <Message message={message} key={message.id} />
-            ))
-          }
-          {
-            !active && 
-              <Box py={0.25} px={0.5}>
-                <Button expand text='Reply' onClick={handleReply} secondary />
-              </Box>
-          }
-        </>
+        expanded && 
+          <>
+            {
+              thread.messageIds.map(id => (
+                <Message id={id} key={id} />
+              ))
+            }
+            {
+              !active && 
+                <Box py={0.25} px={0.5}>
+                  <Button expand text='Reply' onClick={handleReply} secondary />
+                </Box>
+            }
+          </>
       }
       <div id={`thread_${thread.id}`} />
     </S.Container>

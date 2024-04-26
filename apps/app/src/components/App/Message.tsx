@@ -1,9 +1,9 @@
 import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, RichTextEditor, StyleHTML, markdownToHTML, onScrollWheelClick } from '@avsync.live/formation'
 import { memo, useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
-import { MessagesResponse } from 'redux-tk/pocketbase-types'
 import { speak } from '../../language/speech'
 import styled from 'styled-components'
+import { useHarmony_messageById } from 'redux-tk/harmony/hooks'
 
 const formatDate = (date: string): string => {
   const messageDate = new Date(date)
@@ -27,11 +27,61 @@ const formatDate = (date: string): string => {
   }
 }
 
-interface Props {
-  message: MessagesResponse
+interface MessageInfoProps {
+  userid: string
+  id: string
+  created: string
+  dropdownItems: any[] // Define a more specific type if possible
+  onSpeak: () => void
 }
 
-export const Message = memo(({ message }: Props) => {
+const MessageInfo: React.FC<MessageInfoProps> = memo(({ 
+  userid, 
+  id, 
+  created, 
+  dropdownItems,
+  onSpeak
+}) => {
+  return (
+    <Item
+      subtitle={userid}
+      disablePadding
+      disableBreak
+    >
+      <Gap autoWidth>
+        <S.Sender>
+          { formatDate(created) }
+        </S.Sender>
+        <Box>
+          <Button
+            icon='play'
+            iconPrefix='fas'
+            compact
+            minimal
+            square
+            onClick={() => onSpeak()}
+          />
+          <Dropdown
+            icon='ellipsis-h'
+            iconPrefix='fas'
+            compact
+            square
+            minimal
+            items={dropdownItems}
+          />
+        </Box>
+      </Gap>
+    </Item>
+  )
+})
+
+interface Props {
+  id: string
+}
+
+export const Message = memo(({ id }: Props) => {
+  const message = useHarmony_messageById(id)
+  
   const [edit, setEdit] = useState(false)
   const [editText, setEditText] = useState(message?.text)
 
@@ -86,37 +136,15 @@ export const Message = memo(({ message }: Props) => {
         />
       </S.Left>
       <S.Right>
-        <Item
-          subtitle={message.userid}
-          disablePadding
-          disableBreak
-        >
-          <Gap autoWidth>
-            <S.Sender>
-              { formatDate(message.created) }
-            </S.Sender>
-            <Box>
-              <Button
-                icon='play'
-                iconPrefix='fas'
-                compact
-                minimal
-                square
-                onClick={() => {
-                  speak(message.text, `message_${message.id}`, () => {}, )
-                }}
-              />
-              <Dropdown
-                icon='ellipsis-h'
-                iconPrefix='fas'
-                compact
-                square
-                minimal
-                items={dropdownItems}
-              />
-            </Box>
-          </Gap>
-        </Item>
+        <MessageInfo
+          key={message.id}
+          userid={message.userid}
+          onSpeak={() => speak(message.text, `message_${id}`, () => {})}
+          id={message.id}
+          created={message.created}
+          dropdownItems={dropdownItems}
+        />
+
         <S.Container>
           {
             edit

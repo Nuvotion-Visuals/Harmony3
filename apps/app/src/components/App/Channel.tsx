@@ -36,7 +36,7 @@ export const Channel = () => {
       resizeObserver.observe(textBoxRef.current)
     }
 
-    updateHeight() // Initial height update
+    updateHeight()
 
     return () => {
       resizeObserver.disconnect()
@@ -111,18 +111,19 @@ export const Channel = () => {
     />
     <S.Content height={textBoxHeight}>
       <div id='top' />
+      <ChannelHeader
+        channel={activeChannel}
+      />
       <Page>
-        <ChannelHeader
-          channel={activeChannel}
-        />
         {
           activeChannelThreads.map((thread, index) => (
             <Thread
               key={thread.id}
+              index={index}
               thread={thread}
               active={thread.id === activeThreadId}
-              onToggle={() => toggleThread(index)}
-              onReply={() => setActiveThreadId(thread.id)}
+              onToggle={toggleThread}
+              onReply={setActiveThreadId}
             />
           ))
         }

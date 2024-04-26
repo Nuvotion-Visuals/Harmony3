@@ -19,12 +19,12 @@ export const selectActiveSpaceGroups = (state: State): (CollectionResponses['gro
   }))
 }
 
-export const selectActiveChannelThreads = (state: State): (CollectionResponses['threads'] & { messages: CollectionResponses['messages'][] })[] => {
+export const selectActiveChannelThreads = (state: State): (CollectionResponses['threads'] & { messageIds: string[] })[] => {
   const activeChannelId = state.harmony.activeChannelId
   const threads = state.harmony.threads.filter(thread => thread.channelid === activeChannelId)
   return threads.map(thread => ({
     ...thread,
-    messages: state.harmony.messages.filter(message => message.threadid === thread.id)
+    messageIds: state.harmony.messages.filter(message => message.threadid === thread.id).map(message => message.id)
   }))
 }
 
@@ -56,3 +56,5 @@ export const selectMessagesByActiveThread = (state: State): CollectionResponses[
 
 export const selectActiveMessage = (state: State): CollectionResponses['messages'] | undefined =>
   state.harmony.messages.find(message => message.id === state.harmony.activeMessageId);
+
+export const selectMessageById = (id: string) => (state: State) => state.harmony.messages.find(message => message.id === id)

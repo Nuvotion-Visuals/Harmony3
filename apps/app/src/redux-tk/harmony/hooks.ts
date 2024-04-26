@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { harmonyActions } from './slice'
 import * as selectors from './selectors'
-import { CollectionResponses, UsersResponse } from 'redux-tk/pocketbase-types'
+import { CollectionResponses, MessagesResponse, UsersResponse } from 'redux-tk/pocketbase-types'
 import { isEqual } from 'lodash'
 
 export const useHarmony_activeSpaceId = (): string | null => 
@@ -48,12 +48,17 @@ export const useHarmony_activeSpaceGroups = (): CollectionResponses['groups'][] 
   return useSelector(selectors.selectActiveSpaceGroups, isEqual)
 }
 
-export const useHarmony_activeChannelThreads = (): (CollectionResponses['threads'] & { messages: CollectionResponses['messages'][] })[] => {
+export const useHarmony_activeChannelThreads = (): (CollectionResponses['threads'] & { messageIds: string[] })[] => {
   return useSelector(selectors.selectActiveChannelThreads, isEqual)
 }
 
 export const useHarmony_currentUserId = (): string | null => 
   useSelector(selectors.selectCurrentUserId, isEqual)
+
+export const useHarmony_messageById = (id: string): MessagesResponse => {
+  const memoizedSelector = useMemo(() => selectors.selectMessageById(id), [id])
+  return useSelector(memoizedSelector, isEqual)
+}
 
 export const useHarmony_setActiveSpaceIndex = () => {
   const dispatch = useDispatch()
