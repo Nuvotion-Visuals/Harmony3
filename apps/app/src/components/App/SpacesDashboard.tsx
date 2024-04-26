@@ -96,7 +96,7 @@ const S = {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: var(--F_Background_Alternating);
+    background: black;
   `,
   Inner: styled.div<{
     isDesktop: boolean

@@ -1,5 +1,5 @@
 import { split } from 'sentence-splitter'
-
+import { HTMLToPlaintext } from '@avsync.live/formation'
 
 const removeOldHighlights = (html: string): string => {
   const openingTag = `<span style="background-color: #312800;">`
@@ -59,7 +59,6 @@ const highlightText = (html: string, currentlySpeaking: string | null): string =
   return highlightedHtml
 }
 
-import { HTMLToPlaintext } from '@avsync.live/formation';
 class SpeechSynthesizer {
   private audioDataMap: Map<string, string | null> = new Map()
   private isPlaying = false
@@ -85,7 +84,8 @@ class SpeechSynthesizer {
       const blobUrl = URL.createObjectURL(blob)
       this.audioDataMap.set(sentence, blobUrl)
       this.maybePlayAudio() // Check if we can start playing right away
-    } catch (error) {
+    } 
+    catch (error) {
       console.error(`Failed to fetch audio for sentence: ${sentence}`, error)
       this.audioDataMap.set(sentence, null)
     }
@@ -126,19 +126,20 @@ class SpeechSynthesizer {
     this.maybePlayAudio()
   }
 }
+
 export async function speak(text: string, guid: string, callback: (error: any) => void): Promise<void> {
-  text = text.replace(/```[\s\S]*?```/g, "").replace(/`/g, '').replace(/#\w+/g, '').replace(/\[[^\]]*\]/g, '');
+  text = text.replace(/```[\s\S]*?```/g, "").replace(/`/g, '').replace(/#\w+/g, '').replace(/\[[^\]]*\]/g, '')
 
   if (text === '') {
-    callback(new Error('No text to speak'));
-    return;
+    callback(new Error('No text to speak'))
+    return
   }
 
-  const baseUrl = 'http://localhost:5003/api/tts';
-  const normalizedText = HTMLToPlaintext(text);
-  const sentences = split(normalizedText).filter(item => item.type === 'Sentence').map(item => item.raw);
+  const baseUrl = 'http://localhost:5003/api/tts'
+  const normalizedText = HTMLToPlaintext(text)
+  const sentences = split(normalizedText).filter(item => item.type === 'Sentence').map(item => item.raw)
 
-  const synthesizer = new SpeechSynthesizer(sentences, baseUrl, guid);
-  synthesizer.speak();
-  callback(null);
+  const synthesizer = new SpeechSynthesizer(sentences, baseUrl, guid)
+  synthesizer.speak()
+  callback(null)
 }

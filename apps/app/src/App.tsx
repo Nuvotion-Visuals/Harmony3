@@ -7,6 +7,7 @@ import { pb } from 'redux-tk/pocketbase'
 import { UsersResponse } from 'redux-tk/pocketbase-types'
 import { useLocation } from 'react-router-dom'
 import SpacesDashboard from 'components/App/SpacesDashboard'
+import { Chat } from 'components/App/Chat'
 
 interface Props {
   children: React.ReactNode
@@ -42,7 +43,10 @@ export const App = ({ children }: Props) => {
               sidebarWidth='380px'
               firstPage={<FirstPage />}
               secondPage={<Channel />}
-              thirdPage={<>{children}</>}
+              thirdPage={<>
+              {children}
+              <Chat />
+              </>}
               navsPrimary={[
                 {
                   icon: 'diagram-project',
