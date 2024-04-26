@@ -62,87 +62,85 @@ const highlightText = (html: string, currentlySpeaking: string | null): string =
   return highlightedHtml
 }
 import { HTMLToPlaintext } from '@avsync.live/formation';
-
 class SpeechSynthesizer {
-  private audioElements: Array<HTMLAudioElement | null> = [];
-  private isPlaying = false;
-  private playIndex = 0;
+  private audioDataMap: Map<string, string | null> = new Map()
+  private isPlaying = false
+  private currentSentenceIndex = 0
+  private fetchIndex = 0
 
   constructor(private sentences: string[], private baseUrl: string, private guid: string) {
-    this.audioElements = new Array(sentences.length).fill(null); // Initialize the array with nulls
+    this.sentences.forEach(sentence => this.audioDataMap.set(sentence, null))
+    this.fetchNextAudioElement()
   }
 
-  private createAudioElement(text: string, index: number): void {
-    const encodedText = encodeURIComponent(text);
-    const audioUrl = `${this.baseUrl}?text=${encodedText}&speaker_id=p364&style_wav=&language_id=`;
-    const audioElement = new Audio(audioUrl);
-    audioElement.playbackRate = 1.15;
+  private async fetchNextAudioElement(): Promise<void> {
+    if (this.fetchIndex >= this.sentences.length) {
+      return
+    }
+    const sentence = this.sentences[this.fetchIndex]
+    const encodedText = encodeURIComponent(sentence)
+    const audioUrl = `${this.baseUrl}?text=${encodedText}&speaker_id=p364&style_wav=&language_id=`
 
-    audioElement.onloadedmetadata = () => {
-      this.audioElements[index] = audioElement;
-      this.tryToPlayAudio(); // Try to play this audio if it's the next in line
-    };
-
-    audioElement.onerror = () => {
-      console.error(`Failed to load audio for sentence index: ${index}`);
-      this.audioElements[index] = null; // Ensure we can skip over this in case of an error
-      this.tryToPlayAudio(); // Try to play the next available audio
-    };
-  }
-
-  private tryToPlayAudio(): void {
-    if (this.isPlaying || this.audioElements[this.playIndex] === null) {
-      return; // Either something is already playing or the current index audio is not ready
+    try {
+      const response = await fetch(audioUrl)
+      const blob = await response.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      this.audioDataMap.set(sentence, blobUrl)
+      this.maybePlayAudio() // Check if we can start playing right away
+    } catch (error) {
+      console.error(`Failed to fetch audio for sentence: ${sentence}`, error)
+      this.audioDataMap.set(sentence, null)
     }
 
-    const audioElement = this.audioElements[this.playIndex];
-    if (audioElement) {
-      this.isPlaying = true;
-      document.body.appendChild(audioElement);
-      audioElement.play();
+    this.fetchIndex++
+    this.fetchNextAudioElement()
+  }
 
-      // Call searchAndHighlight with the currently playing sentence
-      searchAndHighlight(this.guid, this.sentences[this.playIndex]);
+  private maybePlayAudio(): void {
+    if (!this.isPlaying && this.currentSentenceIndex < this.sentences.length) {
+      const sentence = this.sentences[this.currentSentenceIndex]
+      const audioUrl = this.audioDataMap.get(sentence)
+      if (audioUrl) {
+        this.playAudio(sentence, audioUrl)
+      }
+    }
+  }
 
+  private playAudio(sentence: string, audioUrl: string): void {
+    const audioElement = new Audio(audioUrl)
+    this.isPlaying = true
+    document.body.appendChild(audioElement)
+    searchAndHighlight(this.guid, sentence)
+
+    audioElement.play().then(() => {
       audioElement.onended = () => {
-        document.body.removeChild(audioElement);
-        this.isPlaying = false;
-
-        // Call searchAndHighlight with null to remove the highlight
-        searchAndHighlight(this.guid, null);
-
-        this.playIndex++;
-        this.tryToPlayAudio(); // Attempt to play the next audio
-      };
-    }
-  }
-
-  public startFetching(): void {
-    this.sentences.forEach((sentence, index) => {
-      this.createAudioElement(sentence, index);
-    });
+        document.body.removeChild(audioElement)
+        URL.revokeObjectURL(audioUrl)
+        this.isPlaying = false
+        searchAndHighlight(this.guid, null)
+        this.currentSentenceIndex++
+        this.maybePlayAudio() // Continue to next audio if available
+      }
+    })
   }
 
   public speak(): void {
-    // Start playing audios in order as soon as they're ready
-    this.tryToPlayAudio();
+    this.maybePlayAudio()
   }
 }
-
 export async function speak(text: string, guid: string, callback: (error: any) => void): Promise<void> {
   text = text.replace(/```[\s\S]*?```/g, "").replace(/`/g, '').replace(/#\w+/g, '').replace(/\[[^\]]*\]/g, '');
-  
+
   if (text === '') {
     callback(new Error('No text to speak'));
     return;
   }
 
-  const baseUrl = 'http://localhost:5002/api/tts'; // Base URL for TTS requests
+  const baseUrl = 'http://localhost:5003/api/tts';
   const normalizedText = HTMLToPlaintext(text);
   const sentences = split(normalizedText).filter(item => item.type === 'Sentence').map(item => item.raw);
 
   const synthesizer = new SpeechSynthesizer(sentences, baseUrl, guid);
-  synthesizer.startFetching(); // Begin fetching audio data for all sentences
-  synthesizer.speak(); // Start the playback process
+  synthesizer.speak();
   callback(null);
 }
