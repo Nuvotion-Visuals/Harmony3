@@ -122,7 +122,7 @@ export const Message = memo(({ id }: Props) => {
       onClick: () => handleDelete()
     }
   ] as ItemProps[]
-  
+
   return <ContextMenu
     dropdownProps={{
       items: dropdownItems
