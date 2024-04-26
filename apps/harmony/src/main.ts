@@ -4,6 +4,11 @@ import log from 'electron-log'
 import { spawn } from 'child_process'
 import express from 'express'
 import path from 'path'
+import ollama from 'ollama'
+import cors from 'cors'
+import eventsource from 'eventsource'
+// @ts-ignore
+global.EventSource = eventsource
 
 log.info('App starting...')
 
@@ -52,19 +57,101 @@ const createWindow = () => {
   })
 }
 
+
+const initPocketbaseClient = async () => {
+  const PocketBase = require('pocketbase/cjs')
+  const pb = new PocketBase('http://127.0.0.1:8090')
+  try {
+    const user = await pb.collection('users').authWithPassword(
+      'harmony',
+      'qxIrfPYwKsMxZBQ',
+    )
+
+    const systemId = pb.authStore.model?.id
+
+    pb.collection('messages').subscribe('*', async (event: any) => {
+      switch (event.action) {
+        case 'create':
+          if (event.record.userid !== systemId) {
+            let llmMessages
+            const threadId = event.record.threadid
+
+            try {
+              const messages = await pb.collection('messages').getFullList({
+                filter: `threadid="${threadId}"`,
+                sort: 'created'
+              })
+
+              llmMessages = messages.map((message: any) => ({
+                role: message.userid !== systemId ? 'user' : 'assistant',
+                content: message.text
+              })) 
+            }
+            catch(e) {
+              console.log(e)
+            }
+
+            const assistantMessage = await pb.collection('messages').create({ 
+              text: '', 
+              userid: systemId, 
+              threadid: threadId
+            })
+
+            if (llmMessages && assistantMessage.id) {
+              const response = await ollama.chat({
+                model: 'llama3',
+                messages: llmMessages,
+                stream: true
+              })
+          
+              const fullResponse = []
+          
+              for await (const part of response) {
+                fullResponse.push(part.message.content)
+                const partialResponse = fullResponse.join('')
+                await pb.collection('messages').update(assistantMessage.id, {
+                  'text': partialResponse
+                })
+              }
+            }
+          }
+          break
+        case 'update':
+          console.log('update', event.record)
+          break
+        case 'delete':
+          console.log('delete', event.record)
+          break
+        default:
+          break
+      }
+    })
+  }
+  catch(e) {
+    console.log(e)
+  }
+}
+
+
 // Start PocketBase
 const startPocketBase = () => {
   const pocketbasePath = path.join(__dirname, './pocketbase')
-  pocketbaseProcess = spawn(pocketbasePath, ['serve', '--http=0.0.0.0:8090'])
+  const pocketbaseProcess = spawn(pocketbasePath, ['serve', '--http=0.0.0.0:8090'])
 
-  // @ts-ignore
   pocketbaseProcess.stdout.on('data', data => {
-    log.info(`PocketBase: ${data}`)
+    const output = data.toString()
+    log.info(`PocketBase: ${output}`)
+    if (output.includes("Server started")) {
+      initPocketbaseClient()
+    }
   })
 
-  // @ts-ignore
   pocketbaseProcess.stderr.on('data', data => {
-    log.error(`PocketBase Error: ${data}`)
+    log.error(`PocketBase Error: ${data.toString()}`)
+  })
+
+  pocketbaseProcess.on('exit', code => {
+    log.error(`PocketBase process exited with code ${code}`)
   })
 }
 
@@ -147,8 +234,7 @@ app.listen(PORT, () => {
 })
 
 
-import ollama from 'ollama'
-import cors from 'cors'
+
 const llm = express()
 const PORT2 = process.env.PORT2 || 1616
 llm.use(cors())
@@ -212,3 +298,7 @@ llm.get('/chat', async (req, res) => {
 llm.listen(PORT2, () => {
   console.log(`Server running on http://localhost:${PORT2}`)
 })
+
+
+
+

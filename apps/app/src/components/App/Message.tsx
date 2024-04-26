@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, RichTextEditor, StyleHTML, onScrollWheelClick } from '@avsync.live/formation'
+import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, RichTextEditor, StyleHTML, markdownToHTML, onScrollWheelClick } from '@avsync.live/formation'
 import { useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { MessagesResponse } from 'redux-tk/pocketbase-types'
@@ -151,7 +151,7 @@ export const Message = ({ message }: Props) => {
                   </Gap>
                 </Box>
               : <StyleHTML>
-                  <div dangerouslySetInnerHTML={{ __html: message.text || '' }} className='message' />
+                  <div dangerouslySetInnerHTML={{ __html: markdownToHTML(message.text) || '' }} className='message' />
                 </StyleHTML>
           }
           

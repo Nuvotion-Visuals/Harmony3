@@ -111,7 +111,7 @@ export const TextBox = ({
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault()
               console.log(text)
-              sendMessage(text.substring(0, text.length - 9))
+              sendMessage(text.substring(0, text.length - 11))
             }
           }}
           placeholder='Send a message'
