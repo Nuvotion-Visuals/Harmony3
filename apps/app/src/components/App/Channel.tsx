@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useHarmony_activeChannelThreads, useHarmony_activeThreadId, useHarmony_activeChannel, useHarmony_activeGroup, useHarmony_activeSpace, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
-import { Box, Button, Dropdown, Item, Page, scrollToElementById } from '@avsync.live/formation'
+import { Page, scrollToElementById } from '@avsync.live/formation'
 import { TextBox } from './TextBox'
 import { Thread } from './Thread'
 import { ChannelHeader } from './ChannelHeader'
+import { ChannelControls } from './ChannelControls'
 
 export const Channel = () => {
   const activeChannelThreads = useHarmony_activeChannelThreads()
@@ -63,20 +64,20 @@ export const Channel = () => {
     })
   }, [activeChannelThreads])
 
-  const toggleThread = index => {
+  const toggleThread = useCallback((index) => {
     setExpandedStates(current => {
       const updatedStates = [...current]
       updatedStates[index] = !updatedStates[index]
       return updatedStates
     })
-  }
+  }, [])
 
-  const toggleAll = () => {
+  const toggleAll = useCallback(() => {
     setExpandedStates(current => {
       const anyExpanded = current.some(state => state)
       return new Array(activeChannelThreads.length).fill(!anyExpanded)
     })
-  }
+  }, [activeChannelThreads.length])
 
   useEffect(() => {
     setAnyExpanded(expandedStates.some(state => state))
@@ -96,77 +97,18 @@ export const Channel = () => {
     }
   }, [activeThreadId, activeChannelThreads])
 
-  const handleNewThreadId = newThreadId => {
+  const handleNewThreadId = useCallback((newThreadId) => {
     setNewThreadId(newThreadId)
-  }
+  }, [])
 
   return (<>
-    <Box py={.5}>
-      <Item
-        text={`${activeSpace?.name} > ${activeGroup?.name} > ${activeChannel?.name}`}
-        absoluteRightChildren
-        onClick={toggleAll}
-      >
-        <Box>
-          <Button
-            icon={'arrow-up'}
-            iconPrefix='fas'
-            compact
-            square
-            minimal
-            onClick={(e) => {
-              e.stopPropagation()
-              scrollToElementById('top', { behavior: 'smooth' })
-            }}
-          />
-          <Button
-            icon={'arrow-down'}
-            iconPrefix='fas'
-            compact
-            square
-            minimal
-            onClick={(e) => {
-              e.stopPropagation()
-              scrollToElementById('bottom', { behavior: 'smooth' })}
-            }
-          />
-          <Button
-            icon={anyExpanded ? 'chevron-up' : 'chevron-down'}
-            iconPrefix='fas'
-            compact
-            square
-            minimal
-          />
-          <Dropdown
-            icon='ellipsis-h'
-            iconPrefix='fas'
-            compact
-            square
-            minimal
-            items={[
-              {
-                icon: 'edit',
-                iconPrefix: 'fas',
-                compact: true,
-                text: 'Edit',
-                onClick: () => {
-
-                }
-              },
-              {
-                icon: 'trash-alt',
-                iconPrefix: 'fas',
-                compact: true,
-                text: 'Delete',
-                onClick: () => {
-
-                }
-              }
-            ]}
-          />
-        </Box>
-      </Item>
-    </Box>
+    <ChannelControls
+      activeSpaceName={activeSpace?.name}
+      activeGroupName={activeGroup?.name}
+      activeChannelName={activeChannel?.name}
+      anyExpanded={anyExpanded}
+      toggleAll={toggleAll}
+    />
     <S.Content height={textBoxHeight}>
       <div id='top' />
       <Page>

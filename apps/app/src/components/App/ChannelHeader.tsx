@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 
-export const ChannelHeader = ({ channel }) => {
+interface Props {
+  channel: any
+}
+
+export const ChannelHeader = memo(({ channel }: Props) => {
   const [edit, setEdit] = useState(false)
   const [editName, setEditName] = useState(channel?.name)
   const [editDescription, setEditDescription] = useState(channel?.description)
@@ -124,4 +128,4 @@ export const ChannelHeader = ({ channel }) => {
       }
     </Box>
   )
-}
+})

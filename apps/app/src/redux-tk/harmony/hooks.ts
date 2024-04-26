@@ -3,56 +3,57 @@ import { useCallback } from 'react'
 import { harmonyActions } from './slice'
 import * as selectors from './selectors'
 import { CollectionResponses, UsersResponse } from 'redux-tk/pocketbase-types'
+import { isEqual } from 'lodash'
 
 export const useHarmony_activeSpaceId = (): string | null => 
-  useSelector(selectors.selectActiveSpaceId)
+  useSelector(selectors.selectActiveSpaceId, isEqual)
 
 export const useHarmony_activeGroupId = (): string | null => 
-  useSelector(selectors.selectActiveGroupId)
+  useSelector(selectors.selectActiveGroupId, isEqual)
 
 export const useHarmony_activeChannelId = (): string | null => 
-  useSelector(selectors.selectActiveChannelId)
+  useSelector(selectors.selectActiveChannelId, isEqual)
 
 export const useHarmony_activeThreadId = (): string | null => 
-  useSelector(selectors.selectActiveThreadId)
+  useSelector(selectors.selectActiveThreadId, isEqual)
 
 export const useHarmony_activeMessageId = (): string | null => 
-  useSelector(selectors.selectActiveMessageId)
+  useSelector(selectors.selectActiveMessageId, isEqual)
 
 export const useHarmony_spaces = (): CollectionResponses['spaces'][] => 
-  useSelector(selectors.selectSpaces)
+  useSelector(selectors.selectSpaces, isEqual)
 
 export const useHarmony_activeSpace = (): CollectionResponses['spaces'] | undefined => 
-  useSelector(selectors.selectActiveSpace)
+  useSelector(selectors.selectActiveSpace, isEqual)
 
 export const useHarmony_activeGroup = (): CollectionResponses['groups'] | undefined => 
-  useSelector(selectors.selectActiveGroup)
+  useSelector(selectors.selectActiveGroup, isEqual)
 
 export const useHarmony_activeChannel = (): CollectionResponses['channels'] | undefined => 
-  useSelector(selectors.selectActiveChannel)
+  useSelector(selectors.selectActiveChannel, isEqual)
 
 export const useHarmony_activeThread = (): CollectionResponses['threads'] | undefined => 
-  useSelector(selectors.selectActiveThread)
+  useSelector(selectors.selectActiveThread, isEqual)
 
 export const useHarmony_activeMessage = (): CollectionResponses['messages'] | undefined => 
-  useSelector(selectors.selectActiveMessage)
+  useSelector(selectors.selectActiveMessage, isEqual)
 
 export const useHarmony_activeSpaceIndex = (): number | null => 
-  useSelector(selectors.selectActiveSpaceIndex)
+  useSelector(selectors.selectActiveSpaceIndex, isEqual)
 
 export const useHarmony_currentUser = (): UsersResponse | null => 
-  useSelector(selectors.selectCurrentUser)
+  useSelector(selectors.selectCurrentUser, isEqual)
 
 export const useHarmony_activeSpaceGroups = (): CollectionResponses['groups'][] => {
-  return useSelector(selectors.selectActiveSpaceGroups)
+  return useSelector(selectors.selectActiveSpaceGroups, isEqual)
 }
 
 export const useHarmony_activeChannelThreads = (): (CollectionResponses['threads'] & { messages: CollectionResponses['messages'][] })[] => {
-  return useSelector(selectors.selectActiveChannelThreads)
+  return useSelector(selectors.selectActiveChannelThreads, isEqual)
 }
 
 export const useHarmony_currentUserId = (): string | null => 
-  useSelector(selectors.selectCurrentUserId)
+  useSelector(selectors.selectCurrentUserId, isEqual)
 
 export const useHarmony_setActiveSpaceIndex = () => {
   const dispatch = useDispatch()

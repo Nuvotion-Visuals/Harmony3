@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { Button, Item, Page, RichTextEditor, scrollToElementById } from '@avsync.live/formation'
-import { useHarmony_activeChannelId, useHarmony_activeThread, useHarmony_activeThreadId, useHarmony_currentUserId, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
+import { memo, useEffect, useState } from 'react'
+import { Button, Item, RichTextEditor, scrollToElementById } from '@avsync.live/formation'
+import { useHarmony_activeChannelId, useHarmony_activeThread, useHarmony_currentUserId, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
 import styled from 'styled-components'
 import { pb } from 'redux-tk/pocketbase'
 
@@ -9,7 +9,7 @@ interface Props {
   activeThreadId?: string
 }
 
-export const TextBox = ({
+export const TextBox = memo(({
   onNewThreadId,
   activeThreadId
 }: Props) => {
@@ -132,7 +132,7 @@ export const TextBox = ({
       </S.TextBox>
     </S.Wrapper>
   )
-}
+})
 
 const S = {
   Wrapper: styled.div`

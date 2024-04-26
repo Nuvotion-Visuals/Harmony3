@@ -17,6 +17,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@reduxjs/toolkit": "^2.2.3",
+    "lodash": "^4.17.21",
     "pocketbase": "^0.21.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

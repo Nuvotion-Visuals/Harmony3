@@ -58,6 +58,7 @@ export const Groups = React.memo(() => {
     if (activeSpace?.id) {
       setGroupsList(generateGroupsList(activeSpaceGroups, activeSpace.id, activeChannelId))
     }
+    console.log(activeSpaceGroups)
   }, [activeSpaceGroups, activeSpace?.id, activeChannelId])
 
   const handleDeleteGroup = async (groupId: string) => {

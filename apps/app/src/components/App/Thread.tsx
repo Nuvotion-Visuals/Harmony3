@@ -1,11 +1,23 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo, useCallback } from 'react'
 import styled from 'styled-components'
 import { useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
-import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, RichTextEditor, TextInput, onScrollWheelClick } from '@avsync.live/formation'
+import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, TextInput, onScrollWheelClick } from '@avsync.live/formation'
 import { Message } from './Message'
 import { pb } from 'redux-tk/pocketbase'
 
-export const Thread = ({ thread, active, onToggle, onReply }) => {
+interface Props {
+  thread: any
+  active: boolean
+  onToggle: () => void
+  onReply: () => void
+}
+
+export const Thread = memo(({ 
+  thread, 
+  active, 
+  onToggle, 
+  onReply 
+}: Props) => {
   const setActiveThreadId = useHarmony_setActiveThreadId()
   const [expanded, setExpanded] = useState(active)
 
@@ -13,7 +25,7 @@ export const Thread = ({ thread, active, onToggle, onReply }) => {
   const [editName, setEditName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
   const [editDescription, setEditDescription] = useState(thread?.description)
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     try {
       await pb.collection('threads').delete(thread.id)
       setActiveThreadId(null)
@@ -22,9 +34,8 @@ export const Thread = ({ thread, active, onToggle, onReply }) => {
       console.error('Failed to delete message:', error)
       alert('Failed to delete message')
     }
-  }
-
-  const handleUpdate = async () => {
+  }, [thread.id, setActiveThreadId])
+  const handleUpdate = useCallback(async () => {
     try {
       await pb.collection('threads').update(thread.id, {
         name: editName,
@@ -35,7 +46,7 @@ export const Thread = ({ thread, active, onToggle, onReply }) => {
       console.error('Failed to update thread:', error)
       alert('Failed to update thread')
     }
-  }
+  }, [thread.id, editName, editDescription])
 
   useEffect(() => {
     setExpanded(active)
@@ -196,7 +207,7 @@ export const Thread = ({ thread, active, onToggle, onReply }) => {
       <div id={`thread_${thread.id}`} />
     </S.Container>
   )
-}
+})
 
 const S = {
   Container: styled.div<{
