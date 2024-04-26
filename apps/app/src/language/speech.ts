@@ -10,55 +10,47 @@ const removeOldHighlights = (html: string): string => {
 const searchAndHighlight = async (guid: string, currentlySpeaking: string | null) => {
   await new Promise(resolve => setTimeout(resolve, 50))
   const parentElement = document.getElementById(guid)
-
   if (!parentElement) {
     console.warn('Element with the given GUID not found.')
     return
   }
-
-  const qlEditorElement = parentElement.querySelector('.message')
-
-  if (!qlEditorElement) {
-    console.warn('ql-editor class element not found within the parent.')
+  const parent = parentElement.querySelector('.message')
+  if (!parent) {
     return
   }
-
-  let htmlContent = qlEditorElement.innerHTML
-  
-  // Remove old highlights
+  let htmlContent = parent.innerHTML
   htmlContent = removeOldHighlights(htmlContent)
-
   const highlightedHtml = highlightText(htmlContent, currentlySpeaking)
-  
-  qlEditorElement.innerHTML = highlightedHtml
+  parent.innerHTML = highlightedHtml
+}
+
+function escapeRegExp(string: string) {
+  return string.replace(/[.*+?^${}()|[\]\\"]/g, '\\$&')  // Adding double quotes to the regex
 }
 
 const highlightText = (html: string, currentlySpeaking: string | null): string => {
   const openingTag = `<span style="background-color: #312800;">`
   const closingTag = '</span>'
-  
   if (!currentlySpeaking) {
     return html
   }
-  
+  // Use escapeRegExp function to escape special characters
+  const escapedCurrentlySpeaking = escapeRegExp(currentlySpeaking)
   const numberPrefixRegex = /^\d+\.\s+/ // Regex to detect numbering like "1. "
-  const searchRegex = new RegExp(`(?<!${numberPrefixRegex.source})(?<!\\w)${currentlySpeaking}(?!\\w)`, 'gi') // Avoid highlighting numbering and mid-word matches
-
+  // Use escapedCurrentlySpeaking to build the searchRegex
+  const searchRegex = new RegExp(`(?<!${numberPrefixRegex.source})(?<!\\w)${escapedCurrentlySpeaking}(?!\\w)`, 'gi')
   let highlightedHtml = ''
   let startIndex = 0
   let match
-
   while ((match = searchRegex.exec(html)) !== null) {
     const index = match.index
     const len = match[0].length
     highlightedHtml += html.substring(startIndex, index) + openingTag + html.substring(index, index + len) + closingTag
     startIndex = index + len
   }
-
   highlightedHtml += html.substring(startIndex)
   return highlightedHtml
 }
-
 class SpeechSynthesizer {
   private audioDataMap: Map<string, string | null> = new Map()
   private isPlaying = false
@@ -128,7 +120,20 @@ class SpeechSynthesizer {
 }
 
 export async function speak(text: string, guid: string, callback: (error: any) => void): Promise<void> {
-  text = text.replace(/```[\s\S]*?```/g, "").replace(/`/g, '').replace(/#\w+/g, '').replace(/\[[^\]]*\]/g, '')
+  // Remove all markdown code blocks
+  text = text.replace(/```[\s\S]*?```/g, "")
+
+  // Remove single backtick marks, used for inline code
+  text = text.replace(/`/g, '')
+
+  // Remove hashtags followed by any word characters
+  text = text.replace(/#\w+/g, '')
+
+  // Remove all markdown link texts within square brackets
+  text = text.replace(/\[[^\]]*\]/g, '')
+
+  // Remove all asterisks used for markdown emphasis
+  text = text.replace(/\*/g, '')
 
   if (text === '') {
     callback(new Error('No text to speak'))
@@ -137,7 +142,14 @@ export async function speak(text: string, guid: string, callback: (error: any) =
 
   const baseUrl = 'http://localhost:5003/api/tts'
   const normalizedText = HTMLToPlaintext(text)
-  const sentences = split(normalizedText).filter(item => item.type === 'Sentence').map(item => item.raw)
+
+  // Manually splitting on semicolons and new lines
+  const chunks = normalizedText.split(/[:\n;]/).filter(chunk => chunk.trim().length > 0)
+
+  // Use the split function on each chunk separately and flatten the results
+  const sentences = chunks.flatMap(chunk =>
+    split(chunk).filter(item => item.type === 'Sentence').map(item => item.raw)
+  )
 
   const synthesizer = new SpeechSynthesizer(sentences, baseUrl, guid)
   synthesizer.speak()

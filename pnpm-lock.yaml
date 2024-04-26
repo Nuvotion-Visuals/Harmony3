@@ -24,8 +24,8 @@ importers:
   apps/app:
     dependencies:
       '@avsync.live/formation':
-        specifier: ^1.0.108
-        version: 1.0.108(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8)
+        specifier: ^1.0.109
+        version: 1.0.109(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8)
       '@fortawesome/fontawesome-svg-core':
         specifier: ^6.5.2
         version: 6.5.2
@@ -245,8 +245,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.20
     dev: true
 
-  /@avsync.live/formation@1.0.108(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8):
-    resolution: {integrity: sha512-GIS5tzUaVi+nMZK17JAtK3sljKopqc/9xyL5I7BPkxnwCTro1GZ3Dy08XtoeqrTEebyaTwkjOTaM4EsV+iDhPg==}
+  /@avsync.live/formation@1.0.109(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8):
+    resolution: {integrity: sha512-sHVcfZ/wPpCSlSmteE/FMbH2SMMjTQckA6xbjZ/axQbyxFbzzW1Zm6rh8C02xlNH+qp3LMTKsOaPH2aCji1ZKw==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
@@ -4726,8 +4726,8 @@ packages:
     resolution: {integrity: sha512-3VdM/SXBZX2omc9JF9nOPCtDaYQ67BGp5CoLpIQlO2KCAPETs8TcDHacF26jXadGbvUteZzRTeos2fhID5+ucQ==}
     dev: false
 
-  /dompurify@2.5.0:
-    resolution: {integrity: sha512-5RXhAXSCrKTqt9pSbobT9PVRX+oPpENplTZqCiK1l0ya+ZOzwo9kqsGLbYRsAhzIiLCwKEy99XKSSrqnRTLVcw==}
+  /dompurify@2.5.1:
+    resolution: {integrity: sha512-HH391uRJXAAeelougod93W++2gECfHIVCqq+B/4znhjCgb2zVPL+iLOVnTYwejqAuNf69Ffc5ILQYdPHsZACJA==}
     dev: false
 
   /domutils@1.7.0:
@@ -6893,7 +6893,7 @@ packages:
   /isomorphic-dompurify@0.21.0:
     resolution: {integrity: sha512-aQ+nxkIHc8xqPkS0gzNdkPzAitPvXmRCn2lJZSnMPMJekbCKUWEYBZHWBslokE1hf4f1locnKaaTeMnHJPCmtw==}
     dependencies:
-      dompurify: 2.5.0
+      dompurify: 2.5.1
       jsdom: 20.0.3
     transitivePeerDependencies:
       - bufferutil
@@ -8153,7 +8153,7 @@ packages:
       '@babel/runtime': 7.23.2
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-      react-is: 18.3.0
+      react-is: 18.3.1
     dev: false
 
   /rc@1.2.8:
@@ -8228,8 +8228,8 @@ packages:
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
-  /react-is@18.3.0:
-    resolution: {integrity: sha512-wRiUsea88TjKDc4FBEn+sLvIDesp6brMbGWnJGjew2waAc9evdhja/2LvePc898HJbHw0L+MTWy7NhpnELAvLQ==}
+  /react-is@18.3.1:
+    resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
     dev: false
 
   /react-quill@2.0.0(react-dom@18.2.0)(react@18.2.0):

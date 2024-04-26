@@ -1,5 +1,5 @@
 import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, RichTextEditor, StyleHTML, markdownToHTML, onScrollWheelClick } from '@avsync.live/formation'
-import { memo, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { speak } from '../../language/speech'
 import styled from 'styled-components'
@@ -84,6 +84,12 @@ export const Message = memo(({ id }: Props) => {
   
   const [edit, setEdit] = useState(false)
   const [editText, setEditText] = useState(message?.text)
+
+  useEffect(() => {
+    if (edit) {
+      setEditText(markdownToHTML(message?.text))
+    }
+  }, [message?.text, edit])
 
   const handleDelete = async () => {
     try {
