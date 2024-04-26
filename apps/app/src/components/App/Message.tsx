@@ -2,7 +2,7 @@ import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, RichT
 import { useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { MessagesResponse } from 'redux-tk/pocketbase-types'
-import { speak } from '../../speech/speech'
+import { speak } from '../../language/speech'
 import styled from 'styled-components'
 
 const formatDate = (date: string): string => {
@@ -73,7 +73,11 @@ export const Message = ({ message }: Props) => {
     }
   ] as ItemProps[]
   
-  return <>
+  return <ContextMenu
+    dropdownProps={{
+      items: dropdownItems
+    }}
+  >
     <S.Message onMouseDown={onScrollWheelClick(() => handleDelete())} id={`message_${message.id}`}>
       <S.Left>
         <Avatar
@@ -154,7 +158,7 @@ export const Message = ({ message }: Props) => {
         </S.Container>
       </S.Right>
     </S.Message>
-  </>
+  </ContextMenu>
 }
 
 const S = {

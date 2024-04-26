@@ -97,11 +97,11 @@ const init = async () => {
   ReactDOM.createRoot(document.getElementById('root')!).render(<Main />)
 }
 
-document.addEventListener('contextmenu', event => event.preventDefault())
-document.addEventListener('mousedown', event => {
-  if (event.button === 1) {
-    event.preventDefault()
-  }
-})
+// document.addEventListener('contextmenu', event => event.preventDefault())
+// document.addEventListener('mousedown', event => {
+//   if (event.button === 1) {
+//     event.preventDefault()
+//   }
+// })
 
 init()

@@ -155,39 +155,60 @@ llm.use(cors())
 llm.use(express.json())
 llm.use(express.urlencoded({ extended: true }))
 
-llm.get('/events', async (req, res) => {
+llm.get('/chat', async (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream')
   res.setHeader('Cache-Control', 'no-cache')
   res.setHeader('Connection', 'keep-alive')
 
-  req.on('close', () => {
-    res.end()
-    console.log('Client disconnected')
-  })
+  const data = req.query.data
+  if (typeof data !== 'string') {
+    res.status(400).send('Invalid data format')
+    return
+  }
 
-  const message = req.query.message
-  if (typeof message !== 'string') {
-    res.status(400).send('Message parameter must be a single string')
+  let payload
+  try {
+    payload = JSON.parse(data)
+  } 
+  catch (error) {
+    res.status(400).send('Invalid JSON format')
     return
   }
 
   try {
     const response = await ollama.chat({
       model: 'llama3',
-      messages: [{ role: 'user', content: message }],
+      messages: payload.messages,
       stream: true
     })
 
+    const fullResponse = []
+
     for await (const part of response) {
+      fullResponse.push(part.message.content)
       res.write(`data: ${JSON.stringify(part)}\n\n`)
     }
+
+    res.write(`data: ${JSON.stringify({ endOfStream: true, message: { content: fullResponse.join('')} })}\n\n`)
+
+    console.log(fullResponse)
   } 
   catch (error) {
     console.error('Error streaming response:', error)
     res.status(500).send('Failed to stream response')
   }
+
+  req.on('close', () => {
+    console.log('Client disconnected')
+    res.end()
+  })
+
+  res.on('finish', () => {
+    console.log('Response stream closed')
+  })
 })
 
+
 llm.listen(PORT2, () => {
-  console.log(`Server running on http://localhost:${PORT}`)
+  console.log(`Server running on http://localhost:${PORT2}`)
 })

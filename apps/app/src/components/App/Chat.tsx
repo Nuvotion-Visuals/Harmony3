@@ -1,56 +1,157 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState } from 'react'
+import { chat } from '../../language/chat'
+import { Avatar, Box, Button, Gap, Item, LineBreak, StyleHTML, TextInput, markdownToHTML } from '@avsync.live/formation'
+import styled from 'styled-components'
+import { speak } from '../../language/speech'
 
-export const Chat = () => {
-  const [message, setMessage] = useState('')
-  const [responses, setResponses] = useState([])
-  const eventSource = useRef(null)
-
-  useEffect(() => {
-    // Clean up the event source when the component unmounts
-    return () => {
-      if (eventSource.current) {
-        eventSource.current.close()
-      }
-    }
-  }, [])
-
-  const handleSendMessage = () => {
-    if (eventSource.current) {
-      eventSource.current.close()
-    }
-    eventSource.current = new EventSource(`http://localhost:1616/events?message=${encodeURIComponent(message)}`)
-
-    eventSource.current.onmessage = (event) => {
-      const newResponse = JSON.parse(event.data)
-      setResponses((prevResponses) => [...prevResponses, newResponse])
-    }
-
-    eventSource.current.onerror = (error) => {
-      console.error('EventSource failed:', error)
-      eventSource.current.close()
-    }
-  }
-
+const Message = ({
+  role,
+  content
+}) => {
   return (
-    <div>
-    
-      <div>
-        <h2>Responses:</h2>
-        <div>
-        {responses.map((response, index) => (
-          <>{response.message.content}</>
-        ))}
-        </div>
-       
-      </div>
-
-      <textarea
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Type your message here..."
-      />
-      <button onClick={handleSendMessage}>Send Message</button>
-    </div>
+    <S.Message >
+      <S.Left>
+        <Avatar
+          name={role}
+          labelColor='gray'
+        />
+      </S.Left>
+      <S.Right>
+        <Item
+          subtitle={role}
+          disablePadding
+          disableBreak
+        >
+          <Gap autoWidth>
+            <Box>
+              <Button
+                icon='play'
+                iconPrefix='fas'
+                compact
+                minimal
+                square
+                onClick={() => {
+                  speak(content, ``, () => {}, )
+                }}
+              />
+            </Box>
+          </Gap>
+        </Item>
+        <S.Container>
+          <StyleHTML>
+            <div dangerouslySetInnerHTML={{ __html: content || '' }} className='message' />
+          </StyleHTML>
+        </S.Container>
+      </S.Right>
+    </S.Message>
   )
 }
 
+export const Chat = () => {
+  const [messages, setMessages] = useState([])
+  const [stream, setStream] = useState([])
+
+  const [message, setMessage] = useState('')
+
+  const sendMessage = () => {
+    const newMessages = [
+      ...messages,
+      { role: 'user', content: message }
+    ]
+    setMessages(newMessages)
+    setMessage('')
+
+    chat(newMessages, (response, endOfStream) => {
+      if (!endOfStream) {
+        setStream(prevResponses => [...prevResponses, response.includes('\n\n') ? '\n' : response])
+      } 
+      else {
+        const completeAssistantMessage = { role: 'assistant', content: response }
+        console.log(response, completeAssistantMessage)
+        setMessages(prevHistory => [...prevHistory, completeAssistantMessage])
+        console.log(completeAssistantMessage)
+        setStream([])
+        
+      }
+    })
+  }
+
+  const clear = () => {
+    setMessages([])
+    setMessage('')
+  }
+
+  return (<>
+    <Item
+      text='Quick chat'
+      absoluteRightChildren
+    >
+      <Button
+        icon='refresh'
+        iconPrefix='fas'
+        minimal
+        compact
+        square
+        onClick={clear}
+      />
+    </Item>
+    <LineBreak />
+
+    <S.Content>
+      <Gap>
+        {
+          messages.map(message =>
+            <Message
+              role={message.role}
+              content={markdownToHTML(message.content)}
+            />)
+        }
+        {
+          stream.length > 0 && <Message
+            role={'assistant'}
+            content={markdownToHTML(stream.join(''))}
+          />
+        }
+      </Gap>
+    </S.Content>
+
+    <TextInput
+      value={message}
+      placeholder='Chat'
+      onChange={val => setMessage(val)}
+      onEnter={sendMessage}
+      secondaryIcon='arrow-up'
+      iconPrefix='fas'
+      secondaryOnClick={sendMessage}
+    />
+  </>)
+}
+
+
+const S = {
+  Content: styled.div`
+    width: 100%;
+    height: calc(100vh - 70px);
+    overflow-y: auto;
+  `,
+  Message: styled.div`
+    width: calc(100% - 1rem);
+    display: flex;
+    gap: .25rem;
+    padding-left: 1rem;
+    margin-bottom: .5rem;
+  `,
+  Left: styled.div`
+    width: 2rem;
+  `,
+  Right: styled.div`
+    width: calc(100% - 2rem);
+  `,
+  Container: styled.div`
+    margin-top: -.5rem;
+  `,
+  Sender: styled.div`
+    font-size: 12px;
+    color: var(--F_Font_Color_Disabled);
+  `
+}
