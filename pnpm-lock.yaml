@@ -24,8 +24,8 @@ importers:
   apps/app:
     dependencies:
       '@avsync.live/formation':
-        specifier: ^1.0.106
-        version: 1.0.106(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8)
+        specifier: ^1.0.108
+        version: 1.0.108(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8)
       '@fortawesome/fontawesome-svg-core':
         specifier: ^6.5.2
         version: 6.5.2
@@ -224,8 +224,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.20
     dev: true
 
-  /@avsync.live/formation@1.0.106(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8):
-    resolution: {integrity: sha512-6p7lgUUsT86UmiNDL7gW7WbaKY5b3VAneBvMo7KkhwcX+lRsM/EL1/NzlVQqZcs22ozU0yWSAxMOAbfFbYw1Wg==}
+  /@avsync.live/formation@1.0.108(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8):
+    resolution: {integrity: sha512-GIS5tzUaVi+nMZK17JAtK3sljKopqc/9xyL5I7BPkxnwCTro1GZ3Dy08XtoeqrTEebyaTwkjOTaM4EsV+iDhPg==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
@@ -2284,7 +2284,7 @@ packages:
       '@radix-ui/react-select': 1.2.2(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)
       '@radix-ui/react-toolbar': 1.0.4(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)
       '@storybook/client-logger': 7.6.18
-      '@storybook/csf': 0.1.4
+      '@storybook/csf': 0.1.5
       '@storybook/global': 5.0.0
       '@storybook/theming': 7.6.18(react-dom@18.2.0)(react@18.2.0)
       '@storybook/types': 7.6.18
@@ -2310,8 +2310,8 @@ packages:
       ts-dedent: 2.2.0
     dev: false
 
-  /@storybook/csf@0.1.4:
-    resolution: {integrity: sha512-B9UI/lsQMjF+oEfZCI6YXNoeuBcGZoOP5x8yKbe2tIEmsMjSztFKkpPzi5nLCnBk/MBtl6QJeI3ksJnbsWPkOw==}
+  /@storybook/csf@0.1.5:
+    resolution: {integrity: sha512-pW7Dtk/bE2JGrAe/KuBY4Io02NBe/2CLP2DkgVgWlSwvEVdm/rbQyiwy8RaL0lQlJCv9CsGBY+n9HQG8d4bZjQ==}
     dependencies:
       type-fest: 2.19.0
     dev: false
@@ -2326,7 +2326,7 @@ packages:
       '@storybook/channels': 7.6.17
       '@storybook/client-logger': 7.6.17
       '@storybook/core-events': 7.6.17
-      '@storybook/csf': 0.1.4
+      '@storybook/csf': 0.1.5
       '@storybook/global': 5.0.0
       '@storybook/router': 7.6.17
       '@storybook/theming': 7.6.17(react-dom@18.2.0)(react@18.2.0)
@@ -2348,7 +2348,7 @@ packages:
       '@storybook/channels': 7.6.17
       '@storybook/client-logger': 7.6.17
       '@storybook/core-events': 7.6.17
-      '@storybook/csf': 0.1.4
+      '@storybook/csf': 0.1.5
       '@storybook/global': 5.0.0
       '@storybook/types': 7.6.17
       '@types/qs': 6.9.15

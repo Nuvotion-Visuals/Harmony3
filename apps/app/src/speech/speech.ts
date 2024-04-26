@@ -1,7 +1,5 @@
-import { store } from 'redux-tk/store';
-import { split } from 'sentence-splitter';
+import { split } from 'sentence-splitter'
 
-let targetMessageGuid = ''
 
 const removeOldHighlights = (html: string): string => {
   const openingTag = `<span style="background-color: #312800;">`
@@ -33,34 +31,34 @@ const searchAndHighlight = async (guid: string, currentlySpeaking: string | null
   const highlightedHtml = highlightText(htmlContent, currentlySpeaking)
   
   qlEditorElement.innerHTML = highlightedHtml
-  console.log('Updated HTML:', qlEditorElement.innerHTML)
 }
 
 const highlightText = (html: string, currentlySpeaking: string | null): string => {
   const openingTag = `<span style="background-color: #312800;">`
   const closingTag = '</span>'
-  let len = 0
-  if (currentlySpeaking) {
-    len = currentlySpeaking.length
+  
+  if (!currentlySpeaking) {
+    return html
   }
+  
+  const numberPrefixRegex = /^\d+\.\s+/ // Regex to detect numbering like "1. "
+  const searchRegex = new RegExp(`(?<!${numberPrefixRegex.source})(?<!\\w)${currentlySpeaking}(?!\\w)`, 'gi') // Avoid highlighting numbering and mid-word matches
 
-  let startIndex = 0
-  let index = currentlySpeaking ? html.indexOf(currentlySpeaking, startIndex) : -1
   let highlightedHtml = ''
+  let startIndex = 0
+  let match
 
-  console.log('Initial index:', index)
-
-  while (index !== -1) {
-    highlightedHtml += html.substring(startIndex, index)
-    highlightedHtml += openingTag + html.substring(index, index + len) + closingTag
+  while ((match = searchRegex.exec(html)) !== null) {
+    const index = match.index
+    const len = match[0].length
+    highlightedHtml += html.substring(startIndex, index) + openingTag + html.substring(index, index + len) + closingTag
     startIndex = index + len
-    index = html.indexOf(currentlySpeaking as string, startIndex)
   }
 
   highlightedHtml += html.substring(startIndex)
-
   return highlightedHtml
 }
+
 import { HTMLToPlaintext } from '@avsync.live/formation';
 class SpeechSynthesizer {
   private audioDataMap: Map<string, string | null> = new Map()

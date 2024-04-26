@@ -114,6 +114,7 @@ export const TextBox = ({
               sendMessage(text.substring(0, text.length - 9))
             }
           }}
+          placeholder='Send a message'
         />
         {
           text !== '' &&
