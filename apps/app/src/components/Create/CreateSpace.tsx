@@ -1,25 +1,24 @@
-import { Gap, TextInput, Button } from '@avsync.live/formation'
+import { Gap, TextInput, Button, RichTextEditor, Page, Box } from '@avsync.live/formation'
+import { SpaceSuggestions } from 'components/App/SpaceSuggestions'
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
 import { pb } from 'redux-tk/pocketbase'
 
-interface CreateSpaceProps {
-  // empty props for now
-}
-
-export function CreateSpace({}: CreateSpaceProps) {
+export const CreateSpace = () => {
+  const navigate = useNavigate()
   const userId = useHarmony_currentUserId()
-  const [spaceName, setSpaceName] = useState('')
-  const [spaceDescription, setSpaceDescription] = useState('')
+  const [name, setName] = useState('')
+  const [description, setSpaceDescription] = useState('')
 
   async function handleCreateSpace() {
     if (!userId) return
-    setSpaceName('')
+    setName('')
     setSpaceDescription('')
-    const data = { name: spaceName, description: spaceDescription, userid: userId }
+    const data = { name, description, userid: userId }
     try {
-      await pb.collection('spaces').create(data)
-      
+      const response = await pb.collection('spaces').create(data)
+      navigate(`/spaces/${response.id}`)
     } 
     catch (error) {
       console.error('Failed to create space:', error)
@@ -28,17 +27,40 @@ export function CreateSpace({}: CreateSpaceProps) {
   }
 
   return (
-    <Gap>
-      <TextInput
-        value={spaceName}
-        onChange={val => setSpaceName(val)}
-        compact
-        placeholder="Space Name"
-        secondaryIcon='arrow-right'
-        secondaryOnClick={handleCreateSpace}
-        onEnter={handleCreateSpace}
-        hideOutline
-      />
-    </Gap>
+    <Box mt={1}>
+      <Page>
+        <Gap>
+          <Gap disableWrap>
+            <TextInput
+              value={name}
+              onChange={val => setName(val)}
+              compact
+              placeholder='Space Name'
+              onEnter={handleCreateSpace}
+              autoFocus
+            />
+            <Button
+              text='Create'
+              icon='arrow-right'
+              iconPrefix='fas'
+              compact
+              primary={name !== ''}
+              disabled={name === ''}
+              onClick={handleCreateSpace}
+            />
+          </Gap>
+          
+          <RichTextEditor
+            value={description}
+            onChange={val => setSpaceDescription(val)}
+            outline
+            px={1}
+            placeholder='Description'
+          />
+
+          <SpaceSuggestions />
+        </Gap>
+      </Page>
+    </Box>
   )
 }

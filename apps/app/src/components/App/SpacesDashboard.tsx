@@ -39,7 +39,7 @@ const SpacesDashboard = ({ }: Props) => {
 
         )
       }
-      <Link href='/spaces/add'>
+      <Link href='/spaces/create'>
       <S.AddContainer>
         <AspectRatio ratio={16/9}>
           <Button icon='plus' iconPrefix='fas' hero minimal />

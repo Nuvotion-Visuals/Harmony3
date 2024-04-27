@@ -102,13 +102,18 @@ export const Groups = React.memo(() => {
                     square
                     items={[
                       {
+                        icon: 'arrow-right',
+                        iconPrefix: 'fas',
+                        compact: true,
+                        text: 'Visit',
+                        href: `/spaces/${activeSpace.id}/groups/${expandableList.id}`
+                      },
+                      {
                         icon: 'edit',
                         iconPrefix: 'fas',
                         compact: true,
                         text: 'Edit',
-                        onClick: () => {
-
-                        }
+                        href: `/spaces/${activeSpace.id}/groups/${expandableList.id}`
                       },
                       {
                         icon: 'trash-alt',

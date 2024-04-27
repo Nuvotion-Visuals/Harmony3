@@ -7,6 +7,7 @@ import { SpaceCard } from './SpaceCard'
 import { Logo } from './Logo'
 import { useHarmony_activeSpace, useHarmony_activeSpaceIndex, useHarmony_setActiveSpaceIndex, useHarmony_spaces } from 'redux-tk/harmony/hooks'
 import { Link } from 'components/Util/Link'
+import { useLocation } from 'react-router-dom'
 
 const SpacesSidebarComponent = () => {
   const activeSpaceIndex = useHarmony_activeSpaceIndex()
@@ -23,7 +24,7 @@ const SpacesSidebarComponent = () => {
     {
       icon: 'plus',
       iconPrefix: 'fas',
-      href: '/spaces/add'
+      href: '/spaces/create'
     }
   ] as ItemProps[]
 
@@ -46,6 +47,8 @@ interface Props {
 
 export const SpaceSidebar = React.memo(({ }: Props) => {
   const activeSpace = useHarmony_activeSpace()
+  const location = useLocation() 
+
   return (<S.GroupsSidebar>
     <SpacesSidebarComponent />
     <S.SidebarContainer>
@@ -57,7 +60,11 @@ export const SpaceSidebar = React.memo(({ }: Props) => {
         threadsCount={30}
         messageCount={120}
       />
-      <Groups />
+      {
+        location.pathname !== '/spaces/create' &&
+          <Groups />
+      }
+      
     </S.SidebarContainer>
   </S.GroupsSidebar>)
 })

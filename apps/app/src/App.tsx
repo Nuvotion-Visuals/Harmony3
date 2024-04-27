@@ -5,9 +5,12 @@ import { useHarmony_setCurrentUser } from 'redux-tk/harmony/hooks'
 import { useEffect } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { UsersResponse } from 'redux-tk/pocketbase-types'
-import { useLocation } from 'react-router-dom'
+import { matchPath, useLocation, useParams } from 'react-router-dom'
 import SpacesDashboard from 'components/App/SpacesDashboard'
 import { Chat } from 'components/App/Chat'
+import { CreateSpace } from 'components/Create/CreateSpace'
+import { Space } from 'components/App/Space'
+import { Group } from 'components/App/Group'
 
 interface Props {
   children: React.ReactNode
@@ -22,8 +25,39 @@ export const App = ({ children }: Props) => {
     setCurrentUser(pb.authStore.model as UsersResponse | null)
   }, [])
 
+
   const FirstPage = () => {
     return <SpaceSidebar />
+  }
+
+  const SecondPage = () => {
+    const location = useLocation()
+  
+    // Match for the specific space ID
+    const matchSpace = matchPath({ path: "/spaces/:spaceid", end: true }, location.pathname)
+    if (matchSpace) {
+      return <Space />
+    }
+  
+    // Match for the specific group within a space
+    const matchGroup = matchPath({ path: "/spaces/:spaceid/groups/:groupid", end: true }, location.pathname)
+    if (matchGroup) {
+      return <Group />
+    }
+  
+    switch (location.pathname) {
+      case '/spaces/create':
+        return <CreateSpace />
+      default:
+        return <Channel />
+    }
+  }
+
+  const ThirdPage = () => {
+    switch(location.pathname) {
+      default:
+        return <Chat />
+    }
   }
 
   return (
@@ -42,10 +76,10 @@ export const App = ({ children }: Props) => {
               channels={[]}
               sidebarWidth='380px'
               firstPage={<FirstPage />}
-              secondPage={<Channel />}
+              secondPage={<SecondPage />}
               thirdPage={<>
-              {children}
-              <Chat />
+                {children}
+                <ThirdPage />
               </>}
               navsPrimary={[
                 {

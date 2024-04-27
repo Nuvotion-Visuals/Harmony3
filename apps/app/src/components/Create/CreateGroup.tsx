@@ -1,6 +1,7 @@
 import { Box, TextInput } from '@avsync.live/formation'
 import React, { useState } from 'react'
-import { useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
+import { useNavigate } from 'react-router-dom'
+import { useHarmony_activeSpaceId, useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
 import { pb } from 'redux-tk/pocketbase'
 
 interface CreateGroupProps {
@@ -9,6 +10,8 @@ interface CreateGroupProps {
 
 export function CreateGroup({ spaceId }: CreateGroupProps) {
   const userId = useHarmony_currentUserId()
+  const activeSpaceId = useHarmony_activeSpaceId()
+  const navigate = useNavigate()
   
   const [groupName, setGroupName] = useState('')
   // const [groupDescription, setGroupDescription] = useState('') // Temporarily commented out
@@ -18,7 +21,8 @@ export function CreateGroup({ spaceId }: CreateGroupProps) {
     setGroupName('')
     const data = { name: groupName, userid: userId, spaceid: spaceId }
     try {
-      await pb.collection('groups').create(data)
+      const response = await pb.collection('groups').create(data)
+      navigate(`/spaces/${activeSpaceId}/groups/${response.id}`)
     } 
     catch (error) {
       console.error('Failed to create group:', error)
