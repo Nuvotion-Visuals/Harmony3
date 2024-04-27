@@ -6,6 +6,7 @@
       "redux-tk/*": ["src/redux-tk/*"],
       "language/*": ["src/language/*"],
       "utils/*": ["src/utils/*"],
+      "spaces/*": ["src/spaces/*"],
       "react": [ "./node_modules/@types/react" ]
     },
     "target": "ESNext",

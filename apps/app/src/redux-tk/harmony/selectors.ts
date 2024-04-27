@@ -69,3 +69,13 @@ export const selectThreadMessagesWithRole = (threadId: string) => (state: State)
       role: message.userid !== state.harmony.currentUser?.id ? 'user' : 'assistant',
       content: message.text || ''
     }))
+
+export const selectActiveChannelThreadNamesAndDescriptions = (state: State): { name: string, description: string }[] => {
+  const activeChannelId = state.harmony.activeChannelId
+  return state.harmony.threads
+    .filter(thread => thread.channelid === activeChannelId)
+    .map(thread => ({
+      name: thread.name || '',
+      description: thread.description || ''
+    }))
+}

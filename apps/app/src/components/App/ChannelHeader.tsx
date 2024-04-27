@@ -1,6 +1,7 @@
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
+import { ChannelSuggestThreads } from './ChannelSuggestThreads'
 
 interface Props {
   channel: any
@@ -8,12 +9,13 @@ interface Props {
 
 export const ChannelHeader = memo(({ channel }: Props) => {
   const [edit, setEdit] = useState(false)
-  const [editName, setEditName] = useState(channel?.name)
-  const [editDescription, setEditDescription] = useState(channel?.description)
+
+  const [name, setName] = useState(channel?.name)
+  const [description, setDescription] = useState(channel?.description)
 
   useEffect(() => {
-    setEditName(channel?.name)
-    setEditDescription(channel?.description)
+    setName(channel?.name)
+    setDescription(channel?.description)
   }, [channel])
 
   const handleDelete = async () => {
@@ -30,8 +32,8 @@ export const ChannelHeader = memo(({ channel }: Props) => {
   const handleUpdate = async () => {
     try {
       await pb.collection('channels').update(channel.id, {
-        name: editName,
-        description: editDescription
+        name,
+        description
       })
       setEdit(false)
       console.log('Channel updated')
@@ -41,6 +43,12 @@ export const ChannelHeader = memo(({ channel }: Props) => {
       alert('Failed to update channel')
     }
   }
+
+  const handleCancelEdit = useCallback(() => {
+    setName(channel.name)
+    setDescription(channel.description)
+    setEdit(false)
+  }, [channel])
 
   const dropdownItems = [
     {
@@ -61,23 +69,23 @@ export const ChannelHeader = memo(({ channel }: Props) => {
 
   return (
     <Page noPadding>
-      <Box width='100%' py={1}>
+      <Box width='100%' py={.5}>
         {
             edit
               ? <Box width='100%' mt={.5}>
                   <Gap disableWrap>
                     <Gap >
                       <TextInput
-                        value={editName}
-                        onChange={val => setEditName(val)}
+                        value={name}
+                        onChange={val => setName(val)}
                         autoFocus
                         placeholder='Name'
                         onEnter={handleUpdate}
                         compact
                       />
                       <TextInput
-                        value={editDescription}
-                        onChange={val => setEditDescription(val)}
+                        value={description}
+                        onChange={val => setDescription(val)}
                         placeholder='Description'
                         onEnter={handleUpdate}
                         compact
@@ -89,7 +97,7 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                           icon='save'
                           iconPrefix='fas'
                           square
-                          onClick={() => handleUpdate()}
+                          onClick={handleUpdate}
                           compact
                         />
                         <Button
@@ -97,7 +105,7 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                           iconPrefix='fas'
                           square
                           minimal
-                          onClick={() => setEdit(false)}
+                          onClick={handleCancelEdit}
                           compact
                         />
                       </Gap>
@@ -128,6 +136,7 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                 </ContextMenu> 
         }
       </Box>
+      <ChannelSuggestThreads />
     </Page>
   )
 })

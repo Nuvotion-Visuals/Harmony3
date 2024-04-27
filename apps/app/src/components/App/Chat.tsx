@@ -49,7 +49,7 @@ const Message = ({
 
 export const Chat = () => {
   const [messages, setMessages] = useState([])
-  const [stream, setStream] = useState([])
+  const [stream, setStream] = useState('')
 
   const [message, setMessage] = useState('')
 
@@ -64,14 +64,14 @@ export const Chat = () => {
     chat({
       messages: newMessages,
       onPartial: response => {
-        setStream(prevResponses => [...prevResponses, response.includes('\n\n') ? '\n' : response])
+        setStream(response)
       },
       onComplete: response => {
         const completeAssistantMessage = { role: 'assistant', content: response }
         console.log(response, completeAssistantMessage)
         setMessages(prevHistory => [...prevHistory, completeAssistantMessage])
         console.log(completeAssistantMessage)
-        setStream([])
+        setStream('')
       }
     })
   }
@@ -109,7 +109,7 @@ export const Chat = () => {
         {
           stream.length > 0 && <Message
             role={'assistant'}
-            content={markdownToHTML(stream.join(''))}
+            content={markdownToHTML(stream)}
           />
         }
       </Gap>
@@ -138,7 +138,7 @@ const S = {
     width: calc(100% - 1rem);
     display: flex;
     gap: .25rem;
-    padding-left: 1rem;
+    padding-left: .5rem;
     margin-bottom: .5rem;
   `,
   Left: styled.div`

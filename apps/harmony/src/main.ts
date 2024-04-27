@@ -61,70 +61,74 @@ const createWindow = () => {
 const initPocketbaseClient = async () => {
   const PocketBase = require('pocketbase/cjs')
   const pb = new PocketBase('http://127.0.0.1:8090')
+
   try {
     const user = await pb.collection('users').authWithPassword(
       'harmony',
-      'qxIrfPYwKsMxZBQ',
+      'qxIrfPYwKsMxZBQ'
     )
 
     const systemId = pb.authStore.model?.id
 
     pb.collection('messages').subscribe('*', async (event: any) => {
-      switch (event.action) {
-        case 'create':
-          if (event.record.userid !== systemId) {
-            let llmMessages
-            const threadId = event.record.threadid
+      if (event.action === 'create' && event.record.userid !== systemId) {
+        let llmMessages
+        const threadId = event.record.threadid
+        let isFirstAssistantMessage = true
 
-            try {
-              const messages = await pb.collection('messages').getFullList({
-                filter: `threadid="${threadId}"`,
-                sort: 'created'
-              })
+        try {
+          const messages = await pb.collection('messages').getFullList({
+            filter: `threadid="${threadId}"`,
+            sort: 'created'
+          })
 
-              llmMessages = messages.map((message: any) => ({
-                role: message.userid !== systemId ? 'user' : 'assistant',
-                content: message.text
-              })) 
-            }
-            catch(e) {
-              console.log(e)
-            }
+          llmMessages = messages.map((message: any) => ({
+            role: message.userid !== systemId ? 'user' : 'assistant',
+            content: message.text
+          }))
 
-            const assistantMessage = await pb.collection('messages').create({ 
-              text: '', 
-              userid: systemId, 
-              threadid: threadId
+          // Check if this is the first assistant message in the thread
+          isFirstAssistantMessage = messages.every((message: any) => message.userid !== systemId)
+        }
+        catch (e) {
+          console.error(e)
+        }
+
+        const assistantMessage = await pb.collection('messages').create({
+          text: '', 
+          userid: systemId, 
+          threadid: threadId
+        })
+
+        if (llmMessages && assistantMessage.id) {
+          const response = await ollama.chat({
+            model: 'llama3',
+            messages: llmMessages,
+            stream: true
+          })
+
+          const fullResponse = []
+
+          for await (const part of response) {
+            fullResponse.push(part.message.content)
+            const partialResponse = fullResponse.join('')
+            await pb.collection('messages').update(assistantMessage.id, {
+              text: partialResponse
             })
-
-            if (llmMessages && assistantMessage.id) {
-              const response = await ollama.chat({
-                model: 'llama3',
-                messages: llmMessages,
-                stream: true
-              })
-          
-              const fullResponse = []
-          
-              for await (const part of response) {
-                fullResponse.push(part.message.content)
-                const partialResponse = fullResponse.join('')
-                await pb.collection('messages').update(assistantMessage.id, {
-                  'text': partialResponse
-                })
-              }
-            }
           }
-          break
-        default:
-          break
+
+          if (isFirstAssistantMessage) {
+            console.log('Complete response and first assistant message in thread')
+          }
+        }
       }
     })
   }
-  catch(e) {
-    console.log(e)
+  catch (e) {
+    console.error(e)
   }
 }
+
 
 
 // Start PocketBase

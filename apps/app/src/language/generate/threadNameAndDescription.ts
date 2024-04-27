@@ -1,4 +1,4 @@
-import { chat } from "../chat";
+import { chat } from 'language/chat'
 
 export const generate_threadNameAndDescription = ({
   prompt,
@@ -33,11 +33,8 @@ export const generate_threadNameAndDescription = ({
     ],
     onPartial: response => {
       onPartial(response)
-      console.log(response)
     },
     onComplete: response => {
-      const completeAssistantMessage = { role: 'assistant', content: response }
-      console.log(response, completeAssistantMessage)
       onComplete(response)
     }
   })

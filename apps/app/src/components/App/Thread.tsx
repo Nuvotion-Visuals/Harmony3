@@ -27,22 +27,25 @@ export const Thread = memo(({
   const setActiveThreadId = useHarmony_setActiveThreadId()
   const [expanded, setExpanded] = useState(active)
 
-  const [displayName, setDisplayName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
-  const [displayDescription, setDisplayDescription] = useState(thread?.description)
+  const [name, setName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
+  const [description, setDescription] = useState(thread?.description)
+  const [edit, setEdit] = useState(false)
 
   useEffect(() => {
-    setDisplayName(thread?.name)
+    setName(thread?.name)
   }, [thread?.name])
-
+  
   useEffect(() => {
-    setDisplayDescription(thread?.description)
+    setDescription(thread?.description)
   }, [thread?.description])
 
-  const [edit, setEdit] = useState(false)
-  const [editName, setEditName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
-  const [editDescription, setEditDescription] = useState(thread?.description)
-
   const jsonValidatorRef = useRef(new JsonValidator())
+
+  const handleCancelEdit = useCallback(() => {
+    setName(thread.name)
+    setDescription(thread.description)
+    setEdit(false)
+  }, [thread.name, thread.description])
 
   const handleDelete = useCallback(async () => {
     try {
@@ -58,15 +61,16 @@ export const Thread = memo(({
   const handleUpdate = useCallback(async () => {
     try {
       await pb.collection('threads').update(thread.id, {
-        name: editName,
-        description: editDescription
+        name,
+        description
       })
       setEdit(false)
-    } catch (error) {
+    } 
+    catch (error) {
       console.error('Failed to update thread:', error)
       alert('Failed to update thread')
     }
-  }, [thread.id, editName, editDescription])
+  }, [thread.id, name, description])
 
   useEffect(() => {
     setExpanded(active)
@@ -100,15 +104,13 @@ export const Thread = memo(({
       text: 'Suggest',
       onClick: (e) => {
         e.stopPropagation()
-        const threadMessagesWithRole = selectors.selectThreadMessagesWithRole(thread.id)(store.getState());
+        const threadMessagesWithRole = selectors.selectThreadMessagesWithRole(thread.id)(store.getState())
         generate_threadNameAndDescription({
           prompt: JSON.stringify(threadMessagesWithRole),
           enableEmoji: true,
           onComplete: async (text) => {
             const newName = JSON.parse(text).name
             const newDescription = JSON.parse(text).description
-            setDisplayName(newName)
-            setDisplayDescription(newDescription)
             try {
               await pb.collection('threads').update(thread.id, {
                 name: newName,
@@ -122,8 +124,8 @@ export const Thread = memo(({
             }
           },
           onPartial: text => {
-            setDisplayName(jsonValidatorRef.current.parseJsonProperty(text, 'name'))
-            setDisplayDescription(jsonValidatorRef.current.parseJsonProperty(text, 'description'))
+            setName(jsonValidatorRef.current.parseJsonProperty(text, 'name'))
+            setDescription(jsonValidatorRef.current.parseJsonProperty(text, 'description'))
           }
         })
       }
@@ -158,16 +160,16 @@ export const Thread = memo(({
               <Gap disableWrap>
                 <Gap >
                   <TextInput
-                    value={editName}
-                    onChange={val => setEditName(val)}
+                    value={name}
+                    onChange={val => setName(val)}
                     autoFocus
                     placeholder='Name'
                     onEnter={handleUpdate}
                     compact
                   />
                   <TextInput
-                    value={editDescription}
-                    onChange={val => setEditDescription(val)}
+                    value={description}
+                    onChange={val => setDescription(val)}
                     placeholder='Description'
                     onEnter={handleUpdate}
                     compact
@@ -179,7 +181,7 @@ export const Thread = memo(({
                       icon='save'
                       iconPrefix='fas'
                       square
-                      onClick={() => handleUpdate()}
+                      onClick={handleUpdate}
                       compact
                     />
                     <Button
@@ -187,7 +189,7 @@ export const Thread = memo(({
                       iconPrefix='fas'
                       square
                       minimal
-                      onClick={() => setEdit(false)}
+                      onClick={handleCancelEdit}
                       compact
                     />
                   </Gap>
@@ -200,8 +202,8 @@ export const Thread = memo(({
               }}
             >
               <Item
-                headingText={displayName}
-                subtitle={displayDescription}
+                headingText={name}
+                subtitle={description}
                 onClick={toggleExpanded}
                 onMouseDown={onScrollWheelClick(() => handleDelete())}
               >
@@ -241,7 +243,6 @@ export const Thread = memo(({
               </Item>
             </ContextMenu>
           }
-      
       <S.Bottom />
       {
         expanded && 

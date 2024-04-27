@@ -44,13 +44,14 @@ export const useHarmony_activeSpaceIndex = (): number | null =>
 export const useHarmony_currentUser = (): UsersResponse | null => 
   useSelector(selectors.selectCurrentUser, isEqual)
 
-export const useHarmony_activeSpaceGroups = (): CollectionResponses['groups'][] => {
-  return useSelector(selectors.selectActiveSpaceGroups, isEqual)
-}
+export const useHarmony_activeSpaceGroups = (): CollectionResponses['groups'][] => 
+  useSelector(selectors.selectActiveSpaceGroups, isEqual)
 
-export const useHarmony_activeChannelThreads = (): (CollectionResponses['threads'] & { messageIds: string[] })[] => {
-  return useSelector(selectors.selectActiveChannelThreads, isEqual)
-}
+export const useHarmony_activeChannelThreadNamesAndDescriptions = (): { name: string, description: string }[] => 
+  useSelector(selectors.selectActiveChannelThreadNamesAndDescriptions, isEqual)
+
+export const useHarmony_activeChannelThreads = (): (CollectionResponses['threads'] & { messageIds: string[] })[] => 
+  useSelector(selectors.selectActiveChannelThreads, isEqual)
 
 export const useHarmony_currentUserId = (): string | null => 
   useSelector(selectors.selectCurrentUserId, isEqual)

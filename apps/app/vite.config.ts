@@ -21,6 +21,7 @@ export default defineConfig({
       'redux-tk': path.resolve(__dirname, 'src/redux-tk'),
       'language': path.resolve(__dirname, 'src/language'),
       'utils': path.resolve(__dirname, 'src/utils'),
+      'spaces': path.resolve(__dirname, 'src/spaces'),
     }
   },
 })
