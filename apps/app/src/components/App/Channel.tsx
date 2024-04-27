@@ -124,6 +124,7 @@ export const Channel = () => {
               active={thread.id === activeThreadId}
               onToggle={toggleThread}
               onReply={setActiveThreadId}
+              expanded={expandedStates[index]}
             />
           ))
         }

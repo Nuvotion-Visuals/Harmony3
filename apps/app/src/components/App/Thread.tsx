@@ -16,6 +16,7 @@ interface Props {
   index: number
   onToggle: (index: number) => void
   onReply: (id: string) => void
+  expanded: boolean
 }
 
 export const Thread = memo(({ 
@@ -23,10 +24,10 @@ export const Thread = memo(({
   active, 
   index,
   onToggle,
-  onReply
+  onReply,
+  expanded
 }: Props) => {
   const setActiveThreadId = useHarmony_setActiveThreadId()
-  const [expanded, setExpanded] = useState(active)
 
   const [name, setName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
   const [description, setDescription] = useState(thread?.description)
@@ -73,12 +74,9 @@ export const Thread = memo(({
     }
   }, [thread.id, name, description])
 
-  useEffect(() => {
-    setExpanded(active)
-  }, [active])
+
 
   const toggleExpanded = useCallback(() => {
-    setExpanded(prevExpanded => !prevExpanded)
     onToggle(index)
   }, [index])
 

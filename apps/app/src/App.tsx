@@ -7,7 +7,7 @@ import { pb } from 'redux-tk/pocketbase'
 import { UsersResponse } from 'redux-tk/pocketbase-types'
 import { matchPath, useLocation, useNavigate, useParams } from 'react-router-dom'
 import SpacesDashboard from 'components/App/SpacesDashboard'
-import { Chat } from 'components/App/Chat'
+import { QuickChat } from 'components/App/QuickChat'
 import { CreateSpace } from 'components/Create/CreateSpace'
 import { Space } from 'components/App/Space'
 import { Group } from 'components/App/Group'
@@ -69,7 +69,7 @@ export const App = ({ children }: Props) => {
   const ThirdPage = () => {
     switch(location.pathname) {
       default:
-        return <Chat />
+        return <QuickChat />
     }
   }
 

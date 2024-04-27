@@ -47,12 +47,16 @@ const Message = ({
   )
 }
 
-export const Chat = () => {
+export const QuickChat = () => {
   const [messages, setMessages] = useState([])
   const [stream, setStream] = useState('')
 
   const [textBoxHeight, setTextBoxHeight] = useState(0)
   const textBoxRef = React.createRef<HTMLDivElement>()
+
+  useEffect(() => {
+    scrollToElementById('quickchat_bottom', { behavior: 'auto', block: 'end'})
+  }, [messages])
 
   useEffect(() => {
     const updateHeight = () => {
@@ -90,6 +94,7 @@ export const Chat = () => {
       messages: newMessages,
       onPartial: response => {
         setStream(response)
+        scrollToElementById('quickchat_bottom', { behavior: 'auto', block: 'end'})
       },
       onComplete: response => {
         const completeAssistantMessage = { role: 'assistant', content: response }
