@@ -61,12 +61,10 @@ export const SpaceSidebar = React.memo(({ }: Props) => {
           messageCount={120}
         />
       }
-      
       {
-        location.pathname !== '/spaces/create' &&
+        !['/spaces/create', '/profile'].includes(location.pathname) &&
           <Groups />
       }
-      
     </S.SidebarContainer>
   </S.GroupsSidebar>)
 })

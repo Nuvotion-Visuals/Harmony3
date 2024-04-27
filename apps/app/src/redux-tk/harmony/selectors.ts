@@ -99,3 +99,10 @@ export const selectActiveSpaceGroupNamesAndDescriptions = (state: State): { name
       description: group.description || ''
     }))
 }
+
+export const selectNamesByUserId = (state: State): Record<string, string> => {
+  return state.harmony.users.reduce((names, user) => {
+    names[user.id] = user.name
+    return names
+  }, {} as Record<string, string>)
+}

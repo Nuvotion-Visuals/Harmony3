@@ -67,6 +67,9 @@ export const useHarmony_messageById = (id: string): MessagesResponse => {
   return useSelector(memoizedSelector, isEqual)
 }
 
+export const useHarmony_namesByUserId = (): Record<string, string> => 
+  useSelector(selectors.selectNamesByUserId, isEqual)
+
 export const useHarmony_setActiveSpaceIndex = () => {
   const dispatch = useDispatch()
   return useCallback((index: number | null) => dispatch(harmonyActions.setActiveSpaceIndex(index)), [dispatch])

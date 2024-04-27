@@ -5,12 +5,13 @@ import { useHarmony_setCurrentUser } from 'redux-tk/harmony/hooks'
 import { useEffect } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { UsersResponse } from 'redux-tk/pocketbase-types'
-import { matchPath, useLocation, useParams } from 'react-router-dom'
+import { matchPath, useLocation, useNavigate, useParams } from 'react-router-dom'
 import SpacesDashboard from 'components/App/SpacesDashboard'
 import { Chat } from 'components/App/Chat'
 import { CreateSpace } from 'components/Create/CreateSpace'
 import { Space } from 'components/App/Space'
 import { Group } from 'components/App/Group'
+import { Profile } from 'components/App/Profile'
 
 interface Props {
   children: React.ReactNode
@@ -18,13 +19,19 @@ interface Props {
 
 export const App = ({ children }: Props) => {
   const location = useLocation()
+  const navigate = useNavigate()
 
   const setCurrentUser = useHarmony_setCurrentUser()
 
   useEffect(() => {
-    setCurrentUser(pb.authStore.model as UsersResponse | null)
+    const currentUser = pb.authStore.model as UsersResponse | null
+    if (!currentUser) {
+      navigate('/sign-in')
+    }
+    else {
+      setCurrentUser(currentUser)
+    }
   }, [])
-
 
   const FirstPage = () => {
     return <SpaceSidebar />
@@ -33,6 +40,10 @@ export const App = ({ children }: Props) => {
   const SecondPage = () => {
     const location = useLocation()
   
+    if (location.pathname === '/profile') {
+      return <Profile />
+    }
+
     if (location.pathname === '/spaces/create') {
       return <CreateSpace />
     }
@@ -89,21 +100,21 @@ export const App = ({ children }: Props) => {
                   iconPrefix: 'fas',
                   title: 'Spaces',
                   href: `/spaces`,
-                  active: true
+                  active: location.pathname.includes('/spaces/')
                 },
                 {
                   icon: 'users',
                   iconPrefix: 'fas',
                   title: 'Personas',
                   href: `/personas`,
-                  active: false
+                  active: location.pathname.includes('/personas/')
                 },
                 {
                   icon: 'user-circle',
                   iconPrefix: 'fas',
                   title: 'Profile',
-                  href: `/login`,
-                  active: false
+                  href: `/profile`,
+                  active: location.pathname.includes('/profile')
                 },
               ]}
             />

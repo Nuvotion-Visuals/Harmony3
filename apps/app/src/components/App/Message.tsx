@@ -3,7 +3,7 @@ import { memo, useEffect, useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { speak } from '../../language/speech'
 import styled from 'styled-components'
-import { useHarmony_messageById } from 'redux-tk/harmony/hooks'
+import { useHarmony_messageById, useHarmony_namesByUserId } from 'redux-tk/harmony/hooks'
 
 const formatDate = (date: string): string => {
   const messageDate = new Date(date)
@@ -31,6 +31,7 @@ interface MessageInfoProps {
   userid: string
   id: string
   created: string
+  name: string
   dropdownItems: any[] // Define a more specific type if possible
   onSpeak: () => void
 }
@@ -38,13 +39,15 @@ interface MessageInfoProps {
 const MessageInfo: React.FC<MessageInfoProps> = memo(({ 
   userid, 
   id, 
+  name,
   created, 
   dropdownItems,
   onSpeak
 }) => {
+
   return (
     <Item
-      subtitle={userid}
+      subtitle={name}
       disablePadding
       disableBreak
     >
@@ -81,6 +84,7 @@ interface Props {
 
 export const Message = memo(({ id }: Props) => {
   const message = useHarmony_messageById(id)
+  const namesByUserId = useHarmony_namesByUserId()
   
   const [edit, setEdit] = useState(false)
   const [editText, setEditText] = useState(message?.text)
@@ -137,13 +141,14 @@ export const Message = memo(({ id }: Props) => {
     <S.Message onMouseDown={onScrollWheelClick(() => handleDelete())} id={`message_${message.id}`}>
       <S.Left>
         <Avatar
-          name={message.userid}
+          name={namesByUserId[message.userid]}
           labelColor='gray'
         />
       </S.Left>
       <S.Right>
         <MessageInfo
           key={message.id}
+          name={namesByUserId[message.userid]}
           userid={message.userid}
           onSpeak={() => speak(message.text, `message_${id}`, () => {})}
           id={message.id}

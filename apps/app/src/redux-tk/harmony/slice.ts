@@ -5,6 +5,7 @@ import { pb } from 'redux-tk/pocketbase'
 import { RecordModel } from 'pocketbase'
 
 interface HarmonyState {
+  users: CollectionResponses['users'][]
   spaces: CollectionResponses['spaces'][]
   groups: CollectionResponses['groups'][]
   threads: CollectionResponses['threads'][]
@@ -20,6 +21,7 @@ interface HarmonyState {
 }
 
 const INITIAL_STATE: HarmonyState = {
+  users: [],
   spaces: [],
   groups: [],
   threads: [],
@@ -71,6 +73,14 @@ export const fetchMessagesAsync = createAsyncThunk(
   async () => {
     const fetchedMessages = await pb.collection('messages').getFullList()
     return fetchedMessages as CollectionResponses['messages'][]
+  }
+)
+
+export const fetchUsersAsync = createAsyncThunk(
+  'harmony/fetchUsers',
+  async () => {
+    const fetchedUsers = await pb.collection('users').getFullList()
+    return fetchedUsers as CollectionResponses['users'][]
   }
 )
 
@@ -184,6 +194,22 @@ const harmonySlice = createSlice({
       state.messages = state.messages.filter(message => message.id !== action.payload)
     },
 
+    setUsers: (state, action: PayloadAction<CollectionResponses['users'][]>) => {
+      state.users = action.payload
+    },
+    createUser: (state, action: PayloadAction<CollectionRecords['users']>) => {
+      state.users.push(action.payload as CollectionResponses['users'])
+    },
+    updateUser: (state, action: PayloadAction<RecordModel>) => {
+      const index = state.users.findIndex(user => user.id === action.payload.id);
+      if (index !== -1) {
+        state.users[index] = action.payload as CollectionResponses['users']
+      }
+    },
+    deleteUser: (state, action: PayloadAction<string>) => {
+      state.users = state.users.filter(user => user.id !== action.payload)
+    },
+
     setCurrentUser: (state, action: PayloadAction<UsersResponse | null>) => {
       state.currentUser = action.payload
     }
@@ -205,6 +231,9 @@ const harmonySlice = createSlice({
       .addCase(fetchMessagesAsync.fulfilled, (state, action) => {
         state.messages = action.payload
       })
+      .addCase(fetchUsersAsync.fulfilled, (state, action) => {
+        state.users = action.payload
+      })
   }
 })
 
@@ -215,6 +244,7 @@ export const harmonyActions = {
   fetchChannelsAsync,
   fetchThreadsAsync,
   fetchMessagesAsync,
+  fetchUsersAsync
 }
 
 export default harmonySlice.reducer

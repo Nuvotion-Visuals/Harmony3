@@ -42,6 +42,7 @@ store.dispatch(harmonyActions.fetchGroupsAsync())
 store.dispatch(harmonyActions.fetchChannelsAsync())
 store.dispatch(harmonyActions.fetchThreadsAsync())
 store.dispatch(harmonyActions.fetchMessagesAsync())
+store.dispatch(harmonyActions.fetchUsersAsync())
 
 init()
 

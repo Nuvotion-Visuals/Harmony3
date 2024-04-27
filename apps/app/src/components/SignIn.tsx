@@ -1,50 +1,113 @@
 import { useState } from 'react'
 import PocketBase from 'pocketbase'
+import { Auth, Button, Gap, TextInput, Notification, Item } from '@avsync.live/formation'
+import { useNavigate } from 'react-router-dom'
+import styled from 'styled-components'
+import { Link } from './Util/Link'
 
 const pb = new PocketBase('http://localhost:8090')
 
 export function SignIn() {
+  const navigate = useNavigate()
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  const [userInfo, setUserInfo] = useState('')
+  const handleSignIn = async () => {
+    if (!email || !password) return
+    setError('') // Clear previous errors before attempting
+    try {
+      await pb.collection('users').authWithPassword(
+        email,
+        password
+      )
+      if (pb.authStore.isValid) {
+        navigate('/')
+      }
+      else {
+        setError('Authentication failed')
+      }
+    }
+    catch (e) {
+      const errorData = e?.response?.data || {}
+      const identityError = errorData?.identity?.message
+      const passwordError = errorData?.password?.message
 
-  const handleSignUp = async () => {
-    await pb.collection('users').authWithPassword(
-      email,
-      password,
-    )
-    // after the above you can also access the auth data from the authStore
-    console.log(pb.authStore.isValid)
-    console.log(pb.authStore.token)
-    console.log(pb.authStore.model)
-    setUserInfo(pb.authStore.model?.email)
-    pb.authStore.clear()
+      if (identityError || passwordError) {
+        setError(identityError || passwordError)
+      } 
+      else {
+        setError('Authentication failed')
+      }
+      console.log(JSON.stringify(e))
+    }
   }
 
   return (
-    <div>
-      <h1>Sign In</h1>
-      <input
-        type='email'
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        placeholder='Email'
-      />
-      <input
-        type='password'
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        placeholder='Password'
-      />
-      {error && <p>{error}</p>}
-      <button onClick={handleSignUp}>Sign In</button>
-      {userInfo && `Welcome ${userInfo}`}
-    </div>
+    <Auth
+      title='Sign In'
+      logoSrc='/cute-harmony.png'
+      height='100vh'
+    >
+      <form onSubmit={e => e.preventDefault()}>
+        <Gap gap={.75}>
+          <TextInput
+            value={email}
+            hero
+            label='Email'
+            type='Email'
+            onChange={val => setEmail(val)}
+            icon='envelope'
+            autoFocus
+          />
+          <TextInput
+            value={password}
+            hero
+            label='Password'
+            type='password'
+            onChange={val => setPassword(val)}
+            icon='lock'
+            spellCheck={true}
+            autoComplete='new-password'
+            onEnter={handleSignIn}
+          />
+          {
+            error && <Notification type='error' iconPrefix='fas'>
+              { error }
+            </Notification>
+          }
+          <Button
+            text='Sign in'
+            expand
+            primary={!!email && !!password}
+            disabled={!email || !password}
+            onClick={handleSignIn}
+          />
+
+          <S.Link>
+            <Link href='/sign-up'>
+              Don't have an account? Sign up
+            </Link>
+          </S.Link>
+        </Gap>
+      </form>
+    </Auth>
+ 
   )
 }
 
 export const S = {
-  // Add any styled components here if needed
+  Link: styled.div`
+    width: 100%;
+    font-size: var(--F_Font_Size);
+    color: var(--F_Font_Color_Label);
+    text-decoration: underline;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    * {
+      color: var(--F_Font_Color_Label);
+    }
+  `
 }

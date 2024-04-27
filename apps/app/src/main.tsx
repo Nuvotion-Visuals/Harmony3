@@ -26,6 +26,8 @@ import { Linker, Ripple } from '@avsync.live/formation'
 import { Link } from 'components/Util/Link'
 import { RouteTracker } from 'components/App/RouteTracker'
 import { useEffect } from 'react'
+import { SignIn } from 'components/SignIn'
+import { SignUp } from 'components/SignUp'
 
 library.add(
    // regular
@@ -64,7 +66,7 @@ library.add(
    fas.faBold, fas.faItalic, fas.faUnderline, fas.faListOl, fas.faListUl, fas.faLink,
    fas.faImage, fas.faVideo, fas.faCode, fas.faEraser, fas.faFileVideo, fas.faFileCode,
    fas.faTerminal, fas.faQuoteRight, fas.faEllipsisH, fas.faReply, fas.faSave,
-   fas.faDiagramProject, fas.faBoltLightning
+   fas.faDiagramProject, fas.faBoltLightning, fas.faSignOutAlt
 )
 
 const Main = ({ }) => {
@@ -72,21 +74,23 @@ const Main = ({ }) => {
       <Provider store={store}>
         <BrowserRouter>
           <Linker CustomLink={Link}> 
-            <App>
-              <Ripple />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/spaces/:spaceid" element={<RouteTracker />}>
-                  <Route path="groups/:groupid" element={<RouteTracker />}>
-                    <Route path="channels/:channelid" element={<RouteTracker />}>
-                      <Route path="threads/:threadid" element={<RouteTracker />}>
-                        <Route path="messages/:messageid" element={<RouteTracker />} />
-                      </Route>
+            <Ripple />
+            <Routes>
+              <Route path="/sign-in" element={<SignIn />} />
+              <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/" element={<App><Home /></App>} />
+              <Route path="/profile" element={<App><RouteTracker /></App>} />
+              <Route path="/spaces" element={<App><RouteTracker /></App>}></Route>
+              <Route path="/spaces/:spaceid" element={<App><RouteTracker /></App>}>
+                <Route path="groups/:groupid" element={<App><RouteTracker /></App>}>
+                  <Route path="channels/:channelid" element={<App><RouteTracker /></App>}>
+                    <Route path="threads/:threadid" element={<App><RouteTracker /></App>}>
+                      <Route path="messages/:messageid" element={<App><RouteTracker /></App>} />
                     </Route>
                   </Route>
                 </Route>
-              </Routes>
-            </App>
+              </Route>
+            </Routes>
           </Linker>
         </BrowserRouter>
       </Provider>

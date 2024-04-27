@@ -82,4 +82,20 @@ export const init = () => {
         break
     }
   })
+
+  pb.collection('users').subscribe('*', (event) => {
+    switch (event.action) {
+      case 'create':
+        store.dispatch(harmonyActions.createUser(event.record))
+        break
+      case 'update':
+        store.dispatch(harmonyActions.updateUser(event.record))
+        break
+      case 'delete':
+        store.dispatch(harmonyActions.deleteUser(event.record.id))
+        break
+      default:
+        break
+    }
+  })
 }
