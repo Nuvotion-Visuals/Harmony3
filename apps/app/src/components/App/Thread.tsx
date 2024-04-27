@@ -8,6 +8,7 @@ import { generate_threadNameAndDescription } from 'language/generate/threadNameA
 import * as selectors from 'redux-tk/harmony/selectors'
 import { store } from 'redux-tk/store'
 import { JsonValidator } from 'utils/JSONValidator'
+import { MessageSuggestions } from './MessageSuggestions'
 
 interface Props {
   thread: any
@@ -253,10 +254,11 @@ export const Thread = memo(({
               ))
             }
             {
-              !active && 
-                <Box py={0.25} px={0.5}>
-                  <Button expand text='Reply' onClick={handleReply} secondary />
-                </Box>
+              active
+                ? <MessageSuggestions />
+                : <Box py={0.25} px={0.5}>
+                    <Button expand text='Reply' onClick={handleReply} secondary />
+                  </Box>
             }
           </>
       }

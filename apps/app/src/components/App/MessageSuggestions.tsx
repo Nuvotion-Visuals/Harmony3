@@ -1,15 +1,17 @@
 import { Box, Button, Item, TextInput } from '@avsync.live/formation'
-import { generate_threadPrompts } from 'language/generate/threadPrompts'
+import { generate_messages } from 'language/generate/messages'
+import * as selectors from 'redux-tk/harmony/selectors'
 import { useEffect, useRef, useState } from 'react'
-import { useHarmony_activeChannel, useHarmony_activeChannelThreadNamesAndDescriptions, useHarmony_activeSpace, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
+import { useHarmony_activeChannel, useHarmony_activeSpace, useHarmony_activeThread, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
+import { store } from 'redux-tk/store'
 import { sendMessage } from 'spaces/sendMessage'
 import { JsonValidator } from 'utils/JSONValidator'
 
-export const ChannelSuggestThreads = () => {
+export const MessageSuggestions = () => {
   const activeSpace = useHarmony_activeSpace()
   const activeChannel = useHarmony_activeChannel()
   const setActiveThreadId = useHarmony_setActiveThreadId()
-  const activeChannelThreadNamesAndDescriptions = useHarmony_activeChannelThreadNamesAndDescriptions()
+  const activeThread = useHarmony_activeThread()
 
   const [feedback, setFeedback] = useState('')
 
@@ -24,22 +26,24 @@ export const ChannelSuggestThreads = () => {
   const onSuggest = () => {
     setSuggestions([])
     setFeedback('')
-    generate_threadPrompts({
+    const threadMessagesWithRole = selectors.selectThreadMessagesWithRole(activeThread.id)(store.getState())
+    generate_messages({
       prompt: `
         Space name: ${activeSpace?.name}
         Channel name: ${activeChannel?.name}
         Channel description: ${activeChannel?.description}
-        Existing threads: \n${activeChannelThreadNamesAndDescriptions}
+        Thread name: ${activeThread.name}
+        Thread description: ${activeThread.description}
+        Existing messages: \n${threadMessagesWithRole}
         Your previous suggestions (optional): ${suggestions}
         User feedback (optional): ${feedback}
-
-        PRIORITIZE THE CHANNEL DESCRIPTION!!
       `,
       enableEmoji: true,
       onComplete: async (text) => {
         setSuggestions(JSON.parse(text)?.suggestions)
       },
       onPartial: text => {
+        console.log(text)
         // @ts-ignore
         setSuggestions(jsonValidatorRef.current.parseJsonProperty(text, 'suggestions'))
       }
@@ -57,7 +61,6 @@ export const ChannelSuggestThreads = () => {
               subtitle={suggestion}
               key={suggestion}
               onClick={() => {
-                setActiveThreadId('')
                 sendMessage(suggestion)
                 setSuggestions([])
               }}
@@ -69,7 +72,7 @@ export const ChannelSuggestThreads = () => {
         <TextInput
           value={feedback}
           onChange={val => setFeedback(val)}
-          placeholder='Suggest new threads'
+          placeholder='Suggest new messages'
           hideOutline
           compact
           onEnter={onSuggest}

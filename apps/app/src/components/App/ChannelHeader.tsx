@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
-import { ChannelSuggestThreads } from './ChannelSuggestThreads'
+import { ThreadSuggestions } from 'components/App/ThreadSuggestions'
 
 interface Props {
   channel: any
@@ -136,7 +136,7 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                 </ContextMenu> 
         }
       </Box>
-      <ChannelSuggestThreads />
+      <ThreadSuggestions />
     </Page>
   )
 })
