@@ -2,8 +2,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { useHarmony_activeGroup } from 'redux-tk/harmony/hooks'
-import { ThreadSuggestions } from './ThreadSuggestions'
-import { ChannelSuggestions } from './ChannelSuggestions'
+import { ChannelSuggestions } from 'components/App/Suggestions/ChannelSuggestions'
 
 export const Group = memo(() => {
   const group = useHarmony_activeGroup()
@@ -68,7 +67,7 @@ export const Group = memo(() => {
   ] as ItemProps[]
 
   return (
-    <Page noPadding>
+    <Page>
       <Box width='100%' py={.5}>
         {
             edit

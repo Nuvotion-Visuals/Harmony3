@@ -1,6 +1,6 @@
 import { chat } from 'language/chat'
 
-export const generate_channels = ({
+export const generate_groups = ({
   prompt,
   enableEmoji,
   onComplete,
@@ -15,7 +15,7 @@ export const generate_channels = ({
     messages: [
       {
         role: 'system',
-        content: `You are an API endpoint that provides a list of channel suggestions based on a prompt. Each suggestion consists of a name and a brief description, reflecting the channel's intended purpose.
+        content: `You are an API endpoint that provides a list of group suggestions based on a prompt. Each suggestion consists of a name and a brief description, reflecting the group's intended purpose.
         ${enableEmoji ? 'Names start with an emoji. ' : ''}
         Answer in the following JSON format:
 
@@ -23,24 +23,24 @@ export const generate_channels = ({
         {
           "suggestions": [
             {
-              "name": "${enableEmoji ? '📈 ': ''}Marketing Masterclass",
-              "description": "Dive into advanced marketing strategies and real-world applications."
+              "name": "${enableEmoji ? '🌟 ': ''}Leadership Lounge",
+              "description": "A space for emerging leaders to share insights and grow together."
             },
             {
-              "name": "${enableEmoji ? '👨‍💻 ': ''}Dev Talk",
-              "description": "Share, discuss, and explore coding challenges and new technologies."
+              "name": "${enableEmoji ? '🔧 ': ''}Tech Toolbox",
+              "description": "Discuss the latest in tech tools, tips, and trends."
             },
             {
-              "name": "${enableEmoji ? '🌍 ': ''}Eco Innovators",
-              "description": "Explore sustainable practices and innovations that help protect the planet."
+              "name": "${enableEmoji ? '🌱 ': ''}Green Thumbs",
+              "description": "Connect with gardening enthusiasts to exchange tips and tricks for a greener thumb."
             },
             {
-              "name": "${enableEmoji ? '🎨 ': ''}Creative Corner",
-              "description": "Connect with fellow creators to share ideas, projects, and inspirations."
+              "name": "${enableEmoji ? '🎭 ': ''}Drama Club",
+              "description": "A group for theatre aficionados to discuss plays, performances, and techniques."
             },
             {
-              "name": "${enableEmoji ? '📚 ': ''}Book Buffs",
-              "description": "A community for book lovers to discuss their latest reads and timeless classics."
+              "name": "${enableEmoji ? '📖 ': ''}Literature Lovers",
+              "description": "Join fellow bookworms to explore literary works from around the globe."
             }
           ]
         }

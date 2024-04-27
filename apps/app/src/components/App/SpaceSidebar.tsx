@@ -52,14 +52,16 @@ export const SpaceSidebar = React.memo(({ }: Props) => {
   return (<S.GroupsSidebar>
     <SpacesSidebarComponent />
     <S.SidebarContainer>
-      <SpaceCard
-        previewSrc='https://api.avsync.live/uploads/medium_jive_djs_d7e9e4490a.jpg'
-        name={activeSpace?.name}
-        groupsCount={5}
-        channelsCount={15}
-        threadsCount={30}
-        messageCount={120}
-      />
+      {
+        activeSpace?.id && <SpaceCard
+          name={activeSpace?.name}
+          groupsCount={5}
+          channelsCount={15}
+          threadsCount={30}
+          messageCount={120}
+        />
+      }
+      
       {
         location.pathname !== '/spaces/create' &&
           <Groups />

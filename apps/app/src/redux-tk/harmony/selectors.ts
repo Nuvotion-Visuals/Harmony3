@@ -89,3 +89,13 @@ export const selectActiveGroupChannelNamesAndDescriptions = (state: State): { na
       description: channel.description || ''
     }))
 }
+
+export const selectActiveSpaceGroupNamesAndDescriptions = (state: State): { name: string, description: string }[] => {
+  const activeSpaceId = state.harmony.activeSpaceId
+  return state.harmony.groups
+    .filter(group => group.spaceid === activeSpaceId)
+    .map(group => ({
+      name: group.name || '',
+      description: group.description || ''
+    }))
+}

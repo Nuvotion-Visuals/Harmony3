@@ -2,13 +2,13 @@ import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from '
 import styled from 'styled-components'
 import { useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
 import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, TextInput, onScrollWheelClick } from '@avsync.live/formation'
-import { Message } from './Message'
+import { Message } from 'components/App/Message'
 import { pb } from 'redux-tk/pocketbase'
 import { generate_threadNameAndDescription } from 'language/generate/threadNameAndDescription'
 import * as selectors from 'redux-tk/harmony/selectors'
 import { store } from 'redux-tk/store'
 import { JsonValidator } from 'utils/JSONValidator'
-import { MessageSuggestions } from './MessageSuggestions'
+import { MessageSuggestions } from 'components/App/Suggestions/MessageSuggestions'
 
 interface Props {
   thread: any

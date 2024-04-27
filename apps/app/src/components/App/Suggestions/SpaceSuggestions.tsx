@@ -102,20 +102,22 @@ export const SpaceSuggestions = ({
         />
       </Box>
       <Box wrap width={'100%'}>
-        {value?.length > 0 && (
-          <Box width='100%' wrap my={-0.25}>
-            <ExpandableLists
-              value={value}
-              onExpand={(index) => {
-                setValue(
-                  value.map((item, i) =>
-                    i === index ? { ...item, expanded: !item.expanded } : item
+        {
+          value?.length > 0 && (
+            <Box width='100%' wrap my={-0.25}>
+              <ExpandableLists
+                value={value}
+                onExpand={(index) => {
+                  setValue(
+                    value.map((item, i) =>
+                      i === index ? { ...item, expanded: !item.expanded } : item
+                    )
                   )
-                )
-              }}
-            />
-          </Box>
-        )}
+                }}
+              />
+            </Box>
+          )
+        }
       </Box>
     </Box>
   )

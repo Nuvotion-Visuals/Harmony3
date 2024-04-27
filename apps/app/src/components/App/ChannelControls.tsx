@@ -1,5 +1,5 @@
-import React, { memo } from 'react';
-import { Box, Button, Dropdown, Item } from '@avsync.live/formation';
+import React, { memo } from 'react'
+import { Box, Button, Dropdown, Item } from '@avsync.live/formation'
 
 interface Props {
   activeSpaceName: string;

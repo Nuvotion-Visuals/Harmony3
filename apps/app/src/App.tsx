@@ -33,6 +33,10 @@ export const App = ({ children }: Props) => {
   const SecondPage = () => {
     const location = useLocation()
   
+    if (location.pathname === '/spaces/create') {
+      return <CreateSpace />
+    }
+
     // Match for the specific space ID
     const matchSpace = matchPath({ path: "/spaces/:spaceid", end: true }, location.pathname)
     if (matchSpace) {
@@ -46,8 +50,6 @@ export const App = ({ children }: Props) => {
     }
   
     switch (location.pathname) {
-      case '/spaces/create':
-        return <CreateSpace />
       default:
         return <Channel />
     }

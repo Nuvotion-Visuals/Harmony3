@@ -4,75 +4,66 @@ import styled from 'styled-components'
 import { Badge } from './Badge'
 
 interface Props {
-  previewSrc?: string,
-  name?: string,
-  groupsCount?: number,
-  channelsCount?: number,
-  threadsCount?: number,
-  messageCount?: number,
+  previewSrc?: string
+  name?: string
+  groupsCount?: number
+  channelsCount?: number
+  threadsCount?: number
+  messageCount?: number
   children?: React.ReactNode
+  expandVertical?: boolean
 }
 
-export const SpaceCard = React.memo(({ previewSrc, name, groupsCount, channelsCount, threadsCount, messageCount, children }: Props) => {
+export const SpaceCard = React.memo(({ 
+  previewSrc,
+  name, 
+  groupsCount, 
+  channelsCount, 
+  threadsCount, 
+  messageCount, 
+  children,
+  expandVertical
+}: Props) => {
   const SpaceName = React.memo(() => (<S.SpaceName>
     <Box>
       <Item pageTitle={name}>
-      { children }
-
+        { children }
       </Item>
-      </Box>
+    </Box>
+  </S.SpaceName>))
 
-      </S.SpaceName>
-    ))
-
-  return (<S.SpaceCard>
-    {
-      previewSrc &&
-        <>
-          <S.OverlayContainer>
-              <S.Overlay>
-                <SpaceName />
-              </S.Overlay>
-              <S.OverlayBottom>
-              <S.SpaceStats>
-                <Spacer />
-                <Badge 
-                  groupsCount={groupsCount || 0}
-                  channelsCount={channelsCount || 0}
-                  threadsCount={threadsCount || 0}
-                  messageCount={messageCount || 0}
-                />
-              </S.SpaceStats>
-              
-              </S.OverlayBottom>
-              <AspectRatio
-                ratio={16/9}
-                backgroundSrc={previewSrc}
-                coverBackground
-              />
-          </S.OverlayContainer>
-        </>
-    }
-    {
-      !name && <Box py={.75}>
-        <Gap gap={.75}>
-          <Item
-            title='Create a Space'
-            subtitle='Spaces organize your work into groups of channels.'
+  return (<S.SpaceCard expandVertical={expandVertical}>
+    <S.OverlayContainer>
+        <S.Overlay>
+          <SpaceName />
+        </S.Overlay>
+        <S.OverlayBottom>
+        <S.SpaceStats>
+          <Spacer />
+          <Badge 
+            groupsCount={groupsCount || 0}
+            channelsCount={channelsCount || 0}
+            threadsCount={threadsCount || 0}
+            messageCount={messageCount || 0}
           />
-          <Item
-            text="Let's Work Together"
-            subtitle='Hi, my name is Harmony. I can help you with any project. Think of me as your virtual coworker.'
-          />
-        </Gap>
-      </Box>
-    }
+        </S.SpaceStats>
+        
+        </S.OverlayBottom>
+        <AspectRatio
+          ratio={previewSrc ? 16/9 : 4/1}
+          coverBackground
+        />
+    </S.OverlayContainer>
   </S.SpaceCard>)
 })
 
 const S = {
-  SpaceCard: styled.div`
+  SpaceCard: styled.div<{
+    expandVertical?: boolean
+  }>`
     width: 100%;
+    height: ${props => props.expandVertical ? '100%' : 'auto'};
+    background: var(--F_Surface_1);
   `,
   OverlayContainer: styled.div`
     height: 100%;

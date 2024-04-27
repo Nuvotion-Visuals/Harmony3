@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
-import { ThreadSuggestions } from 'components/App/ThreadSuggestions'
+import { ThreadSuggestions } from 'components/App/Suggestions/ThreadSuggestions'
 
 interface Props {
   channel: any

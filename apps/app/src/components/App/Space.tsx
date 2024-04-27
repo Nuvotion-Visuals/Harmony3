@@ -2,6 +2,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { useHarmony_activeSpace } from 'redux-tk/harmony/hooks'
+import { GroupSuggestions } from './Suggestions/GroupSuggestions'
 
 export const Space = memo(() => {
   const space = useHarmony_activeSpace()
@@ -66,7 +67,7 @@ export const Space = memo(() => {
   ] as ItemProps[]
 
   return (
-    <Page noPadding>
+    <Page>
       <Box width='100%' py={.5}>
         {
             edit
@@ -132,13 +133,14 @@ export const Space = memo(() => {
                     </Box>
                   </Item>
 
+                  <GroupSuggestions />
+
                   <StyleHTML>
                     <div dangerouslySetInnerHTML={{ __html: markdownToHTML(description || '') || '' }} />
                   </StyleHTML>
                 </ContextMenu> 
         }
       </Box>
-      {/* <ThreadSuggestions /> */}
     </Page>
   )
 })

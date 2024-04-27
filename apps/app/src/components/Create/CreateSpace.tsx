@@ -1,5 +1,5 @@
 import { Gap, TextInput, Button, RichTextEditor, Page, Box } from '@avsync.live/formation'
-import { SpaceSuggestions } from 'components/App/SpaceSuggestions'
+import { SpaceSuggestions } from 'components/App/Suggestions/SpaceSuggestions'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
