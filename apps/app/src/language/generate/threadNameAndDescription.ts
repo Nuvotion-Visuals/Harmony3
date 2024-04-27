@@ -24,6 +24,8 @@ export const generate_threadNameAndDescription = ({
             "description": "Craft a successful social media strategy to build your brand's online presence and drive engagement."
           }
           If user feedback is provided it must be prioritized.
+
+          Answer in as a valid JSON object, no extra commentary, only the object. 
           `
       },
       {

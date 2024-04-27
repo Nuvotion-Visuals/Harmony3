@@ -118,8 +118,7 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                   }}
                 >
                   <Item
-                    pageTitle={edit ? 'Edit Channel' : channel?.name}
-                    text={channel?.description}
+                    pageTitle={channel?.name}
                     absoluteRightChildren
                   >
                     <Box height={'100%'}>
@@ -133,6 +132,11 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                       />
                     </Box>
                   </Item>
+                  {
+                    channel?.description && <Item
+                      text={channel?.description}
+                    />
+                  }
                 </ContextMenu> 
         }
       </Box>

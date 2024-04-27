@@ -14,12 +14,11 @@ export function CreateChannel({ groupId }: CreatechannelProps) {
   const activeSpaceId = useHarmony_activeSpaceId()
   
   const [channelName, setChannelName] = useState('')
-  const [channelDescription, setChannelDescription] = useState('')
 
   async function handleCreatechannel() {
     if (!userId || !groupId) return
     setChannelName('')
-    const data = { name: channelName, content: channelDescription, userid: userId, groupid: groupId }
+    const data = { name: channelName, userid: userId, groupid: groupId }
     try {
       const response = await pb.collection('channels').create(data)
       navigate(`/spaces/${activeSpaceId}/groups/${groupId}/channels/${response.id}`)

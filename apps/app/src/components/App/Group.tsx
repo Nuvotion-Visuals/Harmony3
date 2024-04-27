@@ -2,6 +2,8 @@ import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { useHarmony_activeGroup } from 'redux-tk/harmony/hooks'
+import { ThreadSuggestions } from './ThreadSuggestions'
+import { ChannelSuggestions } from './ChannelSuggestions'
 
 export const Group = memo(() => {
   const group = useHarmony_activeGroup()
@@ -118,7 +120,6 @@ export const Group = memo(() => {
                   <Item
                     pageTitle={edit ? 'Edit Group' : group?.name}
                     absoluteRightChildren
-                    disablePadding
                   >
                     <Box height={'100%'}>
                       <Dropdown
@@ -132,13 +133,14 @@ export const Group = memo(() => {
                     </Box>
                   </Item>
 
+                  <ChannelSuggestions />
+
                   <StyleHTML>
                     <div dangerouslySetInnerHTML={{ __html: markdownToHTML(description || '') || '' }} />
                   </StyleHTML>
                 </ContextMenu> 
         }
       </Box>
-      {/* <ThreadSuggestions /> */}
     </Page>
   )
 })

@@ -50,6 +50,9 @@ export const useHarmony_activeSpaceGroups = (): CollectionResponses['groups'][] 
 export const useHarmony_activeChannelThreadNamesAndDescriptions = (): { name: string, description: string }[] => 
   useSelector(selectors.selectActiveChannelThreadNamesAndDescriptions, isEqual)
 
+export const useHarmony_activeGroupChannelNamesAndDescriptions = (): { name: string, description: string }[] => 
+  useSelector(selectors.selectActiveGroupChannelNamesAndDescriptions, isEqual)
+
 export const useHarmony_activeChannelThreads = (): (CollectionResponses['threads'] & { messageIds: string[] })[] => 
   useSelector(selectors.selectActiveChannelThreads, isEqual)
 

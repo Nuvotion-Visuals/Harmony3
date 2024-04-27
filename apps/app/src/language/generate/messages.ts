@@ -43,7 +43,7 @@ export const generate_messages = ({
 
         If user feedback is provided it MUST be prioritized, and all suggestions should center around the user's direction.
         
-        Please phrase all suggestions as QUESTIONS. Answer in as a valid JSON object. Ensure each suggestion is wrapped in double quotes to conform to the JSON specification.`
+        Please phrase all suggestions as QUESTIONS. Answer in as a valid JSON object, no extra commentary, only the object. Ensure each suggestion is wrapped in double quotes to conform to the JSON specification.`
       },
       {
         role: 'user',
