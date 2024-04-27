@@ -8,7 +8,8 @@ import {
 import { CreateChannel } from 'components/Create/CreateChannel'
 import { CreateGroup } from 'components/Create/CreateGroup'
 import React, { useEffect, useState } from 'react'
-import { useHarmony_activeChannelId, useHarmony_activeSpace, useHarmony_activeSpaceGroups } from 'redux-tk/harmony/hooks'
+import { useNavigate } from 'react-router-dom'
+import { useHarmony_activeChannelId, useHarmony_activeGroupId, useHarmony_activeSpace, useHarmony_activeSpaceGroups } from 'redux-tk/harmony/hooks'
 import { pb } from 'redux-tk/pocketbase'
 
 type List = {
@@ -48,7 +49,10 @@ const generateGroupsList = (groups, activeSpaceId, activeChannelId) => {
 }
 
 export const Groups = React.memo(() => {
+  const navigate = useNavigate()
+
   const activeSpace = useHarmony_activeSpace()
+  const activeGroupId = useHarmony_activeGroupId()
   const activeSpaceGroups = useHarmony_activeSpaceGroups()
   const activeChannelId = useHarmony_activeChannelId()
 
@@ -64,6 +68,9 @@ export const Groups = React.memo(() => {
   const handleDeleteGroup = async (groupId: string) => {
     try {
       await pb.collection('groups').delete(groupId)
+      if (activeGroupId === groupId) {
+        navigate(`/spaces/${activeSpace.id}`)
+      }
     } 
     catch (error) {
       console.error('Failed to delete message:', error)
@@ -74,6 +81,9 @@ export const Groups = React.memo(() => {
   const handleDeleteChannel = async (channelId: string) => {
     try {
       await pb.collection('channels').delete(channelId)
+      if (activeChannelId === channelId) {
+        navigate(`/spaces/${activeSpace.id}/groups/${activeGroupId}`)
+      }
     } 
     catch (error) {
       console.error('Failed to delete message:', error)
@@ -106,14 +116,14 @@ export const Groups = React.memo(() => {
                         iconPrefix: 'fas',
                         compact: true,
                         text: 'Visit',
-                        href: `/spaces/${activeSpace.id}/groups/${expandableList.id}`
+                        href: `/spaces/${activeSpace?.id}/groups/${expandableList?.id}`
                       },
                       {
                         icon: 'edit',
                         iconPrefix: 'fas',
                         compact: true,
                         text: 'Edit',
-                        href: `/spaces/${activeSpace.id}/groups/${expandableList.id}`
+                        href: `/spaces/${activeSpace?.id}/groups/${expandableList?.id}`
                       },
                       {
                         icon: 'trash-alt',
@@ -121,7 +131,7 @@ export const Groups = React.memo(() => {
                         compact: true,
                         text: 'Delete',
                         onClick: () => {
-                          handleDeleteGroup(expandableList.id)
+                          handleDeleteGroup(expandableList?.id)
                         } 
                       }
                     ]}
@@ -159,7 +169,7 @@ export const Groups = React.memo(() => {
                     compact: true,
                     text: 'Delete',
                     onClick: () => {
-                      handleDeleteChannel(listItem.id)
+                      handleDeleteChannel(listItem?.id)
                     }
                   }
                 ]}
@@ -167,7 +177,7 @@ export const Groups = React.memo(() => {
             })),
             {
               children: <CreateChannel
-                groupId={expandableList.id}
+                groupId={expandableList?.id}
               />,
               disablePadding: true
             }

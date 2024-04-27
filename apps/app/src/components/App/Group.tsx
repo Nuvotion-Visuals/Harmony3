@@ -1,10 +1,13 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
-import { useHarmony_activeGroup } from 'redux-tk/harmony/hooks'
+import { useHarmony_activeGroup, useHarmony_activeSpaceId } from 'redux-tk/harmony/hooks'
 import { ChannelSuggestions } from 'components/App/Suggestions/ChannelSuggestions'
+import { useNavigate } from 'react-router-dom'
 
 export const Group = memo(() => {
+  const navigate = useNavigate()
+  const activeSpaceId = useHarmony_activeSpaceId()
   const group = useHarmony_activeGroup()
 
   const [edit, setEdit] = useState(false)
@@ -21,6 +24,7 @@ export const Group = memo(() => {
     try {
       await pb.collection('groups').delete(group.id)
       console.log('Group deleted')
+      navigate(`/spaces/${activeSpaceId}`)
     } 
     catch (error) {
       console.error('Failed to delete group:', error)
@@ -119,6 +123,7 @@ export const Group = memo(() => {
                   <Item
                     pageTitle={edit ? 'Edit Group' : group?.name}
                     absoluteRightChildren
+                    small
                   >
                     <Box height={'100%'}>
                       <Dropdown

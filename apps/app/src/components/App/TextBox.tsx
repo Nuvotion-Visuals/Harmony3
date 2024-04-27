@@ -5,13 +5,15 @@ import styled from 'styled-components'
 import { pb } from 'redux-tk/pocketbase'
 
 interface Props {
-  onNewThreadId: (threadId: string) => void
+  onNewThreadId?: (threadId: string) => void
   activeThreadId?: string
+  onSend?: (message: string) => void
 }
 
 export const TextBox = memo(({
   onNewThreadId,
-  activeThreadId
+  activeThreadId,
+  onSend
 }: Props) => {
   const [text, setText] = useState('')
   const setActiveThreadId = useHarmony_setActiveThreadId()
@@ -20,6 +22,11 @@ export const TextBox = memo(({
   const userId = useHarmony_currentUserId()
 
   const sendMessage = async (text) => {
+    if (onSend) {
+      onSend(text)
+      setText('')
+      return
+    }
     if (!text.trim()) return
 
     let threadId = activeThreadId

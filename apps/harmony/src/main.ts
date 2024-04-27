@@ -24,7 +24,7 @@ const createWindow = () => {
   autoUpdater.checkForUpdates()
 
   mainWindow = new BrowserWindow({
-    icon: 'favicon.ico',
+    icon: 'icon.ico',
     width: 1400,
     height: 900,
     frame: false,

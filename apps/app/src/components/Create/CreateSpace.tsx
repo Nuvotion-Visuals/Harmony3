@@ -1,4 +1,4 @@
-import { Gap, TextInput, Button, RichTextEditor, Page, Box } from '@avsync.live/formation'
+import { Gap, TextInput, Button, RichTextEditor, Page, Box, Item } from '@avsync.live/formation'
 import { SpaceSuggestions } from 'components/App/Suggestions/SpaceSuggestions'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -30,6 +30,9 @@ export const CreateSpace = () => {
     <Box mt={1}>
       <Page>
         <Gap>
+          <Item
+            pageTitle='Create Space'
+          />
           <Gap disableWrap>
             <TextInput
               value={name}

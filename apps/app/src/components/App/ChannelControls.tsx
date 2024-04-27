@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { Box, Button, Dropdown, Item } from '@avsync.live/formation'
+import { Box, Button, Dropdown, Item, scrollToElementById } from '@avsync.live/formation'
 
 interface Props {
   activeSpaceName: string;
@@ -31,9 +31,10 @@ export const ChannelControls = memo(({
             square
             minimal
             onClick={(e) => {
-              e.stopPropagation();
-              // scrollToTop();
+              e.stopPropagation()
+              scrollToElementById('top', { behavior: 'smooth'})
             }}
+            title='Scroll to top'
           />
           <Button
             icon={'arrow-down'}
@@ -42,9 +43,10 @@ export const ChannelControls = memo(({
             square
             minimal
             onClick={(e) => {
-              e.stopPropagation();
-              // scrollToBottom();
+              e.stopPropagation()
+              scrollToElementById('bottom', { behavior: 'smooth', block: 'end'})
             }}
+            title='Scroll to bottom'
           />
           <Button
             icon={anyExpanded ? 'chevron-up' : 'chevron-down'}

@@ -120,6 +120,7 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                   <Item
                     pageTitle={channel?.name}
                     absoluteRightChildren
+                    small
                   >
                     <Box height={'100%'}>
                       <Dropdown

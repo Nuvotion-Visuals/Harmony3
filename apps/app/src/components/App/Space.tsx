@@ -3,8 +3,10 @@ import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Pa
 import { pb } from 'redux-tk/pocketbase'
 import { useHarmony_activeSpace } from 'redux-tk/harmony/hooks'
 import { GroupSuggestions } from './Suggestions/GroupSuggestions'
+import { useNavigate } from 'react-router-dom'
 
 export const Space = memo(() => {
+  const navigate = useNavigate()
   const space = useHarmony_activeSpace()
 
   const [edit, setEdit] = useState(false)
@@ -21,6 +23,7 @@ export const Space = memo(() => {
     try {
       await pb.collection('spaces').delete(space.id)
       console.log('Space deleted')
+      navigate('/')
     } 
     catch (error) {
       console.error('Failed to delete space:', error)
@@ -119,7 +122,7 @@ export const Space = memo(() => {
                   <Item
                     pageTitle={edit ? 'Edit Space' : space?.name}
                     absoluteRightChildren
-                    disablePadding
+                    small
                   >
                     <Box height={'100%'}>
                       <Dropdown

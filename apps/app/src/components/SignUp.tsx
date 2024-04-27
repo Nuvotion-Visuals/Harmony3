@@ -53,7 +53,7 @@ export function SignUp() {
   return (
     <Auth
       title='Sign Up'
-      logoSrc='/cute-harmony.png'
+      logoSrc='/harmony-square.png'
       height='100vh'
     >
       <form onSubmit={e => e.preventDefault()}>

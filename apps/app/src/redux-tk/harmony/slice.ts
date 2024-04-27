@@ -98,7 +98,9 @@ const harmonySlice = createSlice({
       } 
       else {
         const index = state.spaces.findIndex(space => space.id === action.payload)
-        state.activeSpaceIndex = index !== -1 ? index : 0
+        if (index !== -1) {
+          state.activeSpaceIndex = index
+        }
       }
     },
    
