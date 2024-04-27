@@ -61,17 +61,17 @@ export const Chat = () => {
     setMessages(newMessages)
     setMessage('')
 
-    chat(newMessages, (response, endOfStream) => {
-      if (!endOfStream) {
+    chat({
+      messages: newMessages,
+      onPartial: response => {
         setStream(prevResponses => [...prevResponses, response.includes('\n\n') ? '\n' : response])
-      } 
-      else {
+      },
+      onComplete: response => {
         const completeAssistantMessage = { role: 'assistant', content: response }
         console.log(response, completeAssistantMessage)
         setMessages(prevHistory => [...prevHistory, completeAssistantMessage])
         console.log(completeAssistantMessage)
         setStream([])
-        
       }
     })
   }

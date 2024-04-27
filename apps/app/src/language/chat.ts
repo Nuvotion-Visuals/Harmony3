@@ -1,16 +1,22 @@
-export type ResponseCallback = (response: string, endOfStream: boolean) => void
+export type ChatConfig = {
+  messages: { role: 'user' | 'assistant' | 'system', content: string }[]
+  onPartial: ResponseCallback
+  onComplete: ResponseCallback
+}
 
-export const chat = (messages: { role: 'user' | 'assistant', content: string }[], onResponse: ResponseCallback): () => void => {
-  const payload = { messages }  // Directly using the messages array
+export type ResponseCallback = (response: string) => void
+
+export const chat = (config: ChatConfig): () => void => {
+  const payload = { messages: config.messages }  // Directly using the messages array from config
   const eventSource = new EventSource(`http://localhost:1616/chat?data=${encodeURIComponent(JSON.stringify(payload))}`)
 
   eventSource.onmessage = event => {
     const data = JSON.parse(event.data)
     if (data.endOfStream) {
-      onResponse(data.message.content, true)
+      config.onComplete(data.message.content)
     } 
     else {
-      onResponse(data.message.content, false)
+      config.onPartial(data.message.content)
     }
   }
 

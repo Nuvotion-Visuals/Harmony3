@@ -116,12 +116,6 @@ const initPocketbaseClient = async () => {
             }
           }
           break
-        case 'update':
-          console.log('update', event.record)
-          break
-        case 'delete':
-          console.log('delete', event.record)
-          break
         default:
           break
       }
@@ -233,8 +227,6 @@ app.listen(PORT, () => {
   console.log(`Proxy server running on http://localhost:${PORT}`)
 })
 
-
-
 const llm = express()
 const PORT2 = process.env.PORT2 || 1616
 llm.use(cors())
@@ -272,12 +264,16 @@ llm.get('/chat', async (req, res) => {
 
     for await (const part of response) {
       fullResponse.push(part.message.content)
-      res.write(`data: ${JSON.stringify(part)}\n\n`)
+      res.write(`data: ${JSON.stringify({
+        ...part,
+        message: {
+          ...part.message,
+          content: fullResponse.join('')
+        }
+      })}\n\n`)
     }
 
     res.write(`data: ${JSON.stringify({ endOfStream: true, message: { content: fullResponse.join('')} })}\n\n`)
-
-    console.log(fullResponse)
   } 
   catch (error) {
     console.error('Error streaming response:', error)
@@ -298,7 +294,3 @@ llm.get('/chat', async (req, res) => {
 llm.listen(PORT2, () => {
   console.log(`Server running on http://localhost:${PORT2}`)
 })
-
-
-
-

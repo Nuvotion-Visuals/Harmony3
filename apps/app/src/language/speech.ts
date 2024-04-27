@@ -25,7 +25,7 @@ const searchAndHighlight = async (guid: string, currentlySpeaking: string | null
 }
 
 function escapeRegExp(string: string) {
-  return string.replace(/[.*+?^${}()|[\]\\"]/g, '\\$&')  // Adding double quotes to the regex
+  return string.replace(/[.*+?^${}()|[\]\\"]/g, '\\$&')
 }
 
 const highlightText = (html: string, currentlySpeaking: string | null): string => {
@@ -34,11 +34,10 @@ const highlightText = (html: string, currentlySpeaking: string | null): string =
   if (!currentlySpeaking) {
     return html
   }
-  // Use escapeRegExp function to escape special characters
   const escapedCurrentlySpeaking = escapeRegExp(currentlySpeaking)
   const numberPrefixRegex = /^\d+\.\s+/ // Regex to detect numbering like "1. "
-  // Use escapedCurrentlySpeaking to build the searchRegex
-  const searchRegex = new RegExp(`(?<!${numberPrefixRegex.source})(?<!\\w)${escapedCurrentlySpeaking}(?!\\w)`, 'gi')
+  // This regex allows for punctuation and whitespace to be before or after the term, improving handling of quoted strings
+  const searchRegex = new RegExp(`(?<!${numberPrefixRegex.source})(?<![\\w"])${escapedCurrentlySpeaking}(?![\\w"])`, 'gi')
   let highlightedHtml = ''
   let startIndex = 0
   let match
@@ -51,6 +50,8 @@ const highlightText = (html: string, currentlySpeaking: string | null): string =
   highlightedHtml += html.substring(startIndex)
   return highlightedHtml
 }
+
+
 class SpeechSynthesizer {
   private audioDataMap: Map<string, string | null> = new Map()
   private isPlaying = false
@@ -150,6 +151,8 @@ export async function speak(text: string, guid: string, callback: (error: any) =
   const sentences = chunks.flatMap(chunk =>
     split(chunk).filter(item => item.type === 'Sentence').map(item => item.raw)
   )
+
+  console.log(sentences)
 
   const synthesizer = new SpeechSynthesizer(sentences, baseUrl, guid)
   synthesizer.speak()

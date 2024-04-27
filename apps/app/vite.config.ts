@@ -19,6 +19,8 @@ export default defineConfig({
     alias: {
       'components': path.resolve(__dirname, 'src/components'),
       'redux-tk': path.resolve(__dirname, 'src/redux-tk'),
+      'language': path.resolve(__dirname, 'src/language'),
+      'utils': path.resolve(__dirname, 'src/utils'),
     }
   },
 })

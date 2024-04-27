@@ -58,3 +58,14 @@ export const selectActiveMessage = (state: State): CollectionResponses['messages
   state.harmony.messages.find(message => message.id === state.harmony.activeMessageId);
 
 export const selectMessageById = (id: string) => (state: State) => state.harmony.messages.find(message => message.id === id)
+
+export const selectMessagesByThreadId = (threadId: string) => (state: State): CollectionResponses['messages'][] =>
+  state.harmony.messages.filter(message => message.threadid === threadId)
+
+export const selectThreadMessagesWithRole = (threadId: string) => (state: State): { role: string, content: string }[] =>
+  state.harmony.messages
+    .filter(message => message.threadid === threadId)
+    .map(message => ({
+      role: message.userid !== state.harmony.currentUser?.id ? 'user' : 'assistant',
+      content: message.text || ''
+    }))

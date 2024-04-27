@@ -1,9 +1,13 @@
-import React, { useState, useEffect, memo, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from 'react'
 import styled from 'styled-components'
 import { useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
 import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, TextInput, onScrollWheelClick } from '@avsync.live/formation'
 import { Message } from './Message'
 import { pb } from 'redux-tk/pocketbase'
+import { generate_threadNameAndDescription } from 'language/generate/threadNameAndDescription'
+import * as selectors from 'redux-tk/harmony/selectors'
+import { store } from 'redux-tk/store'
+import { JsonValidator } from 'utils/JSONValidator'
 
 interface Props {
   thread: any
@@ -23,9 +27,22 @@ export const Thread = memo(({
   const setActiveThreadId = useHarmony_setActiveThreadId()
   const [expanded, setExpanded] = useState(active)
 
+  const [displayName, setDisplayName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
+  const [displayDescription, setDisplayDescription] = useState(thread?.description)
+
+  useEffect(() => {
+    setDisplayName(thread?.name)
+  }, [thread?.name])
+
+  useEffect(() => {
+    setDisplayDescription(thread?.description)
+  }, [thread?.description])
+
   const [edit, setEdit] = useState(false)
   const [editName, setEditName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
   const [editDescription, setEditDescription] = useState(thread?.description)
+
+  const jsonValidatorRef = useRef(new JsonValidator())
 
   const handleDelete = useCallback(async () => {
     try {
@@ -75,6 +92,41 @@ export const Thread = memo(({
         e.stopPropagation()
         handleReply()
       },
+    },
+    {
+      icon: 'bolt-lightning',
+      iconPrefix: 'fas',
+      compact: true,
+      text: 'Suggest',
+      onClick: (e) => {
+        e.stopPropagation()
+        const threadMessagesWithRole = selectors.selectThreadMessagesWithRole(thread.id)(store.getState());
+        generate_threadNameAndDescription({
+          prompt: JSON.stringify(threadMessagesWithRole),
+          enableEmoji: true,
+          onComplete: async (text) => {
+            const newName = JSON.parse(text).name
+            const newDescription = JSON.parse(text).description
+            setDisplayName(newName)
+            setDisplayDescription(newDescription)
+            try {
+              await pb.collection('threads').update(thread.id, {
+                name: newName,
+                description: newDescription
+              })
+              setEdit(false)
+            } 
+            catch (error) {
+              console.error('Failed to update thread:', error)
+              alert('Failed to update thread')
+            }
+          },
+          onPartial: text => {
+            setDisplayName(jsonValidatorRef.current.parseJsonProperty(text, 'name'))
+            setDisplayDescription(jsonValidatorRef.current.parseJsonProperty(text, 'description'))
+          }
+        })
+      }
     },
     {
       icon: 'edit',
@@ -148,8 +200,8 @@ export const Thread = memo(({
               }}
             >
               <Item
-                headingText={thread?.name}
-                subtitle={thread?.description}
+                headingText={displayName}
+                subtitle={displayDescription}
                 onClick={toggleExpanded}
                 onMouseDown={onScrollWheelClick(() => handleDelete())}
               >

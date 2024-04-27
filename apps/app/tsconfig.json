@@ -4,6 +4,8 @@
     "paths": {
       "components/*": ["src/components/*"],
       "redux-tk/*": ["src/redux-tk/*"],
+      "language/*": ["src/language/*"],
+      "utils/*": ["src/utils/*"],
       "react": [ "./node_modules/@types/react" ]
     },
     "target": "ESNext",
