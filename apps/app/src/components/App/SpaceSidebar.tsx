@@ -78,6 +78,9 @@ const S = {
     width: 100%;
     align-items: flex-start;
     border-right: 1px solid var(--F_Surface);
+    * {
+      user-select: none;
+    }
   `,
   SidebarContainer: styled.div`
     height: calc(calc(100vh - calc(1 * var(--F_Header_Height))) - .25rem);

@@ -14,8 +14,8 @@ export const Profile = () => {
   const [email, setEmail] = useState(currentUser?.email)
 
   useEffect(() => {
-    setName(currentUser.name)
-    setEmail(currentUser.email)
+    setName(currentUser?.name)
+    setEmail(currentUser?.email)
   }, [currentUser])
 
   const handleUpdate = async () => {

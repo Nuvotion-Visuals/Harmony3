@@ -93,14 +93,9 @@ const harmonySlice = createSlice({
     },
     setActiveSpaceId: (state, action: PayloadAction<string | null>) => {
       state.activeSpaceId = action.payload
-      if (action.payload === null) {
-        state.activeSpaceIndex = null
-      } 
-      else {
-        const index = state.spaces.findIndex(space => space.id === action.payload)
-        if (index !== -1) {
-          state.activeSpaceIndex = index
-        }
+      const index = state.spaces.findIndex(space => space.id === action.payload)
+      if (index !== -1) {
+        state.activeSpaceIndex = index
       }
     },
    
@@ -220,6 +215,10 @@ const harmonySlice = createSlice({
     builder
       .addCase(fetchSpacesAsync.fulfilled, (state, action) => {
         state.spaces = action.payload
+        const index = action.payload.findIndex(space => space.id === state.activeSpaceId)
+        if (index !== -1) {
+          state.activeSpaceIndex = index
+        }
       })
       .addCase(fetchGroupsAsync.fulfilled, (state, action) => {
         state.groups = action.payload

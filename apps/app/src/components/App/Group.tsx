@@ -1,14 +1,19 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, AspectRatio, FileUpload, LineBreak } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
-import { useHarmony_activeGroup, useHarmony_activeSpaceId } from 'redux-tk/harmony/hooks'
+import { useHarmony_activeGroup, useHarmony_activeSpaceId, useHarmony_setActiveChannelId } from 'redux-tk/harmony/hooks'
 import { ChannelSuggestions } from 'components/App/Suggestions/ChannelSuggestions'
 import { useNavigate } from 'react-router-dom'
 
 export const Group = memo(() => {
   const navigate = useNavigate()
   const activeSpaceId = useHarmony_activeSpaceId()
+  const setActiveChannelId = useHarmony_setActiveChannelId()
   const group = useHarmony_activeGroup()
+
+  useEffect(() => {
+    setActiveChannelId(null)
+  }, [])
 
   const [edit, setEdit] = useState(false)
 
