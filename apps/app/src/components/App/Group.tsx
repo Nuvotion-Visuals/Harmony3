@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
-import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor } from '@avsync.live/formation'
+import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, AspectRatio, FileUpload, LineBreak } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { useHarmony_activeGroup, useHarmony_activeSpaceId } from 'redux-tk/harmony/hooks'
 import { ChannelSuggestions } from 'components/App/Suggestions/ChannelSuggestions'
@@ -14,10 +14,14 @@ export const Group = memo(() => {
 
   const [name, setName] = useState(group?.name)
   const [description, setDescription] = useState(group?.description)
+  const [banner, setBanner] = useState(group?.banner ? `http://localhost:8090/api/files/groups/${group.id}/${group.banner}` : null)
+
+  const [file, setFile] = useState(null)
 
   useEffect(() => {
     setName(group?.name)
     setDescription(group?.description)
+    setBanner(group?.banner ? `http://localhost:8090/api/files/groups/${group.id}/${group.banner}` : null)
   }, [group])
 
   const handleDelete = async () => {
@@ -33,11 +37,15 @@ export const Group = memo(() => {
   }
 
   const handleUpdate = async () => {
+    const formData = new FormData()
+    if (file) {
+      formData.append('banner', file)
+    }
+    formData.append('name', name)
+    formData.append('description', description)
+
     try {
-      await pb.collection('groups').update(group.id, {
-        name,
-        description
-      })
+      await pb.collection('groups').update(group.id, formData)
       setEdit(false)
       console.log('Group updated')
     } 
@@ -48,8 +56,9 @@ export const Group = memo(() => {
   }
 
   const handleCancelEdit = useCallback(() => {
-    setName(group.name)
-    setDescription(group.description)
+    setName(group?.name)
+    setDescription(group?.description)
+    setBanner(group?.banner ? `http://localhost:8090/api/files/groups/${group.id}/${group.banner}` : null)
     setEdit(false)
   }, [group])
 
@@ -60,6 +69,9 @@ export const Group = memo(() => {
       compact: true,
       text: 'Edit',
       onClick: () => setEdit(true)
+    },
+    {
+      children: <LineBreak color='var(--F_Font_Color_Disabled)'/>
     },
     {
       icon: 'trash-alt',
@@ -78,6 +90,32 @@ export const Group = memo(() => {
               ? <Box width='100%' mt={.5}>
                   <Gap disableWrap>
                     <Gap >
+                      {
+                        banner && <AspectRatio
+                          ratio={4/1}
+                          backgroundSrc={banner}
+                          coverBackground
+                          borderRadius={1}
+                        />
+                      }
+                      
+                      <FileUpload
+                        minimal
+                        buttonProps={{
+                          icon: 'image',
+                          iconPrefix: 'fas',
+                          text: 'Choose banner',
+                          compact: true,
+                          expand: true
+                        }}
+                        onFileChange={files => {
+                          const file = files?.[0]
+                          if (file) {
+                            setFile(file)
+                            setBanner(URL.createObjectURL(file))
+                          }
+                        }}
+                      />
                       <TextInput
                         value={name}
                         onChange={val => setName(val)}
@@ -120,6 +158,14 @@ export const Group = memo(() => {
                     items: dropdownItems
                   }}
                 >
+                  {
+                    banner && <AspectRatio
+                      ratio={4/1}
+                      backgroundSrc={banner}
+                      coverBackground
+                      borderRadius={1}
+                    />
+                  }
                   <Item
                     pageTitle={edit ? 'Edit Group' : group?.name}
                     absoluteRightChildren

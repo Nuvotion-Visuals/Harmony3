@@ -1,9 +1,10 @@
-import { Box, Spacer, AspectRatio, Gap, Item } from '@avsync.live/formation'
+import { Box, Spacer, AspectRatio, Gap, Item, Dropdown, ContextMenu, ItemProps } from '@avsync.live/formation'
 import React from 'react'
 import styled from 'styled-components'
 import { Badge } from './Badge'
 
 interface Props {
+  id: string
   previewSrc?: string
   name?: string
   groupsCount?: number
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export const SpaceCard = React.memo(({ 
+  id,
   previewSrc,
   name, 
   groupsCount, 
@@ -32,29 +34,62 @@ export const SpaceCard = React.memo(({
     </Box>
   </S.SpaceName>))
 
-  return (<S.SpaceCard expandVertical={expandVertical}>
-    <S.OverlayContainer>
-        <S.Overlay>
-          <SpaceName />
-        </S.Overlay>
-        <S.OverlayBottom>
-        <S.SpaceStats>
-          <Spacer />
-          <Badge 
-            groupsCount={groupsCount || 0}
-            channelsCount={channelsCount || 0}
-            threadsCount={threadsCount || 0}
-            messageCount={messageCount || 0}
-          />
-        </S.SpaceStats>
-        
-        </S.OverlayBottom>
-        <AspectRatio
-          ratio={previewSrc ? 16/9 : 4/1}
-          coverBackground
-        />
-    </S.OverlayContainer>
-  </S.SpaceCard>)
+  const dropdownItems = [
+    {
+      icon: 'edit',
+      iconPrefix: 'fas',
+      compact: true,
+      text: 'Edit',
+      href: `/spaces/${id}`
+    },
+  ] as ItemProps[]
+
+  return (
+    <AspectRatio
+      ratio={4/1}
+    >
+    <ContextMenu
+      dropdownProps={{
+        items: dropdownItems
+      }}
+    >
+      <S.SpaceCard expandVertical={expandVertical}>
+        <S.OverlayContainer>
+            <S.Overlay>
+              <Gap disableWrap>
+                <SpaceName />
+                <Box mr={.5}>
+                  <Dropdown
+                    icon='ellipsis-h'
+                    iconPrefix='fas'
+                    items={dropdownItems}
+                    circle
+                    compact
+                  />
+                </Box>
+              </Gap>
+            </S.Overlay>
+            <S.OverlayBottom>
+            <S.SpaceStats>
+              <Spacer />
+              <Badge 
+                groupsCount={groupsCount || 0}
+                channelsCount={channelsCount || 0}
+                threadsCount={threadsCount || 0}
+                messageCount={messageCount || 0}
+              />
+            </S.SpaceStats>
+            
+            </S.OverlayBottom>
+            <AspectRatio
+              ratio={previewSrc ? 4/1 : 4/1}
+              backgroundSrc={previewSrc ? previewSrc : undefined}
+              coverBackground
+            />
+        </S.OverlayContainer>
+      </S.SpaceCard>
+    </ContextMenu>
+  </AspectRatio>)
 })
 
 const S = {
@@ -78,6 +113,9 @@ const S = {
     width: 100%;
     z-index: 3;
     background: linear-gradient(to top, hsla(0, 0%, 7%, 0) 0%, hsla(0, 0%, 7%,.4) 40%, hsla(0, 0%, 7%,.5) 100%);
+    button {
+      background: black;
+    }
   `,
   OverlayBottom: styled.div`
     position: absolute;
@@ -91,8 +129,7 @@ const S = {
   `,
   SpaceStats: styled.div`
     width: calc(100% - .75rem);
-    height: 2rem;
-    padding: .25rem;
+    padding-bottom: .5rem;
     display: flex;
   `,
   PosterContainer: styled.div`

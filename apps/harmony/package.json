@@ -11,7 +11,8 @@
     "build": "tsc",
     "dev": "npm run build && electron .",
     "pack": "rm -rf ./dist && npm run build && npm run copy-assets && electron-builder --dir",
-    "dist": "rm -rf ./dist && npm run build && npm run copy-assets && electron-builder"
+    "dist": "rm -rf ./dist && npm run build && npm run copy-assets && electron-builder",
+    "generate-types": "npx pocketbase-typegen --db dist/pb_data/data.db --out pocketbase-types.ts"
   },
   "build": {
     "appId": "harmony.avsync.live",

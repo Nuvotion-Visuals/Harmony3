@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
-import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor } from '@avsync.live/formation'
+import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, LineBreak, AspectRatio, FileUpload } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { useHarmony_activeSpace } from 'redux-tk/harmony/hooks'
 import { GroupSuggestions } from './Suggestions/GroupSuggestions'
@@ -13,10 +13,17 @@ export const Space = memo(() => {
 
   const [name, setName] = useState(space?.name)
   const [description, setDescription] = useState(space?.description)
+  const [banner, setBanner] = useState(space?.banner ? `http://localhost:8090/api/files/spaces/${space.id}/${space.banner}` : null)
+  const [icon, setIcon] = useState(space?.icon ? `http://localhost:8090/api/files/spaces/${space.id}/${space.icon}` : null)
+
+  const [bannerFile, setBannerFile] = useState(null)
+  const [iconFile, setIconFile] = useState(null)
 
   useEffect(() => {
     setName(space?.name)
     setDescription(space?.description)
+    setBanner(space?.banner ? `http://localhost:8090/api/files/spaces/${space.id}/${space.banner}` : null)
+    setIcon(space?.icon ? `http://localhost:8090/api/files/spaces/${space.id}/${space.icon}` : null)
   }, [space])
 
   const handleDelete = async () => {
@@ -33,10 +40,16 @@ export const Space = memo(() => {
 
   const handleUpdate = async () => {
     try {
-      await pb.collection('spaces').update(space.id, {
-        name,
-        description
-      })
+      const formData = new FormData()
+      if (bannerFile) {
+        formData.append('banner', bannerFile)
+      }
+      if (iconFile) {
+        formData.append('icon', iconFile)
+      }
+      formData.append('name', name)
+      formData.append('description', description)
+      await pb.collection('spaces').update(space.id, formData)
       setEdit(false)
       console.log('Space updated')
     } 
@@ -49,6 +62,8 @@ export const Space = memo(() => {
   const handleCancelEdit = useCallback(() => {
     setName(space.name)
     setDescription(space.description)
+    setBanner(space?.banner ? `http://localhost:8090/api/files/spaces/${space.id}/${space.banner}` : null)
+    setIcon(space?.icon ? `http://localhost:8090/api/files/spaces/${space.id}/${space.icon}` : null)
     setEdit(false)
   }, [space])
 
@@ -59,6 +74,9 @@ export const Space = memo(() => {
       compact: true,
       text: 'Edit',
       onClick: () => setEdit(true)
+    },
+    {
+      children: <LineBreak color='var(--F_Font_Color_Disabled)'/>
     },
     {
       icon: 'trash-alt',
@@ -76,7 +94,63 @@ export const Space = memo(() => {
             edit
               ? <Box width='100%' mt={.5}>
                   <Gap disableWrap>
-                    <Gap >
+                    <Gap>
+                      <Gap disableWrap>
+                        {
+                          icon && <Box width={8}><AspectRatio
+                            ratio={1}
+                            backgroundSrc={icon}
+                            coverBackground
+                            borderRadius={1}
+                          /></Box>
+                        }
+                        {
+                          banner && <AspectRatio
+                            ratio={4/1}
+                            backgroundSrc={banner}
+                            coverBackground
+                            borderRadius={1}
+                          />
+                        }
+                      </Gap>
+                     
+                      <Gap disableWrap>
+                        <FileUpload
+                          minimal
+                          buttonProps={{
+                            icon: 'image',
+                            iconPrefix: 'fas',
+                            text: 'Choose icon',
+                            compact: true,
+                            expand: true
+                          }}
+                          onFileChange={files => {
+                            const file = files?.[0]
+                            if (file) {
+                              setIconFile(file)
+                              setIcon(URL.createObjectURL(file))
+                            }
+                          }}
+                        />
+                        <FileUpload
+                          minimal
+                          buttonProps={{
+                            icon: 'image',
+                            iconPrefix: 'fas',
+                            text: 'Choose banner',
+                            compact: true,
+                            expand: true
+                          }}
+                          onFileChange={files => {
+                            const file = files?.[0]
+                            if (file) {
+                              setBannerFile(file)
+                              setBanner(URL.createObjectURL(file))
+                            }
+                          }}
+                        />
+                      </Gap>
+                       
                       <TextInput
                         value={name}
                         onChange={val => setName(val)}
@@ -119,6 +193,14 @@ export const Space = memo(() => {
                     items: dropdownItems
                   }}
                 >
+                  {
+                    banner && <AspectRatio
+                      ratio={4/1}
+                      backgroundSrc={banner}
+                      coverBackground
+                      borderRadius={1}
+                    />
+                  }
                   <Item
                     pageTitle={edit ? 'Edit Space' : space?.name}
                     absoluteRightChildren

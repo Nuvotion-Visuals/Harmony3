@@ -39,12 +39,14 @@ export type AuthSystemFields<T = never> = {
 // Record types for each collection
 
 export type ChannelsRecord = {
+	banner?: string
 	description?: HTMLString
 	groupid?: RecordIdString
 	name?: string
 }
 
 export type GroupsRecord = {
+	banner?: string
 	description?: HTMLString
 	name?: string
 	spaceid?: RecordIdString
@@ -58,7 +60,9 @@ export type MessagesRecord = {
 }
 
 export type SpacesRecord = {
+	banner?: string
 	description?: HTMLString
+	icon?: string
 	name?: string
 	userid?: RecordIdString
 }

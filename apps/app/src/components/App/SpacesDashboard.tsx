@@ -18,13 +18,14 @@ const SpacesDashboard = () => {
           <S.SearchContainer>
           </S.SearchContainer>
         </Page>
-        <Grid maxWidth={isMobile ? 10 : 14} gap={isMobile ? .75 : 1.5} >
+        <Grid maxWidth={isMobile ? 12 : 18} gap={isMobile ? .75 : 1.5} >
           {
             spaces.filter(space => space.name.toLowerCase().includes(searchQuery.toLowerCase())).map(space =>
               <Link href={`/spaces/${space.id}`}>
                 <S.CardContainer>
                   <SpaceCard
                     {...space}
+                    previewSrc={space?.banner ? `http://localhost:8090/api/files/spaces/${space.id}/${space.banner}` : undefined}
                     expandVertical
                   />
                 </S.CardContainer>
@@ -34,7 +35,7 @@ const SpacesDashboard = () => {
 
           <Link href='/spaces/create'>
             <S.AddContainer>
-              <AspectRatio ratio={16/9}>
+              <AspectRatio ratio={4/1}>
                 <Icon icon='plus' iconPrefix='fas' size='xl' />
               </AspectRatio>
             </S.AddContainer>

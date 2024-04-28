@@ -24,8 +24,8 @@ export const Badge = React.memo(({
 
 const S = {
   Badge: styled.div`
-    background: var(--F_Surface_0);
-    padding: .5rem .75rem;
+    background: black;
+    padding: .25rem .5rem;
     border-radius: 1rem;
     font-size: 12px;
     color: var(--F_Font_Color_Label);

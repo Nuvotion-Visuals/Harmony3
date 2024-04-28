@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
-import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page } from '@avsync.live/formation'
+import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, FileUpload, AspectRatio, LineBreak } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { ThreadSuggestions } from 'components/App/Suggestions/ThreadSuggestions'
 
@@ -12,10 +12,14 @@ export const ChannelHeader = memo(({ channel }: Props) => {
 
   const [name, setName] = useState(channel?.name)
   const [description, setDescription] = useState(channel?.description)
+  const [banner, setBanner] = useState(channel?.banner ? `http://localhost:8090/api/files/channels/${channel.id}/${channel.banner}` : null)
+
+  const [file, setFile] = useState(null)
 
   useEffect(() => {
     setName(channel?.name)
     setDescription(channel?.description)
+    setBanner(channel?.banner ? `http://localhost:8090/api/files/channels/${channel.id}/${channel.banner}` : null)
   }, [channel])
 
   const handleDelete = async () => {
@@ -30,11 +34,16 @@ export const ChannelHeader = memo(({ channel }: Props) => {
   }
 
   const handleUpdate = async () => {
+    const formData = new FormData()
+    if (file) {
+      formData.append('banner', file)
+    }
+    formData.append('name', name)
+    formData.append('description', description)
+
     try {
-      await pb.collection('channels').update(channel.id, {
-        name,
-        description
-      })
+      const updatedRecord = await pb.collection('channels').update(channel.id, formData)
+      setBanner(updatedRecord.banner)
       setEdit(false)
       console.log('Channel updated')
     } 
@@ -45,8 +54,9 @@ export const ChannelHeader = memo(({ channel }: Props) => {
   }
 
   const handleCancelEdit = useCallback(() => {
-    setName(channel.name)
-    setDescription(channel.description)
+    setName(channel?.name)
+    setDescription(channel?.description)
+    setBanner(channel?.banner ? `http://localhost:8090/api/files/channels/${channel.id}/${channel.banner}` : null)
     setEdit(false)
   }, [channel])
 
@@ -57,6 +67,9 @@ export const ChannelHeader = memo(({ channel }: Props) => {
       compact: true,
       text: 'Edit',
       onClick: () => setEdit(true)
+    },
+    {
+      children: <LineBreak color='var(--F_Font_Color_Disabled)'/>
     },
     {
       icon: 'trash-alt',
@@ -74,7 +87,33 @@ export const ChannelHeader = memo(({ channel }: Props) => {
             edit
               ? <Box width='100%' mt={.5}>
                   <Gap disableWrap>
-                    <Gap >
+                    <Gap>
+                      {
+                        banner && <AspectRatio
+                          ratio={4/1}
+                          backgroundSrc={banner}
+                          coverBackground
+                          borderRadius={1}
+                        />
+                      }
+                    
+                      <FileUpload
+                        minimal
+                        buttonProps={{
+                          icon: 'image',
+                          iconPrefix: 'fas',
+                          text: 'Choose banner',
+                          compact: true,
+                          expand: true
+                        }}
+                        onFileChange={files => {
+                          const file = files?.[0]
+                          if (file) {
+                            setFile(file)
+                            setBanner(URL.createObjectURL(file))
+                          }
+                        }}
+                      />
                       <TextInput
                         value={name}
                         onChange={val => setName(val)}
@@ -117,6 +156,14 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                     items: dropdownItems
                   }}
                 >
+                  {
+                    banner && <AspectRatio
+                      ratio={4/1}
+                      backgroundSrc={banner}
+                      coverBackground
+                      borderRadius={1}
+                    />
+                  }
                   <Item
                     pageTitle={channel?.name}
                     absoluteRightChildren

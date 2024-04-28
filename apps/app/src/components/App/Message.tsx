@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, RichTextEditor, StyleHTML, markdownToHTML, onScrollWheelClick } from '@avsync.live/formation'
+import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, RichTextEditor, StyleHTML, markdownToHTML, onScrollWheelClick } from '@avsync.live/formation'
 import { memo, useEffect, useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { speak } from '../../language/speech'
@@ -116,6 +116,10 @@ export const Message = memo(({ id }: Props) => {
     }
   }
 
+  const onSpeak = () => {
+    speak(message.text, `message_${id}`, () => {})
+  }
+
   const dropdownItems = [
     {
       icon: 'edit',
@@ -123,6 +127,16 @@ export const Message = memo(({ id }: Props) => {
       compact: true,
       text: 'Edit',
       onClick: () => setEdit(true)
+    },
+    {
+      icon: 'play',
+      iconPrefix: 'fas',
+      compact: true,
+      text: 'Speak',
+      onClick: () => onSpeak()
+    },
+    {
+      children: <LineBreak color='var(--F_Font_Color_Disabled)'/>
     },
     {
       icon: 'trash-alt',
@@ -142,7 +156,7 @@ export const Message = memo(({ id }: Props) => {
       <S.Left>
         <Avatar
           name={namesByUserId[message.userid]}
-          labelColor='gray'
+          labelColor={namesByUserId[message.userid] === 'Harmony' ? 'red' : 'green'}
         />
       </S.Left>
       <S.Right>
@@ -150,7 +164,7 @@ export const Message = memo(({ id }: Props) => {
           key={message.id}
           name={namesByUserId[message.userid]}
           userid={message.userid}
-          onSpeak={() => speak(message.text, `message_${id}`, () => {})}
+          onSpeak={onSpeak}
           id={message.id}
           created={message.created}
           dropdownItems={dropdownItems}

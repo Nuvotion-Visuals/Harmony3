@@ -19,7 +19,7 @@ const SpacesSidebarComponent = () => {
     ...spacesInfo.map(space => ({
       name: space.name,
       href: `/spaces/${space.id}`,
-      // src: ''
+      src: space.icon ? `http://localhost:8090/api/files/spaces/${space.id}/${space.icon}` : undefined
     })),
     {
       icon: 'plus',
@@ -53,8 +53,10 @@ export const SpaceSidebar = React.memo(({ }: Props) => {
     <SpacesSidebarComponent />
     <S.SidebarContainer>
       {
-        activeSpace?.id && <SpaceCard
+        (activeSpace?.id && location.pathname !== '/profile') && <SpaceCard
+          id={activeSpace.id}
           name={activeSpace?.name}
+          previewSrc={activeSpace?.banner ? `http://localhost:8090/api/files/spaces/${activeSpace.id}/${activeSpace.banner}` : undefined}
           groupsCount={5}
           channelsCount={15}
           threadsCount={30}

@@ -1,26 +1,35 @@
-import React, { useEffect, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import { chat } from '../../language/chat'
 import { Avatar, Box, Button, Gap, Item, StyleHTML, markdownToHTML, scrollToElementById } from '@avsync.live/formation'
 import styled from 'styled-components'
 import { speak } from '../../language/speech'
-import { TextBox } from './TextBox'  // Importing TextBox from its file location
+import { TextBox } from './TextBox' 
+import { useHarmony_currentUserId, useHarmony_namesByUserId } from 'redux-tk/harmony/hooks'
 
-const Message = ({
+const Message = memo(({
   role,
   content,
   index
+}: {
+  role: string,
+  content: string,
+  index: number
 }) => {
+  const currentUserId = useHarmony_currentUserId()
+  const namesByUserId = useHarmony_namesByUserId()
+  const name = namesByUserId?.[currentUserId]
+
   return (
     <S.Message id={`quickchat_message_${index}`}>
       <S.Left>
         <Avatar
-          name={role}
-          labelColor='gray'
+          name={role === 'user' ? name : 'Harmony'}
+          labelColor={role === 'user' ? 'green' : 'red'}
         />
       </S.Left>
       <S.Right>
         <Item
-          subtitle={role}
+          subtitle={role === 'user' ? name : 'Harmony'}
           disablePadding
           disableBreak
         >
@@ -45,7 +54,7 @@ const Message = ({
       </S.Right>
     </S.Message>
   )
-}
+})
 
 export const QuickChat = () => {
   const [messages, setMessages] = useState([])

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from 'react'
 import styled from 'styled-components'
 import { useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
-import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, TextInput, onScrollWheelClick } from '@avsync.live/formation'
+import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, TextInput, onScrollWheelClick } from '@avsync.live/formation'
 import { Message } from 'components/App/Message'
 import { pb } from 'redux-tk/pocketbase'
 import { generate_threadNameAndDescription } from 'language/generate/threadNameAndDescription'
@@ -74,8 +74,6 @@ export const Thread = memo(({
     }
   }, [thread.id, name, description])
 
-
-
   const toggleExpanded = useCallback(() => {
     onToggle(index)
   }, [index])
@@ -138,6 +136,9 @@ export const Thread = memo(({
         e.stopPropagation()
         setEdit(true)
       },
+    },
+    {
+      children: <LineBreak color='var(--F_Font_Color_Disabled)'/>
     },
     {
       icon: 'trash-alt',
