@@ -13,7 +13,7 @@ interface Props {
 export const TextBox = memo(({
   onNewThreadId,
   activeThreadId,
-  onSend
+  onSend,
 }: Props) => {
   const [text, setText] = useState('')
   const setActiveThreadId = useHarmony_setActiveThreadId()
@@ -82,6 +82,7 @@ export const TextBox = memo(({
     }, 10)
   }, [activeThreadId])
 
+
   return (
     <S.Wrapper>
       {
@@ -106,13 +107,18 @@ export const TextBox = memo(({
             />
           </Item>
       }
-      <S.TextBox>
+      <S.TextBox onClick={() => {
+         setAutoFocus(true)
+         setTimeout(() => {
+           setAutoFocus(false)
+         }, 10)
+      }}>
         <RichTextEditor
           value={text}
           onChange={val => setText(val)}
           outline
           px={1}
-          minimal
+          minimal={true}
           autoFocus={autoFocus}
           onKeyDown={e => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -123,19 +129,17 @@ export const TextBox = memo(({
           }}
           placeholder='Send a message'
         />
-        {
-          text !== '' &&
-            <S.Absolute>
-              <Button
-                icon='arrow-up'
-                iconPrefix='fas'
-                square
-                primary
-                onClick={() => sendMessage(text)}
-                circle
-              />
-            </S.Absolute>
-        }
+        <S.Absolute>
+          <Button
+            icon='arrow-up'
+            iconPrefix='fas'
+            onClick={() => sendMessage(text)}
+            circle
+            minimal
+          />
+        </S.Absolute>
+       
+       
       </S.TextBox>
     </S.Wrapper>
   )
@@ -155,8 +159,8 @@ const S = {
   `,
   Absolute: styled.div`
     position: absolute;
-    right: 1px;
-    top: 1px;
+    right: 0px;
+    top: 0px;
     transform: scale(.9);
   `
 }

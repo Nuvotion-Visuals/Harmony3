@@ -40,7 +40,7 @@ export const SpaceCard = React.memo(({
       iconPrefix: 'fas',
       compact: true,
       text: 'Edit',
-      href: `/spaces/${id}`
+      href: `/spaces/${id}?edit=true`
     },
   ] as ItemProps[]
 

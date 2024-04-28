@@ -2,13 +2,18 @@ import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, FileUpload, AspectRatio, LineBreak, FileDrop } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { ThreadSuggestions } from 'components/App/Suggestions/ThreadSuggestions'
+import { useSearchParams } from 'react-router-dom'
+import { useRemoveQueryParam } from 'utils/removeEditQuery'
 
 interface Props {
   channel: any
 }
 
 export const ChannelHeader = memo(({ channel }: Props) => {
-  const [edit, setEdit] = useState(false)
+  const [searchParams] = useSearchParams()
+  const removeQueryParam = useRemoveQueryParam()
+
+  const [edit, setEdit] = useState(!!searchParams.get('edit'))
 
   const [name, setName] = useState(channel?.name)
   const [description, setDescription] = useState(channel?.description)
@@ -44,6 +49,7 @@ export const ChannelHeader = memo(({ channel }: Props) => {
     try {
       await pb.collection('channels').update(channel.id, formData)
       setEdit(false)
+      removeQueryParam('edit')
       console.log('Channel updated')
     } 
     catch (error) {
@@ -57,6 +63,7 @@ export const ChannelHeader = memo(({ channel }: Props) => {
     setDescription(channel?.description)
     setBanner(channel?.banner ? `http://localhost:8090/api/files/channels/${channel.id}/${channel.banner}` : null)
     setEdit(false)
+    removeQueryParam('edit')
   }, [channel])
 
   const dropdownItems = [

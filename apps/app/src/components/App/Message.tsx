@@ -80,9 +80,17 @@ const MessageInfo: React.FC<MessageInfoProps> = memo(({
 
 interface Props {
   id: string
+  index?: number
+  expanded?: boolean
+  onToggle?: (index: number) => void
 }
 
-export const Message = memo(({ id }: Props) => {
+export const Message = memo(({ 
+  id, 
+  index,
+  expanded,
+  onToggle 
+}: Props) => {
   const message = useHarmony_messageById(id)
   const namesByUserId = useHarmony_namesByUserId()
   
@@ -121,6 +129,16 @@ export const Message = memo(({ id }: Props) => {
   }
 
   const dropdownItems = [
+    {
+      icon: expanded ? 'chevron-up' : 'chevron-down',
+      iconPrefix: 'fas',
+      compact: true,
+      text: expanded ? 'Collapse' : 'Expand',
+      onClick: (e) => {
+        e.stopPropagation()
+        onToggle(index ? index : 0)
+      },
+    },
     {
       icon: 'edit',
       iconPrefix: 'fas',

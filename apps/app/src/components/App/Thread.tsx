@@ -85,6 +85,16 @@ export const Thread = memo(({
 
   const dropdownItems = useMemo(() => [
     {
+      icon: expanded ? 'chevron-up' : 'chevron-down',
+      iconPrefix: 'fas',
+      compact: true,
+      text: expanded ? 'Collapse' : 'Expand',
+      onClick: (e) => {
+        e.stopPropagation()
+        toggleExpanded()
+      },
+    },
+    {
       icon: 'reply',
       iconPrefix: 'fas',
       compact: true,
@@ -150,7 +160,8 @@ export const Thread = memo(({
         handleDelete()
       },
     },
-  ], []) as ItemProps[]
+  ], [expanded]) as ItemProps[]
+
 
   return (
     <S.Container active={active}>
@@ -249,7 +260,13 @@ export const Thread = memo(({
           <>
             {
               thread.messageIds.map(id => (
-                <Message id={id} key={id} />
+                <Message 
+                  id={id} 
+                  key={id} 
+                  expanded={expanded} 
+                  onToggle={onToggle} 
+                  index={index}
+                />
               ))
             }
             {

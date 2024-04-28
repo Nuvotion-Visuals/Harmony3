@@ -3,10 +3,14 @@ import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Pa
 import { pb } from 'redux-tk/pocketbase'
 import { useHarmony_activeGroup, useHarmony_activeSpaceId, useHarmony_setActiveChannelId } from 'redux-tk/harmony/hooks'
 import { ChannelSuggestions } from 'components/App/Suggestions/ChannelSuggestions'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useRemoveQueryParam } from 'utils/removeEditQuery'
 
 export const Group = memo(() => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const removeQueryParam = useRemoveQueryParam()
+
   const activeSpaceId = useHarmony_activeSpaceId()
   const setActiveChannelId = useHarmony_setActiveChannelId()
   const group = useHarmony_activeGroup()
@@ -15,7 +19,7 @@ export const Group = memo(() => {
     setActiveChannelId(null)
   }, [])
 
-  const [edit, setEdit] = useState(false)
+  const [edit, setEdit] = useState(!!searchParams.get('edit'))
 
   const [name, setName] = useState(group?.name)
   const [description, setDescription] = useState(group?.description)
@@ -52,6 +56,7 @@ export const Group = memo(() => {
     try {
       await pb.collection('groups').update(group.id, formData)
       setEdit(false)
+      removeQueryParam('edit')
       console.log('Group updated')
     } 
     catch (error) {
@@ -65,6 +70,7 @@ export const Group = memo(() => {
     setDescription(group?.description)
     setBanner(group?.banner ? `http://localhost:8090/api/files/groups/${group.id}/${group.banner}` : null)
     setEdit(false)
+    removeQueryParam('edit')
   }, [group])
 
   const dropdownItems = [

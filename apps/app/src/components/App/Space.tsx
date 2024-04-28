@@ -3,13 +3,17 @@ import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Pa
 import { pb } from 'redux-tk/pocketbase'
 import { useHarmony_activeSpace } from 'redux-tk/harmony/hooks'
 import { GroupSuggestions } from './Suggestions/GroupSuggestions'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useRemoveQueryParam } from 'utils/removeEditQuery'
 
 export const Space = memo(() => {
   const navigate = useNavigate()
   const space = useHarmony_activeSpace()
 
-  const [edit, setEdit] = useState(false)
+  const [searchParams] = useSearchParams()
+  const removeQueryParam = useRemoveQueryParam()
+
+  const [edit, setEdit] = useState(!!searchParams.get('edit'))
 
   const [name, setName] = useState(space?.name)
   const [description, setDescription] = useState(space?.description)
@@ -51,6 +55,7 @@ export const Space = memo(() => {
       formData.append('description', description)
       await pb.collection('spaces').update(space.id, formData)
       setEdit(false)
+      removeQueryParam('edit')
       console.log('Space updated')
     } 
     catch (error) {
@@ -65,6 +70,7 @@ export const Space = memo(() => {
     setBanner(space?.banner ? `http://localhost:8090/api/files/spaces/${space.id}/${space.banner}` : null)
     setIcon(space?.icon ? `http://localhost:8090/api/files/spaces/${space.id}/${space.icon}` : null)
     setEdit(false)
+    removeQueryParam('edit')
   }, [space])
 
   const dropdownItems = [
@@ -97,7 +103,7 @@ export const Space = memo(() => {
                     <Gap>
                       <Gap disableWrap>
                         {
-                          icon && <Box width={8}><FileDrop 
+                          icon && <Box width={10}><FileDrop 
                             onFileDrop={files => {
                               const file = files?.[0]
                               if (file) {
@@ -136,23 +142,26 @@ export const Space = memo(() => {
                       </Gap>
                      
                       <Gap disableWrap>
-                        <FileUpload
-                          minimal
-                          buttonProps={{
-                            icon: 'image',
-                            iconPrefix: 'fas',
-                            text: 'Choose icon',
-                            compact: true,
-                            expand: true
-                          }}
-                          onFileChange={files => {
-                            const file = files?.[0]
-                            if (file) {
-                              setIconFile(file)
-                              setIcon(URL.createObjectURL(file))
-                            }
-                          }}
-                        />
+                        <Box width={10}>
+                          <FileUpload
+                            minimal
+                            buttonProps={{
+                              icon: 'image',
+                              iconPrefix: 'fas',
+                              text: 'Choose icon',
+                              compact: true,
+                              expand: true
+                            }}
+                            onFileChange={files => {
+                              const file = files?.[0]
+                              if (file) {
+                                setIconFile(file)
+                                setIcon(URL.createObjectURL(file))
+                              }
+                            }}
+                          />
+                        </Box>
+                       
                         <FileUpload
                           minimal
                           buttonProps={{

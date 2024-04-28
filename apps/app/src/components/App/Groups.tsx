@@ -113,7 +113,7 @@ export const Groups = React.memo(() => {
               iconPrefix: 'fas',
               compact: true,
               text: 'Edit',
-              href: `/spaces/${activeSpace?.id}/groups/${expandableList?.id}`
+              href: `/spaces/${activeSpace?.id}/groups/${expandableList?.id}?edit=true`
             },
             {
               children: <LineBreak color='var(--F_Font_Color_Disabled)' />
@@ -169,7 +169,7 @@ export const Groups = React.memo(() => {
                       iconPrefix: 'fas',
                       compact: true,
                       text: 'Edit',
-                      href: `/spaces/${activeSpace?.id}/groups/${expandableList?.id}/channels/${listItem?.id}`
+                      href: `/spaces/${activeSpace?.id}/groups/${expandableList?.id}/channels/${listItem?.id}?edit=true`
                     },
                     {
                       children: <LineBreak color='var(--F_Font_Color_Disabled)' />
