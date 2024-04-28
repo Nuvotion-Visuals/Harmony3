@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
-import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, AspectRatio, FileUpload, LineBreak } from '@avsync.live/formation'
+import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, AspectRatio, FileUpload, LineBreak, FileDrop } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { useHarmony_activeGroup, useHarmony_activeSpaceId, useHarmony_setActiveChannelId } from 'redux-tk/harmony/hooks'
 import { ChannelSuggestions } from 'components/App/Suggestions/ChannelSuggestions'
@@ -96,12 +96,22 @@ export const Group = memo(() => {
                   <Gap disableWrap>
                     <Gap >
                       {
-                        banner && <AspectRatio
-                          ratio={4/1}
-                          backgroundSrc={banner}
-                          coverBackground
-                          borderRadius={1}
-                        />
+                        banner && <FileDrop 
+                          onFileDrop={files => {
+                            const file = files?.[0]
+                            if (file) {
+                              setFile(file)
+                              setBanner(URL.createObjectURL(file))
+                            }
+                          }}
+                        >
+                          <AspectRatio
+                            ratio={4/1}
+                            backgroundSrc={banner}
+                            coverBackground
+                            borderRadius={1}
+                          />
+                        </FileDrop>
                       }
                       
                       <FileUpload

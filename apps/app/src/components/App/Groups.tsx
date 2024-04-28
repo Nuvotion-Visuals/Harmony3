@@ -38,7 +38,7 @@ const generateGroupsList = (groups, activeSpaceId, activeGroupId, activeChannelI
     id: group.id,
     value: {
       item: {
-        label: group.name, // Using 'name' as the label for the group
+        text: group.name, // Using 'name' as the label for the group
         labelColor: 'none' as LabelColor, // Type assertion for 'LabelColor'
         active: activeChannelId === null && activeGroupId === group.id
       },
@@ -123,9 +123,7 @@ export const Groups = React.memo(() => {
               iconPrefix: 'fas',
               compact: true,
               text: 'Delete',
-              onClick: () => {
-                handleDeleteGroup(expandableList?.id)
-              } 
+              onClick: () => handleDeleteGroup(expandableList?.id) 
             }
           ] as ItemProps[]
 
@@ -142,17 +140,17 @@ export const Groups = React.memo(() => {
                       items: groupDropdownItems
                     }}
                   >
-                    <Box width='100%'>
+                    <Box width='100%' height='100%'>
                       <Spacer />
-                        <Dropdown
-                          icon='ellipsis-h'
-                          iconPrefix='fas'
-                          compact
-                          minimal
-                          square
-                          items={groupDropdownItems}
-                        />
-                      </Box>
+                      <Dropdown
+                        icon='ellipsis-h'
+                        iconPrefix='fas'
+                        compact
+                        minimal
+                        square
+                        items={groupDropdownItems}
+                      />
+                    </Box>
                   </ContextMenu>
                 </S.Overlay>
               },
@@ -160,13 +158,29 @@ export const Groups = React.memo(() => {
                 ...expandableList.value.list.map(listItem => {
                   const dropdownItems = [
                     {
+                      icon: 'arrow-right',
+                      iconPrefix: 'fas',
+                      compact: true,
+                      text: 'Visit',
+                      href: `/spaces/${activeSpace?.id}/groups/${expandableList?.id}/channels/${listItem?.id}`
+                    },
+                    {
+                      icon: 'edit',
+                      iconPrefix: 'fas',
+                      compact: true,
+                      text: 'Edit',
+                      href: `/spaces/${activeSpace?.id}/groups/${expandableList?.id}/channels/${listItem?.id}`
+                    },
+                    {
+                      children: <LineBreak color='var(--F_Font_Color_Disabled)' />
+                    },
+                    {
                       icon: 'trash-alt',
                       iconPrefix: 'fas',
                       compact: true,
                       text: 'Delete',
-                      onClick: () => {
-                        handleDeleteChannel(listItem?.id)
-                      }
+                      onClick: () => handleDeleteChannel(listItem?.id)
+
                     }
                   ] as ItemProps[]
                   return ({
@@ -185,33 +199,26 @@ export const Groups = React.memo(() => {
                             compact
                             minimal
                             square
-                            onClick={(e) => {
-                              e.preventDefault()
-                            }
-                            }
+                            onClick={(e) => e.preventDefault()}
                             items={dropdownItems}
                           />
                         </Box>
                       </ContextMenu>
-                      </S.Overlay>
+                    </S.Overlay>
                   })
                 }),
-              {
-                children: <CreateChannel
-                  groupId={expandableList?.id}
-                />,
-                disablePadding: true
-              }
-            ]
+                {
+                  children: <CreateChannel groupId={expandableList?.id} />,
+                  disablePadding: true
+                }
+              ]
             }
           })
         })}
         onExpand={index => setGroupsList(groupsList.map((item, i) => i === index ? ({...item, expanded: !item.expanded}) : item))}
       />
       <Box height='var(--F_Input_Height)'>
-        <CreateGroup
-          spaceId={activeSpace?.id}
-        />
+        <CreateGroup spaceId={activeSpace?.id} />
       </Box>
     </>
   )

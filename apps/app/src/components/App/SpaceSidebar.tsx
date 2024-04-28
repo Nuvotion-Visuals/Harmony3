@@ -57,10 +57,10 @@ export const SpaceSidebar = React.memo(({ }: Props) => {
           id={activeSpace.id}
           name={activeSpace?.name}
           previewSrc={activeSpace?.banner ? `http://localhost:8090/api/files/spaces/${activeSpace.id}/${activeSpace.banner}` : undefined}
-          groupsCount={5}
-          channelsCount={15}
-          threadsCount={30}
-          messageCount={120}
+          groupsCount={0}
+          channelsCount={0}
+          threadsCount={0}
+          messageCount={0}
         />
       }
       {

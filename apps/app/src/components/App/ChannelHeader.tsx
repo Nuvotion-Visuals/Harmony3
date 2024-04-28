@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
-import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, FileUpload, AspectRatio, LineBreak } from '@avsync.live/formation'
+import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, FileUpload, AspectRatio, LineBreak, FileDrop } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { ThreadSuggestions } from 'components/App/Suggestions/ThreadSuggestions'
 
@@ -42,8 +42,7 @@ export const ChannelHeader = memo(({ channel }: Props) => {
     formData.append('description', description)
 
     try {
-      const updatedRecord = await pb.collection('channels').update(channel.id, formData)
-      setBanner(updatedRecord.banner)
+      await pb.collection('channels').update(channel.id, formData)
       setEdit(false)
       console.log('Channel updated')
     } 
@@ -89,12 +88,22 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                   <Gap disableWrap>
                     <Gap>
                       {
-                        banner && <AspectRatio
-                          ratio={4/1}
-                          backgroundSrc={banner}
-                          coverBackground
-                          borderRadius={1}
-                        />
+                        banner && <FileDrop 
+                          onFileDrop={files => {
+                            const file = files?.[0]
+                            if (file) {
+                              setFile(file)
+                              setBanner(URL.createObjectURL(file))
+                            }
+                          }}
+                        >
+                          <AspectRatio
+                            ratio={4/1}
+                            backgroundSrc={banner}
+                            coverBackground
+                            borderRadius={1}
+                          />
+                        </FileDrop>
                       }
                     
                       <FileUpload

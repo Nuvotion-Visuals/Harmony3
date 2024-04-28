@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
-import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, LineBreak, AspectRatio, FileUpload } from '@avsync.live/formation'
+import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, LineBreak, AspectRatio, FileUpload, FileDrop } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { useHarmony_activeSpace } from 'redux-tk/harmony/hooks'
 import { GroupSuggestions } from './Suggestions/GroupSuggestions'
@@ -97,20 +97,41 @@ export const Space = memo(() => {
                     <Gap>
                       <Gap disableWrap>
                         {
-                          icon && <Box width={8}><AspectRatio
-                            ratio={1}
-                            backgroundSrc={icon}
-                            coverBackground
-                            borderRadius={1}
-                          /></Box>
+                          icon && <Box width={8}><FileDrop 
+                            onFileDrop={files => {
+                              const file = files?.[0]
+                              if (file) {
+                                setIconFile(file)
+                                setIcon(URL.createObjectURL(file))
+                              }
+                            }}
+                          >
+                            <AspectRatio
+                              ratio={1}
+                              backgroundSrc={icon}
+                              coverBackground
+                              borderRadius={1}
+                            />
+                            </FileDrop>
+                          </Box>
                         }
                         {
-                          banner && <AspectRatio
-                            ratio={4/1}
-                            backgroundSrc={banner}
-                            coverBackground
-                            borderRadius={1}
-                          />
+                          banner && <FileDrop 
+                            onFileDrop={files => {
+                              const file = files?.[0]
+                              if (file) {
+                                setBannerFile(file)
+                                setBanner(URL.createObjectURL(file))
+                              }
+                            }}
+                          >
+                            <AspectRatio
+                              ratio={4/1}
+                              backgroundSrc={banner}
+                              coverBackground
+                              borderRadius={1}
+                            />
+                          </FileDrop>
                         }
                       </Gap>
                      
