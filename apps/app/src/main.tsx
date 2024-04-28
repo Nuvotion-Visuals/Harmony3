@@ -67,29 +67,29 @@ library.add(
 
 const Main = ({ }) => {
   return (
-      <Provider store={store}>
-        <BrowserRouter>
-          <Linker CustomLink={Link}> 
-            <Ripple />
-            <Routes>
-              <Route path="/sign-in" element={<SignIn />} />
-              <Route path="/sign-up" element={<SignUp />} />
-              <Route path="/" element={<App><></></App>} />
-              <Route path="/profile" element={<App><RouteTracker /></App>} />
-              <Route path="/spaces" element={<App><RouteTracker /></App>}></Route>
-              <Route path="/spaces/:spaceid" element={<App><RouteTracker /></App>}>
-                <Route path="groups/:groupid" element={<App><RouteTracker /></App>}>
-                  <Route path="channels/:channelid" element={<App><RouteTracker /></App>}>
-                    <Route path="threads/:threadid" element={<App><RouteTracker /></App>}>
-                      <Route path="messages/:messageid" element={<App><RouteTracker /></App>} />
-                    </Route>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Linker CustomLink={Link}> 
+          <Ripple />
+          <Routes>
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/" element={<App><></></App>} />
+            <Route path="/profile" element={<App><RouteTracker /></App>} />
+            <Route path="/spaces" element={<App><RouteTracker /></App>}></Route>
+            <Route path="/spaces/:spaceid" element={<App><RouteTracker /></App>}>
+              <Route path="groups/:groupid" element={<App><RouteTracker /></App>}>
+                <Route path="channels/:channelid" element={<App><RouteTracker /></App>}>
+                  <Route path="threads/:threadid" element={<App><RouteTracker /></App>}>
+                    <Route path="messages/:messageid" element={<App><RouteTracker /></App>} />
                   </Route>
                 </Route>
               </Route>
-            </Routes>
-          </Linker>
-        </BrowserRouter>
-      </Provider>
+            </Route>
+          </Routes>
+        </Linker>
+      </BrowserRouter>
+    </Provider>
   )
 }
 
