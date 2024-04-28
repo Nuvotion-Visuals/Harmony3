@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from 'react'
 import styled from 'styled-components'
 import { useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
-import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, TextInput, onScrollWheelClick } from '@avsync.live/formation'
+import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, TextInput, onScrollWheelClick, scrollToElementById } from '@avsync.live/formation'
 import { Message } from 'components/App/Message'
 import { pb } from 'redux-tk/pocketbase'
 import { generate_threadNameAndDescription } from 'language/generate/threadNameAndDescription'
@@ -95,13 +95,38 @@ export const Thread = memo(({
       },
     },
     {
-      icon: 'reply',
+      icon: 'circle-up',
       iconPrefix: 'fas',
       compact: true,
-      text: 'Reply',
+      text: 'Thread top',
       onClick: (e) => {
         e.stopPropagation()
-        handleReply()
+        scrollToElementById(`thread_${thread.id}_top`, { behavior: 'smooth'})
+      },
+    },
+    {
+      icon: 'circle-down',
+      iconPrefix: 'fas',
+      compact: true,
+      text: 'Thread bottom',
+      onClick: (e) => {
+        e.stopPropagation()
+        scrollToElementById(`thread_${thread.id}_bottom`, { behavior: 'smooth'})
+      },
+    },
+    {
+      children: <LineBreak color='var(--F_Font_Color_Disabled)'/>
+    },
+    {
+      icon: active ? 'times' : 'reply',
+      iconPrefix: 'fas',
+      compact: true,
+      text: active ? 'Exit reply' : 'Reply',
+      onClick: (e) => {
+        e.stopPropagation()
+        active
+          ? setActiveThreadId(null)
+          : handleReply()
       },
     },
     {
@@ -165,6 +190,7 @@ export const Thread = memo(({
 
   return (
     <S.Container active={active}>
+      <div id={`thread_${thread.id}_top`} />
       {
         edit
           ? <Box ml={.5}>
@@ -209,7 +235,8 @@ export const Thread = memo(({
             </Box>
           : <ContextMenu
               dropdownProps={{
-                items: dropdownItems
+                items: dropdownItems,
+                maxWidth: '10rem'
               }}
             >
               <Item
@@ -250,6 +277,7 @@ export const Thread = memo(({
                   minimal
                   square
                   items={dropdownItems}
+                  maxWidth='10rem'
                 />
               </Item>
             </ContextMenu>
@@ -266,6 +294,8 @@ export const Thread = memo(({
                   expanded={expanded} 
                   onToggle={onToggle} 
                   index={index}
+                  threadActive={active}
+                  onHandleReply={handleReply}
                 />
               ))
             }
@@ -279,6 +309,7 @@ export const Thread = memo(({
           </>
       }
       <div id={`thread_${thread.id}`} />
+      <div id={`thread_${thread.id}_bottom`} />
     </S.Container>
   )
 })

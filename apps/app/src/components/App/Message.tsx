@@ -1,9 +1,9 @@
-import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, RichTextEditor, StyleHTML, markdownToHTML, onScrollWheelClick } from '@avsync.live/formation'
+import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, RichTextEditor, StyleHTML, markdownToHTML, onScrollWheelClick, scrollToElementById } from '@avsync.live/formation'
 import { memo, useEffect, useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { speak } from '../../language/speech'
 import styled from 'styled-components'
-import { useHarmony_messageById, useHarmony_namesByUserId } from 'redux-tk/harmony/hooks'
+import { useHarmony_messageById, useHarmony_namesByUserId, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
 
 const formatDate = (date: string): string => {
   const messageDate = new Date(date)
@@ -67,6 +67,8 @@ const MessageInfo: React.FC<MessageInfoProps> = memo(({
             square
             minimal
             items={dropdownItems}
+            maxWidth='10rem'
+            disableSearch
           />
         </Box>
       </Gap>
@@ -79,16 +81,21 @@ interface Props {
   index?: number
   expanded?: boolean
   onToggle?: (index: number) => void
+  onHandleReply?: () => void
+  threadActive?: boolean
 }
 
 export const Message = memo(({ 
   id, 
   index,
   expanded,
-  onToggle 
+  onToggle,
+  onHandleReply,
+  threadActive
 }: Props) => {
   const message = useHarmony_messageById(id)
   const namesByUserId = useHarmony_namesByUserId()
+  const setActiveThreadId = useHarmony_setActiveThreadId()
   
   const [edit, setEdit] = useState(false)
   const [editText, setEditText] = useState(message?.text)
@@ -129,10 +136,68 @@ export const Message = memo(({
       icon: expanded ? 'chevron-up' : 'chevron-down',
       iconPrefix: 'fas',
       compact: true,
-      text: expanded ? 'Collapse' : 'Expand',
+      text: expanded ? 'Thread collapse' : 'Thread expand',
       onClick: (e) => {
         e.stopPropagation()
         onToggle(index ? index : 0)
+      },
+    },
+    {
+      icon: 'circle-up',
+      iconPrefix: 'fas',
+      compact: true,
+      text: 'Thread top',
+      onClick: (e) => {
+        e.stopPropagation()
+        scrollToElementById(`thread_${message.threadid}_top`, { behavior: 'smooth'})
+      },
+    },
+    {
+      icon: 'circle-down',
+      iconPrefix: 'fas',
+      compact: true,
+      text: 'Thread bottom',
+      onClick: (e) => {
+        e.stopPropagation()
+        scrollToElementById(`thread_${message.threadid}_bottom`, { behavior: 'smooth'})
+      },
+    },
+    {
+      children: <LineBreak color='var(--F_Font_Color_Disabled)'/>
+    },
+    {
+      icon: 'arrow-up',
+      iconPrefix: 'fas',
+      compact: true,
+      text: 'Message top',
+      onClick: (e) => {
+        e.stopPropagation()
+        scrollToElementById(`message_${id}_top`, { behavior: 'smooth'})
+      },
+    },
+    {
+      icon: 'arrow-down',
+      iconPrefix: 'fas',
+      compact: true,
+      text: 'Message bottom',
+      onClick: (e) => {
+        e.stopPropagation()
+        scrollToElementById(`message_${id}_bottom`, { behavior: 'smooth'})
+      },
+    },
+    {
+      children: <LineBreak color='var(--F_Font_Color_Disabled)'/>
+    },
+    {
+      icon: threadActive ? 'times' : 'reply',
+      iconPrefix: 'fas',
+      compact: true,
+      text: threadActive ? 'Exit reply' : 'Reply',
+      onClick: (e) => {
+        e.stopPropagation()
+        threadActive
+          ? setActiveThreadId(null)
+          : onHandleReply()
       },
     },
     {
@@ -163,9 +228,12 @@ export const Message = memo(({
 
   return <ContextMenu
     dropdownProps={{
-      items: dropdownItems
+      items: dropdownItems,
+      maxWidth: '10rem',
+      disableSearch: true
     }}
   >
+    <div id={`message_${id}_top`} />
     <S.Message onMouseDown={onScrollWheelClick(() => handleDelete())} id={`message_${message.id}`}>
       <S.Left>
         <Avatar
@@ -219,10 +287,10 @@ export const Message = memo(({
                   <div dangerouslySetInnerHTML={{ __html: markdownToHTML(message.text) || '' }} className='message' />
                 </StyleHTML>
           }
-          
         </S.Container>
       </S.Right>
     </S.Message>
+    <div id={`message_${id}_bottom`} />
   </ContextMenu>
 })
 
