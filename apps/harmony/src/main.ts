@@ -62,23 +62,17 @@ const createWindow = () => {
   })
 }
 
-import { Response } from 'express';
-
-interface ChatMessage {
-  content: string;
-}
-
 interface StreamResponsePart {
   message: {
-    content: string;
-  };
-  endOfStream?: boolean;
+    content: string
+  }
+  endOfStream?: boolean
 }
 
-type StreamCallback = (data: StreamResponsePart) => void;
+type StreamCallback = (data: StreamResponsePart) => void
 
 const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq', messages: any, callback: StreamCallback) => {
-  let fullResponse: string[] = [];
+  let fullResponse: string[] = []
 
   try {
     switch (provider) {
@@ -87,60 +81,58 @@ const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq', messag
           model: 'llama3',
           messages,
           stream: true
-        });
+        })
         for await (const part of ollamaResponse) {
-          fullResponse.push(part.message.content);
+          fullResponse.push(part.message.content)
           callback({
             message: {
               content: fullResponse.join('')
             }
-          });
+          })
         }
-        break;
+        break
 
       case 'openai':
         const openaiStream = await openai.chat.completions.create({
           model: 'gpt-4',
           messages,
           stream: true
-        });
+        })
         for await (const chunk of openaiStream) {
-          const content = chunk.choices[0]?.delta?.content || '';
-          fullResponse.push(content);
+          const content = chunk.choices[0]?.delta?.content || ''
+          fullResponse.push(content)
           callback({
             message: {
               content: fullResponse.join('')
             }
-          });
+          })
         }
-        break;
+        break
 
       case 'groq':
         const groqStream = await groq.chat.completions.create({
           model: 'llama3-70b-8192',
           messages,
           stream: true
-        });
+        })
         for await (const chunk of groqStream) {
-          const content = chunk.choices[0]?.delta?.content || '';
-          fullResponse.push(content);
+          const content = chunk.choices[0]?.delta?.content || ''
+          fullResponse.push(content)
           callback({
             message: {
               content: fullResponse.join('')
             }
-          });
+          })
         }
-        break;
+        break
     }
 
     callback({ message: { content: fullResponse.join('') }, endOfStream: true });
-  } catch (error) {
-    console.error('Error streaming response:', error);
-    // Consider how you might want to handle errors in this context.
+  } 
+  catch (error) {
+    console.error('Error streaming response:', error)
   }
 }
-
-
 
 // Chat
 const chat = express()
@@ -175,26 +167,102 @@ chat.get('/chat', async (req, res) => {
 
   streamChatResponse(payload.provider, payload.messages, (data) => {
     if (data.endOfStream) {
-      res.write(`data: ${JSON.stringify(data)}\n\n`);
-      res.end();
-    } else {
-      res.write(`data: ${JSON.stringify(data)}\n\n`);
+      res.write(`data: ${JSON.stringify(data)}\n\n`)
+      res.end()
+    } 
+    else {
+      res.write(`data: ${JSON.stringify(data)}\n\n`)
     }
-  });
+  })
 
   req.on('close', () => {
     console.log('Client disconnected')
   })
-});
+})
 
 chat.listen(PORT2, () => {
   console.log(`Server running on http://localhost:${PORT2}`)
 })
 
+export class JsonValidator {
+  private lastValidJson: string
+
+  constructor() {
+    this.lastValidJson = ''
+  }
+
+  public ensureValidJson(str: string): string | null {
+    try {
+      if (str === 'null') {
+        return this.lastValidJson
+      }
+      JSON.parse(str)
+      this.lastValidJson = str
+      return str
+    } catch (error) {
+      let repairedString = str
+      let stack: string[] = []
+      let withinString = false
+
+      for (let i = 0; i < str.length; i++) {
+        const char = str[i]
+
+        if (char === '"' && (i === 0 || str[i - 1] !== '\\')) {
+          withinString = !withinString
+        }
+
+        if (!withinString) {
+          if (char === '{' || char === '[') {
+            stack.push(char)
+          } else if (char === '}' || char === ']') {
+            const lastOpen = stack.pop()
+            if (
+              (char === '}' && lastOpen !== '{')
+              || (char === ']' && lastOpen !== '[')
+            ) {
+              if (lastOpen) stack.push(lastOpen)
+              return this.lastValidJson
+            }
+          }
+        }
+      }
+
+      if (withinString) {
+        repairedString += '"'
+      }
+
+      while (stack.length > 0) {
+        const lastOpen = stack.pop()
+        if (lastOpen === '{') {
+          repairedString += '}'
+        } else if (lastOpen === '[') {
+          repairedString += ']'
+        }
+      }
+
+      try {
+        JSON.parse(repairedString)
+        this.lastValidJson = repairedString
+        return repairedString
+      } catch (finalError) {
+        return this.lastValidJson
+      }
+    }
+  }
+
+  public parseJsonProperty(response: string | null, propertyName: string): string | null {
+    const safeJsonString = this.ensureValidJson(response || '') || '{}'
+    const parsedObject = JSON.parse(safeJsonString)
+    return parsedObject?.[propertyName] || null
+  }  
+}
+
+
 // Pocketbase Client
 const initPocketbaseClient = async () => {
   const PocketBase = require('pocketbase/cjs')
   const pb = new PocketBase('http://127.0.0.1:8090')
+  pb.autoCancellation(false)
 
   try {
     const user = await pb.collection('users').authWithPassword(
@@ -234,7 +302,7 @@ const initPocketbaseClient = async () => {
           threadid: threadId
         })
 
-        streamChatResponse('groq', llmMessages, async (data) => {
+        streamChatResponse('openai', llmMessages, async (data) => {
           if (data.endOfStream) {
             await pb.collection('messages').update(assistantMessage.id, {
               text: data.message.content
@@ -242,6 +310,49 @@ const initPocketbaseClient = async () => {
 
             if (isFirstAssistantMessage) {
               console.log('Complete response and first assistant message in thread')
+
+              const newMessages = await pb.collection('messages').getFullList({
+                filter: `threadid="${threadId}"`,
+                sort: 'created'
+              })
+    
+              let updatedLlmMessages = newMessages.map((message: any) => ({
+                role: message.userid !== systemId ? 'user' : 'assistant',
+                content: message.text
+              }))
+
+              const validator = new JsonValidator()
+              streamChatResponse('openai', [
+                {
+                  role: 'system',
+                  content: `You are an API endpoint that provides a name and description for message thread based on a propmt, which is a series of messages.
+                    The description should be a very short sentence, no more than just a few words.
+                    The name starts with an emoji.
+                    You answer in the following JSON format.
+                    {
+                      "name": "Social media strategies",
+                      "description": "Craft a successful social media strategy to build your brand's online presence and drive engagement."
+                    }
+                    If user feedback is provided it must be prioritized.
+          
+                    Answer in as a valid JSON object, no extra commentary, only the object. 
+                    `
+                },
+                {
+                  role: 'user',
+                  content: JSON.stringify(updatedLlmMessages)
+                }
+              ], async (data) => {
+                const name =  validator.parseJsonProperty(data.message.content, 'name')
+                const description = validator.parseJsonProperty(data.message.content, 'description')
+
+                if (name || description) {
+                  await pb.collection('threads').update(threadId, {
+                    name,
+                    description: description ? description : ''
+                  })
+                }
+              })
             }
           } 
           else {
@@ -266,7 +377,7 @@ const startPocketBase = () => {
   pocketbaseProcess.stdout.on('data', data => {
     const output = data.toString()
     log.info(`PocketBase: ${output}`)
-    if (output.includes("Server started")) {
+    if (output.includes('Server started')) {
       initPocketbaseClient()
     }
   })
@@ -289,7 +400,7 @@ electron.on('ready', () => {
 const tts = express()
 const PORT = 5003
 const TTS_API_URL = 'http://localhost:5002/api/tts'
-tts.use((req, res, next) => {
+tts.use((_, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
   next()
