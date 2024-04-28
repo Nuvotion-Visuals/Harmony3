@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { SpacesSidebar, ItemProps } from '@avsync.live/formation'
+import { SpacesSidebar, ItemProps, Gap } from '@avsync.live/formation'
 import { Groups } from './Groups'
 import { SpaceCard } from './SpaceCard'
 import { Logo } from './Logo'
@@ -52,21 +52,23 @@ export const SpaceSidebar = React.memo(({ }: Props) => {
   return (<S.GroupsSidebar>
     <SpacesSidebarComponent />
     <S.SidebarContainer>
-      {
-        (activeSpace?.id && location.pathname !== '/profile') && <SpaceCard
-          id={activeSpace.id}
-          name={activeSpace?.name}
-          previewSrc={activeSpace?.banner ? `http://localhost:8090/api/files/spaces/${activeSpace.id}/${activeSpace.banner}` : undefined}
-          groupsCount={0}
-          channelsCount={0}
-          threadsCount={0}
-          messageCount={0}
-        />
-      }
-      {
-        !['/spaces/create', '/profile'].includes(location.pathname) &&
-          <Groups />
-      }
+      <Gap>
+        {
+          (activeSpace?.id && location.pathname !== '/profile') && <SpaceCard
+            id={activeSpace.id}
+            name={activeSpace?.name}
+            previewSrc={activeSpace?.banner ? `http://localhost:8090/api/files/spaces/${activeSpace.id}/${activeSpace.banner}` : undefined}
+            groupsCount={0}
+            channelsCount={0}
+            threadsCount={0}
+            messageCount={0}
+          />
+        }
+        {
+          !['/spaces/create', '/profile'].includes(location.pathname) &&
+            <Groups />
+        }
+      </Gap>
     </S.SidebarContainer>
   </S.GroupsSidebar>)
 })

@@ -1,11 +1,9 @@
 import { useState } from 'react'
-import PocketBase from 'pocketbase'
-import { Auth, Button, Gap, TextInput, Notification, Item } from '@avsync.live/formation'
+import { Auth, Button, Gap, TextInput, Notification } from '@avsync.live/formation'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { Link } from './Util/Link'
-
-const pb = new PocketBase('http://localhost:8090')
+import { pb } from 'redux-tk/pocketbase'
 
 export function SignIn() {
   const navigate = useNavigate()

@@ -13,11 +13,7 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  useLocation,
-  useParams
 } from 'react-router-dom'
-
-import Home from './pages/index.page'
 
 import './index.css'
 import '@avsync.live/formation/dist/index.dark.css'
@@ -25,7 +21,6 @@ import { App } from './App'
 import { Linker, Ripple } from '@avsync.live/formation'
 import { Link } from 'components/Util/Link'
 import { RouteTracker } from 'components/App/RouteTracker'
-import { useEffect } from 'react'
 import { SignIn } from 'components/SignIn'
 import { SignUp } from 'components/SignUp'
 
@@ -78,7 +73,7 @@ const Main = ({ }) => {
             <Routes>
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
-              <Route path="/" element={<App><Home /></App>} />
+              <Route path="/" element={<App><></></App>} />
               <Route path="/profile" element={<App><RouteTracker /></App>} />
               <Route path="/spaces" element={<App><RouteTracker /></App>}></Route>
               <Route path="/spaces/:spaceid" element={<App><RouteTracker /></App>}>

@@ -1,4 +1,4 @@
-import { AspectRatio, Button, Gap, Grid, Icon, Page, useBreakpoint } from '@avsync.live/formation'
+import { AspectRatio, Gap, Grid, Icon, Page, useBreakpoint } from '@avsync.live/formation'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Link } from 'components/Util/Link'
@@ -9,7 +9,7 @@ const SpacesDashboard = () => {
   const spaces = useHarmony_spaces()
 
   const { isMobile, isDesktop } = useBreakpoint()
-  const [searchQuery, set_searchQuery] = useState('')
+  const [searchQuery, _] = useState('')
 
   return (<S.SpacesDashboard>
     <S.Inner isDesktop={isDesktop}>

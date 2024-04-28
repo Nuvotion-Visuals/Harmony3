@@ -28,8 +28,6 @@ const formatDate = (date: string): string => {
 }
 
 interface MessageInfoProps {
-  userid: string
-  id: string
   created: string
   name: string
   dropdownItems: any[] // Define a more specific type if possible
@@ -37,8 +35,6 @@ interface MessageInfoProps {
 }
 
 const MessageInfo: React.FC<MessageInfoProps> = memo(({ 
-  userid, 
-  id, 
   name,
   created, 
   dropdownItems,
@@ -181,9 +177,7 @@ export const Message = memo(({
         <MessageInfo
           key={message.id}
           name={namesByUserId[message.userid]}
-          userid={message.userid}
           onSpeak={onSpeak}
-          id={message.id}
           created={message.created}
           dropdownItems={dropdownItems}
         />
