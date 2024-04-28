@@ -10,12 +10,96 @@ const initPocketbaseClient = async () => {
   const pb = new PocketBase('http://127.0.0.1:8090')
   pb.autoCancellation(false)
 
+  console.log('pocketbase started')
+
   try {
     await pb.collection('users').authWithPassword(
       'harmony',
       'qxIrfPYwKsMxZBQ'
     )
     const systemId = pb.authStore.model?.id
+
+     // Handle deletions for spaces
+    pb.collection('spaces').subscribe('*', async (event: any) => {
+      if (event.action === 'delete') {
+        const spaceId = event.record.id
+        console.log(`Space ${spaceId} deleted`)
+
+        const groups = await pb.collection('groups').getFullList({ filter: 'spaceid=null' })
+        for (const group of groups) {
+          await pb.collection('groups').delete(group.id)
+        }
+
+        const channels = await pb.collection('channels').getFullList({ filter: 'spaceid=null' })
+        for (const channel of channels) {
+          await pb.collection('channels').delete(channel.id)
+        }
+
+        const threads = await pb.collection('threads').getFullList({ filter: 'spaceid=null' })
+        for (const thread of threads) {
+          await pb.collection('threads').delete(thread.id)
+        }
+
+        const messages = await pb.collection('messages').getFullList({ filter: 'spaceid=null' })
+        for (const message of messages) {
+          await pb.collection('messages').delete(message.id)
+        }
+      }
+    })
+
+    // Handle deletions for groups
+    pb.collection('groups').subscribe('*', async (event: any) => {
+      if (event.action === 'delete') {
+        const groupId = event.record.id
+        console.log(`Group ${groupId} deleted`)
+
+        const channels = await pb.collection('channels').getFullList({ filter: 'groupid=null' })
+        for (const channel of channels) {
+          await pb.collection('channels').delete(channel.id)
+        }
+
+        const threads = await pb.collection('threads').getFullList({ filter: 'groupid=null' })
+        for (const thread of threads) {
+          await pb.collection('threads').delete(thread.id)
+        }
+
+        const messages = await pb.collection('messages').getFullList({ filter: 'groupid=null' })
+        for (const message of messages) {
+          await pb.collection('messages').delete(message.id)
+        }
+      }
+    })
+
+    // Handle deletions for channels
+    pb.collection('channels').subscribe('*', async (event: any) => {
+      if (event.action === 'delete') {
+        const channelId = event.record.id
+        console.log(`Channel ${channelId} deleted`)
+
+        const threads = await pb.collection('threads').getFullList({ filter: 'channelid=null' })
+        for (const thread of threads) {
+          await pb.collection('threads').delete(thread.id)
+        }
+
+        const messages = await pb.collection('messages').getFullList({ filter: 'channelid=null' })
+        for (const message of messages) {
+          await pb.collection('messages').delete(message.id)
+        }
+      }
+    })
+
+    // Handle deletions for threads
+    pb.collection('threads').subscribe('*', async (event: any) => {
+      if (event.action === 'delete') {
+        const threadId = event.record.id
+        console.log(`Thread ${threadId} deleted`)
+
+        const messages = await pb.collection('messages').getFullList({ filter: 'threadid=null' })
+        for (const message of messages) {
+          await pb.collection('messages').delete(message.id)
+        }
+      }
+    })
 
     pb.collection('messages').subscribe('*', async (event: any) => {
       if (event.action === 'create' && event.record.userid !== systemId) {
@@ -114,7 +198,6 @@ const initPocketbaseClient = async () => {
     console.error(e)
   }
 }
-
 
 export const initPocketbase = () => {
   let basePath = electron.getAppPath()
