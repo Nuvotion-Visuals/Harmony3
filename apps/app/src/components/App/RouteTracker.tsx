@@ -1,21 +1,21 @@
 import { useEffect } from 'react'
 import { useLocation, useParams } from 'react-router-dom'
 import { 
-  useHarmony_setActiveSpaceId,
-  useHarmony_setActiveGroupId,
-  useHarmony_setActiveChannelId,
-  useHarmony_setActiveThreadId,
-  useHarmony_setActiveMessageId
-} from 'redux-tk/harmony/hooks'
+  useSpaces_setActiveSpaceId,
+  useSpaces_setActiveGroupId,
+  useSpaces_setActiveChannelId,
+  useSpaces_setActiveThreadId,
+  useSpaces_setActiveMessageId
+} from 'redux-tk/spaces/hooks'
 
 export const RouteTracker = () => {
   const params = useParams()
   const location = useLocation()
-  const setActiveSpaceId = useHarmony_setActiveSpaceId()
-  const setActiveGroupId = useHarmony_setActiveGroupId()
-  const setActiveChannelId = useHarmony_setActiveChannelId()
-  const setActiveThreadId = useHarmony_setActiveThreadId()
-  const setActiveMessageId = useHarmony_setActiveMessageId()
+  const setActiveSpaceId = useSpaces_setActiveSpaceId()
+  const setActiveGroupId = useSpaces_setActiveGroupId()
+  const setActiveChannelId = useSpaces_setActiveChannelId()
+  const setActiveThreadId = useSpaces_setActiveThreadId()
+  const setActiveMessageId = useSpaces_setActiveMessageId()
 
   useEffect(() => {
     const { spaceid, groupid, channelid, threadid, messageid } = params

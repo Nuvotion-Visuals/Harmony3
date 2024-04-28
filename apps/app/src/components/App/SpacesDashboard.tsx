@@ -3,10 +3,10 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Link } from 'components/Util/Link'
 import { SpaceCard } from './SpaceCard'
-import { useHarmony_spaces } from 'redux-tk/harmony/hooks'
+import { useSpaces_spaces } from 'redux-tk/spaces/hooks'
 
 const SpacesDashboard = () => {
-  const spaces = useHarmony_spaces()
+  const spaces = useSpaces_spaces()
 
   const { isMobile, isDesktop } = useBreakpoint()
   const [searchQuery, _] = useState('')

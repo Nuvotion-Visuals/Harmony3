@@ -1,15 +1,15 @@
 import { Box, Button, Item, TextInput } from '@avsync.live/formation'
 import { generate_threads } from 'language/generate/threads'
 import { useEffect, useRef, useState } from 'react'
-import { useHarmony_activeChannel, useHarmony_activeChannelThreadNamesAndDescriptions, useHarmony_activeSpace, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeChannel, useSpaces_activeChannelThreadNamesAndDescriptions, useSpaces_activeSpace, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
 import { sendMessage } from 'spaces/sendMessage'
 import { JsonValidator } from 'utils/JSONValidator'
 
 export const ThreadSuggestions = () => {
-  const activeSpace = useHarmony_activeSpace()
-  const activeChannel = useHarmony_activeChannel()
-  const setActiveThreadId = useHarmony_setActiveThreadId()
-  const activeChannelThreadNamesAndDescriptions = useHarmony_activeChannelThreadNamesAndDescriptions()
+  const activeSpace = useSpaces_activeSpace()
+  const activeChannel = useSpaces_activeChannel()
+  const setActiveThreadId = useSpaces_setActiveThreadId()
+  const activeChannelThreadNamesAndDescriptions = useSpaces_activeChannelThreadNamesAndDescriptions()
 
   const [feedback, setFeedback] = useState('')
 

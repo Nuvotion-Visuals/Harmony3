@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react'
 import { Button, Item, RichTextEditor, scrollToElementById } from '@avsync.live/formation'
-import { useHarmony_activeChannelId, useHarmony_activeThread, useHarmony_currentUserId, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeChannelId, useSpaces_activeThread, useSpaces_currentUserId, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
 import styled from 'styled-components'
 import { pb } from 'redux-tk/pocketbase'
 
@@ -16,10 +16,10 @@ export const TextBox = memo(({
   onSend,
 }: Props) => {
   const [text, setText] = useState('')
-  const setActiveThreadId = useHarmony_setActiveThreadId()
-  const activeChannelId = useHarmony_activeChannelId()
-  const activeThread = useHarmony_activeThread()
-  const userId = useHarmony_currentUserId()
+  const setActiveThreadId = useSpaces_setActiveThreadId()
+  const activeChannelId = useSpaces_activeChannelId()
+  const activeThread = useSpaces_activeThread()
+  const userId = useSpaces_currentUserId()
 
   const sendMessage = async (text) => {
     if (onSend) {

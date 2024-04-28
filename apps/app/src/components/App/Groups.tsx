@@ -12,7 +12,7 @@ import { CreateChannel } from 'components/Create/CreateChannel'
 import { CreateGroup } from 'components/Create/CreateGroup'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useHarmony_activeChannelId, useHarmony_activeGroupId, useHarmony_activeSpace, useHarmony_activeSpaceGroups } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeChannelId, useSpaces_activeGroupId, useSpaces_activeSpace, useSpaces_activeSpaceGroups } from 'redux-tk/spaces/hooks'
 import { pb } from 'redux-tk/pocketbase'
 import styled from 'styled-components'
 
@@ -56,10 +56,10 @@ const generateGroupsList = (groups, activeSpaceId, activeGroupId, activeChannelI
 export const Groups = React.memo(() => {
   const navigate = useNavigate()
 
-  const activeSpace = useHarmony_activeSpace()
-  const activeGroupId = useHarmony_activeGroupId()
-  const activeSpaceGroups = useHarmony_activeSpaceGroups()
-  const activeChannelId = useHarmony_activeChannelId()
+  const activeSpace = useSpaces_activeSpace()
+  const activeGroupId = useSpaces_activeGroupId()
+  const activeSpaceGroups = useSpaces_activeSpaceGroups()
+  const activeChannelId = useSpaces_activeChannelId()
 
   const [groupsList, setGroupsList] = useState<List[]>(() => generateGroupsList(activeSpaceGroups, activeSpace?.id, activeGroupId, activeChannelId))
 

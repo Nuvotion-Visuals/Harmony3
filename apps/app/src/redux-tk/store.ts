@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { createLogger } from 'redux-logger'
-import harmonyReducer from './harmony/slice'
+import spacesReducer from './spaces/slice'
 
 const logger = createLogger({
   predicate: (_, action) => ![
@@ -25,7 +25,7 @@ const batchMiddleware = (_) => (next) => (actions) => {
 
 export const store = configureStore({
   reducer: {
-    harmony: harmonyReducer,
+    spaces: spacesReducer,
   },
   middleware: getDefaultMiddleware => 
     // @ts-ignore
@@ -34,15 +34,15 @@ export const store = configureStore({
       .concat(batchMiddleware)
 })
 
-import * as harmonyActions from './harmony/slice'
+import * as spacesAction from './spaces/slice'
 import { init } from './sync'
 
-store.dispatch(harmonyActions.fetchSpacesAsync())
-store.dispatch(harmonyActions.fetchGroupsAsync())
-store.dispatch(harmonyActions.fetchChannelsAsync())
-store.dispatch(harmonyActions.fetchThreadsAsync())
-store.dispatch(harmonyActions.fetchMessagesAsync())
-store.dispatch(harmonyActions.fetchUsersAsync())
+store.dispatch(spacesAction.fetchSpacesAsync())
+store.dispatch(spacesAction.fetchGroupsAsync())
+store.dispatch(spacesAction.fetchChannelsAsync())
+store.dispatch(spacesAction.fetchThreadsAsync())
+store.dispatch(spacesAction.fetchMessagesAsync())
+store.dispatch(spacesAction.fetchUsersAsync())
 
 init()
 

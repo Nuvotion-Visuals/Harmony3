@@ -1,10 +1,10 @@
-// harmonySlice.ts
+// spacesSlice.ts
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { CollectionRecords, CollectionResponses, UsersResponse } from '../pocketbase-types'
 import { pb } from 'redux-tk/pocketbase'
 import { RecordModel } from 'pocketbase'
 
-interface HarmonyState {
+interface SpacesState {
   users: CollectionResponses['users'][]
   spaces: CollectionResponses['spaces'][]
   groups: CollectionResponses['groups'][]
@@ -20,7 +20,7 @@ interface HarmonyState {
   currentUser: UsersResponse | null
 }
 
-const INITIAL_STATE: HarmonyState = {
+const INITIAL_STATE: SpacesState = {
   users: [],
   spaces: [],
   groups: [],
@@ -37,7 +37,7 @@ const INITIAL_STATE: HarmonyState = {
 }
 
 export const fetchSpacesAsync = createAsyncThunk(
-  'harmony/fetchSpaces',
+  'spaces/fetchSpaces',
   async () => {
     const fetchedSpaces = await pb.collection('spaces').getFullList()
     return fetchedSpaces as CollectionResponses['spaces'][]
@@ -45,7 +45,7 @@ export const fetchSpacesAsync = createAsyncThunk(
 )
 
 export const fetchGroupsAsync = createAsyncThunk(
-  'harmony/fetchGroups',
+  'spaces/fetchGroups',
   async () => {
     const fetchedGroups = await pb.collection('groups').getFullList()
     return fetchedGroups as CollectionResponses['groups'][]
@@ -53,7 +53,7 @@ export const fetchGroupsAsync = createAsyncThunk(
 )
 
 export const fetchChannelsAsync = createAsyncThunk(
-  'harmony/fetchChannels',
+  'spaces/fetchChannels',
   async () => {
     const fetchedChannels = await pb.collection('channels').getFullList()
     return fetchedChannels as CollectionResponses['channels'][]
@@ -61,7 +61,7 @@ export const fetchChannelsAsync = createAsyncThunk(
 )
 
 export const fetchThreadsAsync = createAsyncThunk(
-  'harmony/fetchThreads',
+  'spaces/fetchThreads',
   async () => {
     const fetchedThreads = await pb.collection('threads').getFullList()
     return fetchedThreads as CollectionResponses['threads'][]
@@ -69,7 +69,7 @@ export const fetchThreadsAsync = createAsyncThunk(
 )
 
 export const fetchMessagesAsync = createAsyncThunk(
-  'harmony/fetchMessages',
+  'spaces/fetchMessages',
   async () => {
     const fetchedMessages = await pb.collection('messages').getFullList()
     return fetchedMessages as CollectionResponses['messages'][]
@@ -77,15 +77,15 @@ export const fetchMessagesAsync = createAsyncThunk(
 )
 
 export const fetchUsersAsync = createAsyncThunk(
-  'harmony/fetchUsers',
+  'spaces/fetchUsers',
   async () => {
     const fetchedUsers = await pb.collection('users').getFullList()
     return fetchedUsers as CollectionResponses['users'][]
   }
 )
 
-const harmonySlice = createSlice({
-  name: 'harmony',
+const spacesSlice = createSlice({
+  name: 'spaces',
   initialState: INITIAL_STATE,
   reducers: {
     setActiveSpaceIndex: (state, action: PayloadAction<number | null>) => {
@@ -238,8 +238,8 @@ const harmonySlice = createSlice({
   }
 })
 
-export const harmonyActions = {
-  ...harmonySlice.actions,
+export const spacesAction = {
+  ...spacesSlice.actions,
   fetchSpacesAsync,
   fetchGroupsAsync,
   fetchChannelsAsync,
@@ -248,4 +248,4 @@ export const harmonyActions = {
   fetchUsersAsync
 }
 
-export default harmonySlice.reducer
+export default spacesSlice.reducer

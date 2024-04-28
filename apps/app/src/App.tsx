@@ -1,7 +1,7 @@
 import { NavSpaces } from '@avsync.live/formation'
 import { SpaceSidebar } from './components/App/SpaceSidebar'
 import { Channel } from 'components/App/Channel'
-import { useHarmony_setCurrentUser } from 'redux-tk/harmony/hooks'
+import { useSpaces_setCurrentUser } from 'redux-tk/spaces/hooks'
 import { useEffect } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { UsersResponse } from 'redux-tk/pocketbase-types'
@@ -21,7 +21,7 @@ export const App = ({ children }: Props) => {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const setCurrentUser = useHarmony_setCurrentUser()
+  const setCurrentUser = useSpaces_setCurrentUser()
 
   useEffect(() => {
     const currentUser = pb.authStore.model as UsersResponse | null

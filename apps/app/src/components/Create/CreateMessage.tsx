@@ -1,6 +1,6 @@
 import { Box, TextInput } from '@avsync.live/formation'
 import React, { useState } from 'react'
-import { useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
+import { useSpaces_currentUserId } from 'redux-tk/spaces/hooks'
 import { pb } from 'redux-tk/pocketbase'
 
 interface CreateMessageProps {
@@ -8,7 +8,7 @@ interface CreateMessageProps {
 }
 
 export function CreateMessage({ threadId }: CreateMessageProps) {
-  const userId = useHarmony_currentUserId()
+  const userId = useSpaces_currentUserId()
   const [messageText, setMessageText] = useState('')
 
   async function handleCreateMessage() {

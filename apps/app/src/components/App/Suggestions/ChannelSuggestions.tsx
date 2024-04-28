@@ -2,20 +2,20 @@ import { Box, Button, Item, TextInput } from '@avsync.live/formation'
 import { generate_channels } from 'language/generate/channels'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useHarmony_activeChannel, useHarmony_activeGroupChannelNamesAndDescriptions, useHarmony_activeGroup, useHarmony_activeSpace, useHarmony_setActiveThreadId, useHarmony_currentUserId, useHarmony_activeGroupId } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeChannel, useSpaces_activeGroupChannelNamesAndDescriptions, useSpaces_activeGroup, useSpaces_activeSpace, useSpaces_setActiveThreadId, useSpaces_currentUserId, useSpaces_activeGroupId } from 'redux-tk/spaces/hooks'
 import { pb } from 'redux-tk/pocketbase'
 import { JsonValidator } from 'utils/JSONValidator'
 
 export const ChannelSuggestions = () => {
   const navigate = useNavigate()
 
-  const activeSpace = useHarmony_activeSpace()
-  const activeGroup = useHarmony_activeGroup()
-  const activeChannel = useHarmony_activeChannel()
-  const setActiveThreadId = useHarmony_setActiveThreadId()
-  const activeGroupChannelNamesAndDescriptions = useHarmony_activeGroupChannelNamesAndDescriptions()
-  const userId = useHarmony_currentUserId()
-  const groupId = useHarmony_activeGroupId()
+  const activeSpace = useSpaces_activeSpace()
+  const activeGroup = useSpaces_activeGroup()
+  const activeChannel = useSpaces_activeChannel()
+  const setActiveThreadId = useSpaces_setActiveThreadId()
+  const activeGroupChannelNamesAndDescriptions = useSpaces_activeGroupChannelNamesAndDescriptions()
+  const userId = useSpaces_currentUserId()
+  const groupId = useSpaces_activeGroupId()
 
   const [feedback, setFeedback] = useState('')
 

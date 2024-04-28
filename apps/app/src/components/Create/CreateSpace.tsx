@@ -2,12 +2,12 @@ import { Gap, TextInput, Button, RichTextEditor, Page, Box, Item } from '@avsync
 import { SpaceSuggestions } from 'components/App/Suggestions/SpaceSuggestions'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
+import { useSpaces_currentUserId } from 'redux-tk/spaces/hooks'
 import { pb } from 'redux-tk/pocketbase'
 
 export const CreateSpace = () => {
   const navigate = useNavigate()
-  const userId = useHarmony_currentUserId()
+  const userId = useSpaces_currentUserId()
   const [name, setName] = useState('')
   const [description, setSpaceDescription] = useState('')
 

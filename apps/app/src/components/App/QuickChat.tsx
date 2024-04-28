@@ -4,7 +4,7 @@ import { Avatar, Box, Button, Gap, Item, StyleHTML, markdownToHTML, scrollToElem
 import styled from 'styled-components'
 import { speak } from '../../language/speech'
 import { TextBox } from './TextBox' 
-import { useHarmony_currentUserId, useHarmony_namesByUserId } from 'redux-tk/harmony/hooks'
+import { useSpaces_currentUserId, useSpaces_namesByUserId } from 'redux-tk/spaces/hooks'
 
 const Message = memo(({
   role,
@@ -15,8 +15,8 @@ const Message = memo(({
   content: string,
   index: number
 }) => {
-  const currentUserId = useHarmony_currentUserId()
-  const namesByUserId = useHarmony_namesByUserId()
+  const currentUserId = useSpaces_currentUserId()
+  const namesByUserId = useSpaces_namesByUserId()
   const name = namesByUserId?.[currentUserId]
 
   return (

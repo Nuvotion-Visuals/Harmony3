@@ -1,7 +1,7 @@
 import { Box, TextInput } from '@avsync.live/formation'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useHarmony_activeSpaceId, useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeSpaceId, useSpaces_currentUserId } from 'redux-tk/spaces/hooks'
 import { pb } from 'redux-tk/pocketbase'
 
 interface CreateGroupProps {
@@ -9,8 +9,8 @@ interface CreateGroupProps {
 }
 
 export function CreateGroup({ spaceId }: CreateGroupProps) {
-  const userId = useHarmony_currentUserId()
-  const activeSpaceId = useHarmony_activeSpaceId()
+  const userId = useSpaces_currentUserId()
+  const activeSpaceId = useSpaces_activeSpaceId()
   const navigate = useNavigate()
   
   const [groupName, setGroupName] = useState('')

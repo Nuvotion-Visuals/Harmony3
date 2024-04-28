@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, AspectRatio, FileUpload, LineBreak, FileDrop } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
-import { useHarmony_activeGroup, useHarmony_activeSpaceId, useHarmony_setActiveChannelId } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeGroup, useSpaces_activeSpaceId, useSpaces_setActiveChannelId } from 'redux-tk/spaces/hooks'
 import { ChannelSuggestions } from 'components/App/Suggestions/ChannelSuggestions'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useRemoveQueryParam } from 'utils/removeEditQuery'
@@ -12,9 +12,9 @@ export const Group = memo(() => {
   const [searchParams] = useSearchParams()
   const removeQueryParam = useRemoveQueryParam()
 
-  const activeSpaceId = useHarmony_activeSpaceId()
-  const setActiveChannelId = useHarmony_setActiveChannelId()
-  const group = useHarmony_activeGroup()
+  const activeSpaceId = useSpaces_activeSpaceId()
+  const setActiveChannelId = useSpaces_setActiveChannelId()
+  const group = useSpaces_activeGroup()
 
   useEffect(() => {
     setActiveChannelId(null)

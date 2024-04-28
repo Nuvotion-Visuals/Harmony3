@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, LineBreak, AspectRatio, FileUpload, FileDrop } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
-import { useHarmony_activeSpace } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeSpace } from 'redux-tk/spaces/hooks'
 import { GroupSuggestions } from './Suggestions/GroupSuggestions'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useRemoveQueryParam } from 'utils/removeEditQuery'
@@ -9,7 +9,7 @@ import { Breadcrumbs } from './Breadcrumbs'
 
 export const Space = memo(() => {
   const navigate = useNavigate()
-  const space = useHarmony_activeSpace()
+  const space = useSpaces_activeSpace()
 
   const [searchParams] = useSearchParams()
   const removeQueryParam = useRemoveQueryParam()

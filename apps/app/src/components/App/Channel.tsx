@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { useHarmony_activeChannelThreads, useHarmony_activeThreadId, useHarmony_activeChannel, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeChannelThreads, useSpaces_activeThreadId, useSpaces_activeChannel, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
 import { Page, scrollToElementById } from '@avsync.live/formation'
 import { TextBox } from './TextBox'
 import { Thread } from './Thread'
@@ -8,10 +8,10 @@ import { ChannelHeader } from './ChannelHeader'
 import { Breadcrumbs } from './Breadcrumbs'
 
 export const Channel = () => {
-  const activeChannelThreads = useHarmony_activeChannelThreads()
-  const activeThreadId = useHarmony_activeThreadId()
-  const activeChannel = useHarmony_activeChannel()
-  const setActiveThreadId = useHarmony_setActiveThreadId()
+  const activeChannelThreads = useSpaces_activeChannelThreads()
+  const activeThreadId = useSpaces_activeThreadId()
+  const activeChannel = useSpaces_activeChannel()
+  const setActiveThreadId = useSpaces_setActiveThreadId()
 
   const [textBoxHeight, setTextBoxHeight] = useState(0)
   const textBoxRef = React.createRef<HTMLDivElement>()

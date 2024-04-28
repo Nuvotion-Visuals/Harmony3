@@ -1,11 +1,11 @@
 import { Box, Button, Gap, Item, Page, TextInput, Notification } from '@avsync.live/formation'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useHarmony_currentUser } from 'redux-tk/harmony/hooks'
+import { useSpaces_currentUser } from 'redux-tk/spaces/hooks'
 import { pb } from 'redux-tk/pocketbase'
 
 export const Profile = () => {
-  const currentUser = useHarmony_currentUser()
+  const currentUser = useSpaces_currentUser()
   const navigate = useNavigate()
 
   const [updated, setUpdated] = useState(false)

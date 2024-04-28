@@ -1,11 +1,11 @@
 import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from 'react'
 import styled from 'styled-components'
-import { useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
+import { useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
 import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, TextInput, onScrollWheelClick, scrollToElementById } from '@avsync.live/formation'
 import { Message } from 'components/App/Message'
 import { pb } from 'redux-tk/pocketbase'
 import { generate_threadNameAndDescription } from 'language/generate/threadNameAndDescription'
-import * as selectors from 'redux-tk/harmony/selectors'
+import * as selectors from 'redux-tk/spaces/selectors'
 import { store } from 'redux-tk/store'
 import { JsonValidator } from 'utils/JSONValidator'
 import { MessageSuggestions } from 'components/App/Suggestions/MessageSuggestions'
@@ -27,7 +27,7 @@ export const Thread = memo(({
   onReply,
   expanded
 }: Props) => {
-  const setActiveThreadId = useHarmony_setActiveThreadId()
+  const setActiveThreadId = useSpaces_setActiveThreadId()
 
   const [name, setName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
   const [description, setDescription] = useState(thread?.description)

@@ -1,16 +1,16 @@
 import { Box, Button, Item, TextInput } from '@avsync.live/formation'
 import { generate_messages } from 'language/generate/messages'
-import * as selectors from 'redux-tk/harmony/selectors'
+import * as selectors from 'redux-tk/spaces/selectors'
 import { useEffect, useRef, useState } from 'react'
-import { useHarmony_activeChannel, useHarmony_activeSpace, useHarmony_activeThread } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeChannel, useSpaces_activeSpace, useSpaces_activeThread } from 'redux-tk/spaces/hooks'
 import { store } from 'redux-tk/store'
 import { sendMessage } from 'spaces/sendMessage'
 import { JsonValidator } from 'utils/JSONValidator'
 
 export const MessageSuggestions = () => {
-  const activeSpace = useHarmony_activeSpace()
-  const activeChannel = useHarmony_activeChannel()
-  const activeThread = useHarmony_activeThread()
+  const activeSpace = useSpaces_activeSpace()
+  const activeChannel = useSpaces_activeChannel()
+  const activeThread = useSpaces_activeThread()
 
   const [feedback, setFeedback] = useState('')
 

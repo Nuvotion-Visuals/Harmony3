@@ -2,18 +2,18 @@ import { Box, Button, Item, TextInput } from '@avsync.live/formation'
 import { generate_groups } from 'language/generate/groups'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useHarmony_activeSpace, useHarmony_setActiveThreadId, useHarmony_currentUserId, useHarmony_activeGroup } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeSpace, useSpaces_setActiveThreadId, useSpaces_currentUserId, useSpaces_activeGroup } from 'redux-tk/spaces/hooks'
 import { pb } from 'redux-tk/pocketbase'
 import { JsonValidator } from 'utils/JSONValidator'
 
 export const GroupSuggestions = () => {
   const navigate = useNavigate()
 
-  const activeSpace = useHarmony_activeSpace()
-  const activeGroup = useHarmony_activeGroup()
-  const setActiveThreadId = useHarmony_setActiveThreadId()
-  const activeSpaceGroupsInfo = useHarmony_activeSpace()
-  const userId = useHarmony_currentUserId()
+  const activeSpace = useSpaces_activeSpace()
+  const activeGroup = useSpaces_activeGroup()
+  const setActiveThreadId = useSpaces_setActiveThreadId()
+  const activeSpaceGroupsInfo = useSpaces_activeSpace()
+  const userId = useSpaces_currentUserId()
 
   const [feedback, setFeedback] = useState('')
 

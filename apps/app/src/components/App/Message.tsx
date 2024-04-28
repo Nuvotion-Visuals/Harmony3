@@ -3,7 +3,7 @@ import { memo, useEffect, useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { speak } from '../../language/speech'
 import styled from 'styled-components'
-import { useHarmony_messageById, useHarmony_namesByUserId, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
+import { useSpaces_messageById, useSpaces_namesByUserId, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
 
 const formatDate = (date: string): string => {
   const messageDate = new Date(date)
@@ -93,9 +93,9 @@ export const Message = memo(({
   onHandleReply,
   threadActive
 }: Props) => {
-  const message = useHarmony_messageById(id)
-  const namesByUserId = useHarmony_namesByUserId()
-  const setActiveThreadId = useHarmony_setActiveThreadId()
+  const message = useSpaces_messageById(id)
+  const namesByUserId = useSpaces_namesByUserId()
+  const setActiveThreadId = useSpaces_setActiveThreadId()
   
   const [edit, setEdit] = useState(false)
   const [editText, setEditText] = useState(message?.text)

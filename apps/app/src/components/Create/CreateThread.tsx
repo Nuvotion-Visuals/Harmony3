@@ -1,6 +1,6 @@
 import { Box, TextInput } from '@avsync.live/formation'
 import React, { useState } from 'react'
-import { useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
+import { useSpaces_currentUserId } from 'redux-tk/spaces/hooks'
 import { pb } from 'redux-tk/pocketbase'
 
 interface CreateThreadProps {
@@ -8,7 +8,7 @@ interface CreateThreadProps {
 }
 
 export function CreateThread({ channelId }: CreateThreadProps) {
-  const userId = useHarmony_currentUserId()
+  const userId = useSpaces_currentUserId()
   const [threadName, setThreadName] = useState('')
   const [threadDescription, setThreadDescription] = useState('')
 

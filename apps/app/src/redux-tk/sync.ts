@@ -1,18 +1,18 @@
 import { store } from './store'
 import { pb } from './pocketbase'
-import { harmonyActions } from './harmony/slice'
+import { spacesAction } from './spaces/slice'
 
 export const init = () => {
   pb.collection('spaces').subscribe('*', (event) => {
     switch (event.action) {
       case 'create':
-        store.dispatch(harmonyActions.createSpace(event.record))
+        store.dispatch(spacesAction.createSpace(event.record))
         break
       case 'update':
-        store.dispatch(harmonyActions.updateSpace(event.record))
+        store.dispatch(spacesAction.updateSpace(event.record))
         break
       case 'delete':
-        store.dispatch(harmonyActions.deleteSpace(event.record.id))
+        store.dispatch(spacesAction.deleteSpace(event.record.id))
         break
       default:
         break
@@ -22,13 +22,13 @@ export const init = () => {
   pb.collection('groups').subscribe('*', (event) => {
     switch (event.action) {
       case 'create':
-        store.dispatch(harmonyActions.createGroup(event.record))
+        store.dispatch(spacesAction.createGroup(event.record))
         break
       case 'update':
-        store.dispatch(harmonyActions.updateGroup(event.record))
+        store.dispatch(spacesAction.updateGroup(event.record))
         break
       case 'delete':
-        store.dispatch(harmonyActions.deleteGroup(event.record.id))
+        store.dispatch(spacesAction.deleteGroup(event.record.id))
         break
       default:
         break
@@ -38,13 +38,13 @@ export const init = () => {
   pb.collection('channels').subscribe('*', (event) => {
     switch (event.action) {
       case 'create':
-        store.dispatch(harmonyActions.createChannel(event.record))
+        store.dispatch(spacesAction.createChannel(event.record))
         break
       case 'update':
-        store.dispatch(harmonyActions.updateChannel(event.record))
+        store.dispatch(spacesAction.updateChannel(event.record))
         break
       case 'delete':
-        store.dispatch(harmonyActions.deleteChannel(event.record.id))
+        store.dispatch(spacesAction.deleteChannel(event.record.id))
         break
       default:
         break
@@ -54,13 +54,13 @@ export const init = () => {
   pb.collection('threads').subscribe('*', (event) => {
     switch (event.action) {
       case 'create':
-        store.dispatch(harmonyActions.createThread(event.record))
+        store.dispatch(spacesAction.createThread(event.record))
         break
       case 'update':
-        store.dispatch(harmonyActions.updateThread(event.record))
+        store.dispatch(spacesAction.updateThread(event.record))
         break
       case 'delete':
-        store.dispatch(harmonyActions.deleteThread(event.record.id))
+        store.dispatch(spacesAction.deleteThread(event.record.id))
         break
       default:
         break
@@ -70,13 +70,13 @@ export const init = () => {
   pb.collection('messages').subscribe('*', (event) => {
     switch (event.action) {
       case 'create':
-        store.dispatch(harmonyActions.createMessage(event.record))
+        store.dispatch(spacesAction.createMessage(event.record))
         break
       case 'update':
-        store.dispatch(harmonyActions.updateMessage(event.record))
+        store.dispatch(spacesAction.updateMessage(event.record))
         break
       case 'delete':
-        store.dispatch(harmonyActions.deleteMessage(event.record.id))
+        store.dispatch(spacesAction.deleteMessage(event.record.id))
         break
       default:
         break
@@ -86,13 +86,13 @@ export const init = () => {
   pb.collection('users').subscribe('*', (event) => {
     switch (event.action) {
       case 'create':
-        store.dispatch(harmonyActions.createUser(event.record))
+        store.dispatch(spacesAction.createUser(event.record))
         break
       case 'update':
-        store.dispatch(harmonyActions.updateUser(event.record))
+        store.dispatch(spacesAction.updateUser(event.record))
         break
       case 'delete':
-        store.dispatch(harmonyActions.deleteUser(event.record.id))
+        store.dispatch(spacesAction.deleteUser(event.record.id))
         break
       default:
         break

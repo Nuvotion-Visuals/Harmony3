@@ -5,15 +5,15 @@ import { SpacesSidebar, ItemProps, Gap } from '@avsync.live/formation'
 import { Groups } from './Groups'
 import { SpaceCard } from './SpaceCard'
 import { Logo } from './Logo'
-import { useHarmony_activeSpace, useHarmony_activeSpaceIndex, useHarmony_setActiveSpaceIndex, useHarmony_spaces } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeSpace, useSpaces_activeSpaceIndex, useSpaces_setActiveSpaceIndex, useSpaces_spaces } from 'redux-tk/spaces/hooks'
 import { Link } from 'components/Util/Link'
 import { useLocation } from 'react-router-dom'
 
 const SpacesSidebarComponent = () => {
-  const activeSpaceIndex = useHarmony_activeSpaceIndex()
-  const setActiveSpaceIndex = useHarmony_setActiveSpaceIndex()
+  const activeSpaceIndex = useSpaces_activeSpaceIndex()
+  const setActiveSpaceIndex = useSpaces_setActiveSpaceIndex()
 
-  const spacesInfo = useHarmony_spaces()
+  const spacesInfo = useSpaces_spaces()
 
   const spaces = [
     ...spacesInfo.map(space => ({
@@ -46,7 +46,7 @@ interface Props {
 }
 
 export const SpaceSidebar = React.memo(({ }: Props) => {
-  const activeSpace = useHarmony_activeSpace()
+  const activeSpace = useSpaces_activeSpace()
   const location = useLocation() 
 
   return (<S.GroupsSidebar>

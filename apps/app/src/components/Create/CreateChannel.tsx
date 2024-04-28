@@ -1,7 +1,7 @@
 import { Box, TextInput } from '@avsync.live/formation'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useHarmony_activeSpaceId, useHarmony_currentUserId } from 'redux-tk/harmony/hooks'
+import { useSpaces_activeSpaceId, useSpaces_currentUserId } from 'redux-tk/spaces/hooks'
 import { pb } from 'redux-tk/pocketbase'
 
 interface CreatechannelProps {
@@ -9,9 +9,9 @@ interface CreatechannelProps {
 }
 
 export function CreateChannel({ groupId }: CreatechannelProps) {
-  const userId = useHarmony_currentUserId()
+  const userId = useSpaces_currentUserId()
   const navigate = useNavigate()
-  const activeSpaceId = useHarmony_activeSpaceId()
+  const activeSpaceId = useSpaces_activeSpaceId()
   
   const [channelName, setChannelName] = useState('')
 
