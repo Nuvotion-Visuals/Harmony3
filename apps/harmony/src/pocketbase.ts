@@ -1,3 +1,4 @@
+import { app as electron } from 'electron'
 import { spawn } from 'child_process'
 import path from 'path'
 import { streamChatResponse } from './streamChatResponse'
@@ -10,11 +11,10 @@ const initPocketbaseClient = async () => {
   pb.autoCancellation(false)
 
   try {
-    const user = await pb.collection('users').authWithPassword(
+    await pb.collection('users').authWithPassword(
       'harmony',
       'qxIrfPYwKsMxZBQ'
     )
-
     const systemId = pb.authStore.model?.id
 
     pb.collection('messages').subscribe('*', async (event: any) => {
@@ -87,7 +87,8 @@ const initPocketbaseClient = async () => {
                   role: 'user',
                   content: JSON.stringify(updatedLlmMessages)
                 }
-              ], async (data) => {
+              ], 
+              async (data) => {
                 const name =  validator.parseJsonProperty(data.message.content, 'name')
                 const description = validator.parseJsonProperty(data.message.content, 'description')
 
@@ -116,7 +117,12 @@ const initPocketbaseClient = async () => {
 
 
 export const initPocketbase = () => {
-  const pocketbasePath = path.join(__dirname, './pocketbase')
+  let basePath = electron.getAppPath()
+  if (process.env.NODE_ENV === 'production') {
+    basePath = path.join(process.resourcesPath)
+  }
+
+  const pocketbasePath = path.join(basePath, 'pocketbase', 'pocketbase.exe')
   const pocketbaseProcess = spawn(pocketbasePath, ['serve', '--http=0.0.0.0:8090'])
 
   pocketbaseProcess.stdout.on('data', data => {
@@ -127,11 +133,10 @@ export const initPocketbase = () => {
   })
 
   pocketbaseProcess.stderr.on('data', data => {
-
+    console.error('PocketBase Error:', data.toString())
   })
 
   pocketbaseProcess.on('exit', code => {
-  
+    console.log(`PocketBase process exited with code ${code}`)
   })
 }
-

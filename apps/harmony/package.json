@@ -23,7 +23,8 @@
       "assets/**/*",
       "node_modules/**/*",
       "index.html",
-      "package.json"
+      "package.json",
+      "!pocketbase/**/*"
     ],
     "win": {
       "target": "nsis"
