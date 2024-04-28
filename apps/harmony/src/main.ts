@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { app as electron, BrowserWindow, ipcMain } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
@@ -5,20 +6,24 @@ import { spawn } from 'child_process'
 import express from 'express'
 import path from 'path'
 import ollama from 'ollama'
+import OpenAI from 'openai'
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+})
+const groq = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: 'https://api.groq.com/openai/v1'
+})
 import cors from 'cors'
 import eventsource from 'eventsource'
 // @ts-ignore
 global.EventSource = eventsource
 
-log.info('App starting...')
-
+// Electron 
 autoUpdater.logger = log
 electron.commandLine.appendSwitch('force_high_performance_gpu')
-
 let mainWindow: Electron.BrowserWindow | null
 let pocketbaseProcess: ReturnType<typeof spawn> | null = null
-
-const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const createWindow = () => {
   autoUpdater.checkForUpdates()
@@ -57,7 +62,136 @@ const createWindow = () => {
   })
 }
 
+import { Response } from 'express';
 
+interface ChatMessage {
+  content: string;
+}
+
+interface StreamResponsePart {
+  message: {
+    content: string;
+  };
+  endOfStream?: boolean;
+}
+
+type StreamCallback = (data: StreamResponsePart) => void;
+
+const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq', messages: any, callback: StreamCallback) => {
+  let fullResponse: string[] = [];
+
+  try {
+    switch (provider) {
+      case 'ollama':
+        const ollamaResponse = await ollama.chat({
+          model: 'llama3',
+          messages,
+          stream: true
+        });
+        for await (const part of ollamaResponse) {
+          fullResponse.push(part.message.content);
+          callback({
+            message: {
+              content: fullResponse.join('')
+            }
+          });
+        }
+        break;
+
+      case 'openai':
+        const openaiStream = await openai.chat.completions.create({
+          model: 'gpt-4',
+          messages,
+          stream: true
+        });
+        for await (const chunk of openaiStream) {
+          const content = chunk.choices[0]?.delta?.content || '';
+          fullResponse.push(content);
+          callback({
+            message: {
+              content: fullResponse.join('')
+            }
+          });
+        }
+        break;
+
+      case 'groq':
+        const groqStream = await groq.chat.completions.create({
+          model: 'llama3-70b-8192',
+          messages,
+          stream: true
+        });
+        for await (const chunk of groqStream) {
+          const content = chunk.choices[0]?.delta?.content || '';
+          fullResponse.push(content);
+          callback({
+            message: {
+              content: fullResponse.join('')
+            }
+          });
+        }
+        break;
+    }
+
+    callback({ message: { content: fullResponse.join('') }, endOfStream: true });
+  } catch (error) {
+    console.error('Error streaming response:', error);
+    // Consider how you might want to handle errors in this context.
+  }
+}
+
+
+
+// Chat
+const chat = express()
+const PORT2 = process.env.PORT2 || 1616
+chat.use(cors())
+chat.use(express.json())
+chat.use(express.urlencoded({ extended: true }))
+
+chat.get('/chat', async (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream')
+  res.setHeader('Cache-Control', 'no-cache')
+  res.setHeader('Connection', 'keep-alive')
+
+  const data = req.query.data
+  if (typeof data !== 'string') {
+    res.status(400).send('Invalid data format')
+    return
+  }
+  let payload
+  try {
+    payload = JSON.parse(data)
+  } 
+  catch (error) {
+    res.status(400).send('Invalid JSON format')
+    return
+  }
+
+  if (!['ollama', 'openai', 'groq'].includes(payload.provider)) {
+    res.status(400).send('Invalid provider specified')
+    return
+  }
+
+  streamChatResponse(payload.provider, payload.messages, (data) => {
+    if (data.endOfStream) {
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
+      res.end();
+    } else {
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
+    }
+  });
+
+  req.on('close', () => {
+    console.log('Client disconnected')
+  })
+});
+
+chat.listen(PORT2, () => {
+  console.log(`Server running on http://localhost:${PORT2}`)
+})
+
+// Pocketbase Client
 const initPocketbaseClient = async () => {
   const PocketBase = require('pocketbase/cjs')
   const pb = new PocketBase('http://127.0.0.1:8090')
@@ -100,27 +234,22 @@ const initPocketbaseClient = async () => {
           threadid: threadId
         })
 
-        if (llmMessages && assistantMessage.id) {
-          const response = await ollama.chat({
-            model: 'llama3',
-            messages: llmMessages,
-            stream: true
-          })
-
-          const fullResponse = []
-
-          for await (const part of response) {
-            fullResponse.push(part.message.content)
-            const partialResponse = fullResponse.join('')
+        streamChatResponse('groq', llmMessages, async (data) => {
+          if (data.endOfStream) {
             await pb.collection('messages').update(assistantMessage.id, {
-              text: partialResponse
+              text: data.message.content
+            })
+
+            if (isFirstAssistantMessage) {
+              console.log('Complete response and first assistant message in thread')
+            }
+          } 
+          else {
+            await pb.collection('messages').update(assistantMessage.id, {
+              text: data.message.content
             })
           }
-
-          if (isFirstAssistantMessage) {
-            console.log('Complete response and first assistant message in thread')
-          }
-        }
+        })
       }
     })
   }
@@ -129,9 +258,7 @@ const initPocketbaseClient = async () => {
   }
 }
 
-
-
-// Start PocketBase
+// Pocketbase Server
 const startPocketBase = () => {
   const pocketbasePath = path.join(__dirname, './pocketbase')
   const pocketbaseProcess = spawn(pocketbasePath, ['serve', '--http=0.0.0.0:8090'])
@@ -158,49 +285,23 @@ electron.on('ready', () => {
   createWindow()
 })
 
-// Express Server for Visuals
-const visualsApp = express()
-const visualsPort = 1
-const visualsPath = isDevelopment
-  ? path.join(__dirname, '../assets/visuals/dist')
-  : path.join(process.resourcesPath, 'assets/visuals/dist')
-
-visualsApp.use((req, res, next) => {
-  res.setHeader('Origin-Agent-Cluster', '?1')
-  next()
-})
-
-visualsApp.use(express.static(visualsPath, { extensions: ['html'] }))
-
-visualsApp.get('*', (req, res) => {
-  res.sendFile(path.resolve(visualsPath, 'index.html'))
-})
-
-visualsApp.listen(visualsPort, () => {
-  log.info(`Visuals server listening on port ${visualsPort}`)
-})
-
-
-
-const app = express()
-const PORT = 5003 // Port number for the proxy server
-const TTS_API_URL = 'http://localhost:5002/api/tts' // The base URL for the TTS service
-// Enable CORS for all domains
-app.use((req, res, next) => {
+// TTS
+const tts = express()
+const PORT = 5003
+const TTS_API_URL = 'http://localhost:5002/api/tts'
+tts.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
   next()
 })
 
-// Helper function to construct query string from req.query
 const buildQueryString = (params: any) => {
   return Object.keys(params)
     .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
     .join('&')
 }
 
-// Proxy endpoint
-app.get('/api/tts', async (req, res) => {
+tts.get('/api/tts', async (req, res) => {
   const queryString = buildQueryString(req.query)
   const url = `${TTS_API_URL}?${queryString}`
 
@@ -226,75 +327,7 @@ app.get('/api/tts', async (req, res) => {
   }
 })
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Proxy server running on http://localhost:${PORT}`)
+tts.listen(PORT, () => {
+  console.log(`TTS running on http://localhost:${PORT}`)
 })
 
-const llm = express()
-const PORT2 = process.env.PORT2 || 1616
-llm.use(cors())
-llm.use(express.json())
-llm.use(express.urlencoded({ extended: true }))
-
-llm.get('/chat', async (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream')
-  res.setHeader('Cache-Control', 'no-cache')
-  res.setHeader('Connection', 'keep-alive')
-
-  const data = req.query.data
-  if (typeof data !== 'string') {
-    res.status(400).send('Invalid data format')
-    return
-  }
-
-  let payload
-  try {
-    payload = JSON.parse(data)
-  } 
-  catch (error) {
-    res.status(400).send('Invalid JSON format')
-    return
-  }
-
-  try {
-    const response = await ollama.chat({
-      model: 'llama3',
-      messages: payload.messages,
-      stream: true
-    })
-
-    const fullResponse = []
-
-    for await (const part of response) {
-      fullResponse.push(part.message.content)
-      res.write(`data: ${JSON.stringify({
-        ...part,
-        message: {
-          ...part.message,
-          content: fullResponse.join('')
-        }
-      })}\n\n`)
-    }
-
-    res.write(`data: ${JSON.stringify({ endOfStream: true, message: { content: fullResponse.join('')} })}\n\n`)
-  } 
-  catch (error) {
-    console.error('Error streaming response:', error)
-    res.status(500).send('Failed to stream response')
-  }
-
-  req.on('close', () => {
-    console.log('Client disconnected')
-    res.end()
-  })
-
-  res.on('finish', () => {
-    console.log('Response stream closed')
-  })
-})
-
-
-llm.listen(PORT2, () => {
-  console.log(`Server running on http://localhost:${PORT2}`)
-})

@@ -7,7 +7,10 @@ export type ChatConfig = {
 export type ResponseCallback = (response: string) => void
 
 export const chat = (config: ChatConfig): () => void => {
-  const payload = { messages: config.messages }  // Directly using the messages array from config
+  const payload = { 
+    messages: config.messages, 
+    provider: 'groq'
+  }
   const eventSource = new EventSource(`http://localhost:1616/chat?data=${encodeURIComponent(JSON.stringify(payload))}`)
 
   eventSource.onmessage = event => {

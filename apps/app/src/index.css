@@ -25,3 +25,8 @@ html, body {
 body, html, * {
   font-family: 'Onest' !important;
 }
+
+::-webkit-scrollbar {
+  width: .75rem !important;
+  height: .75rem !important;
+}
