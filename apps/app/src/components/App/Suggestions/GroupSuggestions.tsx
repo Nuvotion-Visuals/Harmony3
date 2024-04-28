@@ -2,7 +2,7 @@ import { Box, Button, Item, TextInput } from '@avsync.live/formation'
 import { generate_groups } from 'language/generate/groups'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useHarmony_activeSpace, useHarmony_setActiveThreadId, useHarmony_currentUserId, useHarmony_activeGroup, useHarmony_activeSpaceGroupNamesAndDescriptions } from 'redux-tk/harmony/hooks'
+import { useHarmony_activeSpace, useHarmony_setActiveThreadId, useHarmony_currentUserId, useHarmony_activeGroup } from 'redux-tk/harmony/hooks'
 import { pb } from 'redux-tk/pocketbase'
 import { JsonValidator } from 'utils/JSONValidator'
 
@@ -12,7 +12,7 @@ export const GroupSuggestions = () => {
   const activeSpace = useHarmony_activeSpace()
   const activeGroup = useHarmony_activeGroup()
   const setActiveThreadId = useHarmony_setActiveThreadId()
-  const activeSpaceGroupNamesAndDescriptions = useHarmony_activeSpaceGroupNamesAndDescriptions()
+  const activeSpaceGroupsInfo = useHarmony_activeSpace()
   const userId = useHarmony_currentUserId()
 
   const [feedback, setFeedback] = useState('')
@@ -32,7 +32,7 @@ export const GroupSuggestions = () => {
       prompt: `
         Space name: ${activeSpace?.name}
         Space description: ${activeSpace?.description}
-        Existing groups: \n${activeSpaceGroupNamesAndDescriptions}
+        Existing groups: \n${activeSpaceGroupsInfo}
         Your previous suggestions (optional): ${suggestions}
         User feedback (optional): ${feedback}
       `,

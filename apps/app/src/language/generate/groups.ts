@@ -45,6 +45,10 @@ export const generate_groups = ({
           ]
         }
 
+        Prioritize the space description. Groups should always be related to the space name and description.
+
+        Avoid suggesting groups which are too similar to existing groups in the space.
+
         If user feedback is provided, it must be prioritized. Answer in as a valid JSON object, no extra commentary, only the object. Ensure each key is wrapped in double quotes to conform to the JSON specification.`
       },
       {

@@ -94,26 +94,28 @@ export const Thread = memo(({
         toggleExpanded()
       },
     },
-    {
-      icon: 'circle-up',
-      iconPrefix: 'fas',
-      compact: true,
-      text: 'Thread top',
-      onClick: (e) => {
-        e.stopPropagation()
-        scrollToElementById(`thread_${thread.id}_top`, { behavior: 'smooth'})
+    ...[
+      {
+        icon: 'circle-up',
+        iconPrefix: 'fas',
+        compact: true,
+        text: 'Thread top',
+        onClick: (e) => {
+          e.stopPropagation()
+          scrollToElementById(`thread_${thread.id}_top`, { behavior: 'smooth'})
+        },
       },
-    },
-    {
-      icon: 'circle-down',
-      iconPrefix: 'fas',
-      compact: true,
-      text: 'Thread bottom',
-      onClick: (e) => {
-        e.stopPropagation()
-        scrollToElementById(`thread_${thread.id}_bottom`, { behavior: 'smooth'})
+      {
+        icon: 'circle-down',
+        iconPrefix: 'fas',
+        compact: true,
+        text: 'Thread bottom',
+        onClick: (e) => {
+          e.stopPropagation()
+          scrollToElementById(`thread_${thread.id}_bottom`, { behavior: 'smooth'})
+        },
       },
-    },
+    ].filter(_ => expanded),
     {
       children: <LineBreak color='var(--F_Font_Color_Disabled)'/>
     },

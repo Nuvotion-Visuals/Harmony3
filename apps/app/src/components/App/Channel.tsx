@@ -1,18 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { useHarmony_activeChannelThreads, useHarmony_activeThreadId, useHarmony_activeChannel, useHarmony_activeGroup, useHarmony_activeSpace, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
+import { useHarmony_activeChannelThreads, useHarmony_activeThreadId, useHarmony_activeChannel, useHarmony_setActiveThreadId } from 'redux-tk/harmony/hooks'
 import { Page, scrollToElementById } from '@avsync.live/formation'
 import { TextBox } from './TextBox'
 import { Thread } from './Thread'
 import { ChannelHeader } from './ChannelHeader'
-import { ChannelControls } from './ChannelControls'
+import { Breadcrumbs } from './Breadcrumbs'
 
 export const Channel = () => {
   const activeChannelThreads = useHarmony_activeChannelThreads()
   const activeThreadId = useHarmony_activeThreadId()
   const activeChannel = useHarmony_activeChannel()
-  const activeGroup = useHarmony_activeGroup()
-  const activeSpace = useHarmony_activeSpace()
   const setActiveThreadId = useHarmony_setActiveThreadId()
 
   const [textBoxHeight, setTextBoxHeight] = useState(0)
@@ -102,10 +100,7 @@ export const Channel = () => {
   }, [])
 
   return (<>
-    <ChannelControls
-      activeSpaceName={activeSpace?.name}
-      activeGroupName={activeGroup?.name}
-      activeChannelName={activeChannel?.name}
+    <Breadcrumbs
       anyExpanded={anyExpanded}
       toggleAll={toggleAll}
     />

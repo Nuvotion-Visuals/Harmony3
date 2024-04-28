@@ -5,6 +5,7 @@ import { useHarmony_activeSpace } from 'redux-tk/harmony/hooks'
 import { GroupSuggestions } from './Suggestions/GroupSuggestions'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useRemoveQueryParam } from 'utils/removeEditQuery'
+import { Breadcrumbs } from './Breadcrumbs'
 
 export const Space = memo(() => {
   const navigate = useNavigate()
@@ -93,7 +94,8 @@ export const Space = memo(() => {
     }
   ] as ItemProps[]
 
-  return (
+  return (<>
+    <Breadcrumbs />
     <Page>
       <Box width='100%' py={.5}>
         {
@@ -257,5 +259,5 @@ export const Space = memo(() => {
         }
       </Box>
     </Page>
-  )
+  </>)
 })

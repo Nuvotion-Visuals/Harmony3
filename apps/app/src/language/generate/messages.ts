@@ -41,6 +41,10 @@ export const generate_messages = ({
           ]
         }
 
+        Prioritize the thread description. Messages should always be related to the thread name and description.
+
+        Avoid suggesting messages which are too similar to existing messages in the thread.
+
         If user feedback is provided it MUST be prioritized, and all suggestions should center around the user's direction.
         
         Please phrase all suggestions as QUESTIONS. Answer in as a valid JSON object, no extra commentary, only the object. Ensure each suggestion is wrapped in double quotes to conform to the JSON specification.`

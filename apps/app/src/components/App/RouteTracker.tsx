@@ -19,11 +19,11 @@ export const RouteTracker = () => {
 
   useEffect(() => {
     const { spaceid, groupid, channelid, threadid, messageid } = params
-    if (spaceid) setActiveSpaceId(spaceid)
-    if (groupid) setActiveGroupId(groupid)
-    if (channelid) setActiveChannelId(channelid)
-    if (threadid) setActiveThreadId(threadid)
-    if (messageid) setActiveMessageId(messageid)
+    setActiveSpaceId(spaceid)
+    setActiveGroupId(groupid)
+    setActiveChannelId(channelid)
+    setActiveThreadId(threadid)
+    setActiveMessageId(messageid)
   }, [params, location])
 
   return <></>

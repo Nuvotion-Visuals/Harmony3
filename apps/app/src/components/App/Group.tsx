@@ -5,6 +5,7 @@ import { useHarmony_activeGroup, useHarmony_activeSpaceId, useHarmony_setActiveC
 import { ChannelSuggestions } from 'components/App/Suggestions/ChannelSuggestions'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useRemoveQueryParam } from 'utils/removeEditQuery'
+import { Breadcrumbs } from './Breadcrumbs'
 
 export const Group = memo(() => {
   const navigate = useNavigate()
@@ -93,7 +94,8 @@ export const Group = memo(() => {
     }
   ] as ItemProps[]
 
-  return (
+  return (<>
+    <Breadcrumbs />
     <Page>
       <Box width='100%' py={.5}>
         {
@@ -213,5 +215,5 @@ export const Group = memo(() => {
         }
       </Box>
     </Page>
-  )
+  </>)
 })

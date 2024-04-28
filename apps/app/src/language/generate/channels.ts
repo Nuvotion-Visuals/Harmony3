@@ -45,6 +45,10 @@ export const generate_channels = ({
           ]
         }
 
+        Prioritize the group description. Channels should always be related to the group name and description.
+
+        Avoid suggesting channels which are too similar to existing channels in the group.
+
         If user feedback is provided, it must be prioritized. Answer in as a valid JSON object, no extra commentary, only the object. Ensure each key is wrapped in double quotes to conform to the JSON specification.`
       },
       {

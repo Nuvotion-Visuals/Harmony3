@@ -29,7 +29,13 @@ export const generate_threads = ({
             "${enableEmoji ? '🎨 ': ''}Create: Inspire creative tasks"
           ]
         }
+
+        Prioritize the channel description. Threads should always be related to the channel name and description.
+
+        Avoid suggesting threads which are too similar to existing threads in the channel.
+
         If user feedback is provided it must be prioritized.
+
         Please phrase all suggestions as QUESTIONS.
 
         Answer in as a valid JSON object. Ensure each suggestion is wrapped in double quotes to conform to the JSON specification.

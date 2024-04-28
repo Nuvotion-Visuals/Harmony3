@@ -90,13 +90,14 @@ export const selectActiveGroupChannelNamesAndDescriptions = (state: State): { na
     }))
 }
 
-export const selectActiveSpaceGroupNamesAndDescriptions = (state: State): { name: string, description: string }[] => {
+export const selectActiveSpaceGroupsInfo = (state: State): { name: string, description: string, id: string }[] => {
   const activeSpaceId = state.harmony.activeSpaceId
   return state.harmony.groups
     .filter(group => group.spaceid === activeSpaceId)
     .map(group => ({
       name: group.name || '',
-      description: group.description || ''
+      description: group.description || '',
+      id: group.id || ''
     }))
 }
 
@@ -105,4 +106,26 @@ export const selectNamesByUserId = (state: State): Record<string, string> => {
     names[user.id] = user.name
     return names
   }, {} as Record<string, string>)
+}
+
+export const selectActiveGroupChannelsInfo = (state: State): { name: string, description: string, id: string }[] => {
+  const activeGroupId = state.harmony.activeGroupId
+  return state.harmony.channels
+    .filter(channel => channel.groupid === activeGroupId)
+    .map(channel => ({
+      name: channel.name || '',
+      description: channel.description || '',
+      id: channel.id || '',
+    }))
+}
+
+export const selectActiveChannelThreadsInfo = (state: State): { name: string, description: string, id: string }[] => {
+  const activeChannelId = state.harmony.activeChannelId
+  return state.harmony.threads
+    .filter(thread => thread.channelid === activeChannelId)
+    .map(thread => ({
+      name: thread.name || '',
+      description: thread.description || '',
+      id: thread.id || ''
+    }))
 }
