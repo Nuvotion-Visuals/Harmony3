@@ -2,6 +2,7 @@ import React, { memo } from 'react'
 import { Box, Button, Dropdown, Spacer, scrollToElementById } from '@avsync.live/formation'
 import { useSpaces_activeChannel, useSpaces_activeChannelThreadsInfo, useSpaces_activeGroup, useSpaces_activeGroupChannelsInfo, useSpaces_activeSpace, useSpaces_activeSpaceGroupsInfo, useSpaces_activeThread, useSpaces_setActiveThreadId, useSpaces_spaces } from 'redux-tk/spaces/hooks'
 import styled from 'styled-components'
+import { Count } from 'components/App/Count'
 
 interface Props {
   anyExpanded?: boolean
@@ -30,7 +31,8 @@ export const Breadcrumbs = memo(({
         icon='diagram-project'
         iconPrefix='fas'
         href={'/'}
-      />
+      >
+      </Button>
       <Dropdown
         text={activeSpace?.name}
         items={spaces?.map(space => ({
@@ -39,9 +41,11 @@ export const Breadcrumbs = memo(({
         }))}
         maxWidth='14rem'
         minimal
+        disablePadding
         compact
       />
-      /
+      <Count count={spaces?.length} />
+      &nbsp;/&nbsp;
       <Dropdown
         text={activeGroup?.name || 'Groups'}
         off={!activeGroup?.name}
@@ -51,11 +55,14 @@ export const Breadcrumbs = memo(({
         }))}
         maxWidth='14rem'
         minimal
+        disablePadding
         compact
       />
+      <Count count={activeSpaceGroupsInfo?.length} />
+
       {
         activeGroup?.name && <>
-          /
+          &nbsp;/&nbsp;
           <Dropdown
             text={activeChannel?.name || 'Channels'}
             off={!activeChannel?.name}
@@ -65,14 +72,17 @@ export const Breadcrumbs = memo(({
             }))}
             maxWidth='14rem'
             minimal
-            compact
+        disablePadding
+        compact
           />
+          <Count count={activeGroupChannelsInfo?.length} />
+
         </>
       }
       
       {
         activeChannel?.name && <>
-          /
+          &nbsp;/&nbsp;
           <Dropdown
             text={activeThread?.name || 'Threads'}
             off={!activeThread?.name}
@@ -82,8 +92,10 @@ export const Breadcrumbs = memo(({
             }))}
             maxWidth='18rem'
             minimal
-            compact
+        disablePadding
+        compact
           />
+          <Count count={activeChannelThreadsInfo?.length} />
         </>
       }
      
@@ -99,6 +111,8 @@ export const Breadcrumbs = memo(({
       }
 
       <Spacer />
+
+
       <Box>
         <Button
           icon={'arrow-up'}
@@ -177,5 +191,6 @@ const S = {
     display: flex;
     align-items: center;
     color: var(--F_Font_Color_Disabled);
+    user-select: none;
   `
 }

@@ -10,12 +10,17 @@ export const selectActiveSpaceIndex = (state: State): number | null => state.spa
 export const selectCurrentUser = (state: State): UsersResponse | null => state.spaces.currentUser
 export const selectCurrentUserId = (state: State): string | null => state.spaces.currentUser?.id || null
 
-export const selectActiveSpaceGroups = (state: State): (CollectionResponses['groups'] & { channels: CollectionResponses['channels'][] })[] => {
+export const selectActiveSpaceGroups = (state: State): (CollectionResponses['groups'] & { channels: (CollectionResponses['channels'] & { threadsCount: number })[] })[] => {
   const activeSpaceId = state.spaces.activeSpaceId
   const groups = state.spaces.groups.filter(group => group.spaceid === activeSpaceId)
   return groups.map(group => ({
     ...group,
-    channels: state.spaces.channels.filter(channel => channel.groupid === group.id)
+    channels: state.spaces.channels
+      .filter(channel => channel.groupid === group.id)
+      .map(channel => ({
+        ...channel,
+        threadsCount: state.spaces.threads.filter(thread => thread.channelid === channel.id).length
+      }))
   }))
 }
 
@@ -128,4 +133,52 @@ export const selectActiveChannelThreadsInfo = (state: State): { name: string, de
       description: thread.description || '',
       id: thread.id || ''
     }))
+}
+
+
+export const selectCountsBySpaceId = (state: State): Record<string, { groups: number; channels: number; threads: number; messages: number }> => {
+  const countsBySpaceId: Record<string, { groups: number; channels: number; threads: number; messages: number }> = {}
+
+  // Initialize space counts structure
+  state.spaces.groups.forEach(group => {
+    if (!countsBySpaceId[group.spaceid]) {
+      countsBySpaceId[group.spaceid] = { groups: 0, channels: 0, threads: 0, messages: 0 }
+    }
+    countsBySpaceId[group.spaceid].groups++
+  })
+
+  // Create mappings for quick lookup
+  const groupIdToSpaceId: Record<string, string> = {}
+  state.spaces.groups.forEach(group => {
+    groupIdToSpaceId[group.id] = group.spaceid
+  })
+
+  const channelIdToGroupId: Record<string, string> = {}
+  state.spaces.channels.forEach(channel => {
+    channelIdToGroupId[channel.id] = channel.groupid
+    if (groupIdToSpaceId[channel.groupid]) {
+      countsBySpaceId[groupIdToSpaceId[channel.groupid]].channels++
+    }
+  })
+
+  const threadIdToChannelId: Record<string, string> = {}
+  state.spaces.threads.forEach(thread => {
+    threadIdToChannelId[thread.id] = thread.channelid
+    const groupId = channelIdToGroupId[thread.channelid]
+    if (groupId && groupIdToSpaceId[groupId]) {
+      countsBySpaceId[groupIdToSpaceId[groupId]].threads++
+    }
+  })
+
+  // Calculate messages count using the mappings
+  state.spaces.messages.forEach(message => {
+    const channelId = threadIdToChannelId[message.threadid]
+    const groupId = channelId ? channelIdToGroupId[channelId] : undefined
+    const spaceId = groupId ? groupIdToSpaceId[groupId] : undefined
+    if (spaceId) {
+      countsBySpaceId[spaceId].messages++
+    }
+  })
+
+  return countsBySpaceId
 }

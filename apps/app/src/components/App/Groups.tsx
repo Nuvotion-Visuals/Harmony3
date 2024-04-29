@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { useSpaces_activeChannelId, useSpaces_activeGroupId, useSpaces_activeSpace, useSpaces_activeSpaceGroups } from 'redux-tk/spaces/hooks'
 import { pb } from 'redux-tk/pocketbase'
 import styled from 'styled-components'
+import { Count } from 'components/App/Count'
 
 type List = {
   id: string
@@ -23,11 +24,13 @@ type List = {
     item: {
       label: string,
       labelColor: LabelColor
+      channelsCount: number
     },
     list: {
       subtitle: string,
       href: string
       id: string
+      threadsCount: number
     }[]
   }
 }
@@ -40,14 +43,16 @@ const generateGroupsList = (groups, activeSpaceId, activeGroupId, activeChannelI
       item: {
         text: group.name, // Using 'name' as the label for the group
         labelColor: 'none' as LabelColor, // Type assertion for 'LabelColor'
-        active: activeChannelId === null && activeGroupId === group.id
+        active: activeChannelId === null && activeGroupId === group.id,
+        channelsCount: group?.channels?.length
       },
       list: group.channels.map(channel => ({
         subtitle: `${channel.name}`, // Use the real channel name
         active: channel.id === activeChannelId,
         id: channel.id,
         compact: true,
-        href: `/spaces/${activeSpaceId}/groups/${group.id}/channels/${channel.id}`
+        href: `/spaces/${activeSpaceId}/groups/${group.id}/channels/${channel.id}`,
+        threadsCount: channel?.threadsCount
       }))
     }
   }))
@@ -142,6 +147,7 @@ export const Groups = React.memo(() => {
                   >
                     <Box width='100%' height='100%'>
                       <Spacer />
+                      <Count count={expandableList.value.item.channelsCount} />
                       <Dropdown
                         icon='ellipsis-h'
                         iconPrefix='fas'
@@ -193,6 +199,7 @@ export const Groups = React.memo(() => {
                       >
                         <Box width='100%'>
                           <Spacer />
+                          <Count count={listItem?.threadsCount} />
                           <Dropdown
                             icon='ellipsis-h'
                             iconPrefix='fas'

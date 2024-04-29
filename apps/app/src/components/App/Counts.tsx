@@ -8,19 +8,16 @@ interface Props {
   messageCount: number
 }
 
-export const Badge = React.memo(({ 
+export const Counts = React.memo(({ 
   groupsCount,
   channelsCount,
   threadsCount,
   messageCount
-}: Props) => {
-
-  return (
-    <S.Badge title={`${groupsCount} groups · ${channelsCount} channels · ${threadsCount} threads· ${messageCount} messages`}>
-      {`${groupsCount}·${channelsCount}·${threadsCount}·${messageCount}`}
-    </S.Badge>
-  )
-})
+}: Props) => 
+  <S.Badge title={`${groupsCount} groups · ${channelsCount} channels · ${threadsCount} threads· ${messageCount} messages`}>
+    { `${groupsCount}·${channelsCount}·${threadsCount}·${messageCount}` }
+  </S.Badge>
+)
 
 const S = {
   Badge: styled.div`
@@ -28,7 +25,7 @@ const S = {
     padding: .25rem .5rem;
     border-radius: 1rem;
     font-size: 12px;
-    color: var(--F_Font_Color_Label);
+    color: var(--F_Font_Color_Disabled);
     display: flex;
     align-items: center;
     height: .75rem;

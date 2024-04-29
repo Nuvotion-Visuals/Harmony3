@@ -1,16 +1,13 @@
 import { Box, Spacer, AspectRatio, Gap, Item, Dropdown, ContextMenu, ItemProps } from '@avsync.live/formation'
 import React from 'react'
 import styled from 'styled-components'
-import { Badge } from './Badge'
+import { Counts } from 'components/App/Counts'
+import { useSpaces_countsById } from 'redux-tk/spaces/hooks'
 
 interface Props {
   id: string
   previewSrc?: string
   name?: string
-  groupsCount?: number
-  channelsCount?: number
-  threadsCount?: number
-  messageCount?: number
   children?: React.ReactNode
   expandVertical?: boolean
 }
@@ -19,10 +16,6 @@ export const SpaceCard = React.memo(({
   id,
   previewSrc,
   name, 
-  groupsCount, 
-  channelsCount, 
-  threadsCount, 
-  messageCount, 
   children,
   expandVertical
 }: Props) => {
@@ -43,6 +36,8 @@ export const SpaceCard = React.memo(({
       href: `/spaces/${id}?edit=true`
     },
   ] as ItemProps[]
+
+  const count = useSpaces_countsById(id)
 
   return (
     <AspectRatio
@@ -72,11 +67,11 @@ export const SpaceCard = React.memo(({
             <S.OverlayBottom>
             <S.SpaceStats>
               <Spacer />
-              <Badge 
-                groupsCount={groupsCount || 0}
-                channelsCount={channelsCount || 0}
-                threadsCount={threadsCount || 0}
-                messageCount={messageCount || 0}
+              <Counts 
+                groupsCount={count.groups}
+                channelsCount={count.channels}
+                threadsCount={count.threads}
+                messageCount={count.messages}
               />
             </S.SpaceStats>
             

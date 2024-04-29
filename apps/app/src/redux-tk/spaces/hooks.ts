@@ -44,7 +44,7 @@ export const useSpaces_activeSpaceIndex = (): number | null =>
 export const useSpaces_currentUser = (): UsersResponse | null => 
   useSelector(selectors.selectCurrentUser, isEqual)
 
-export const useSpaces_activeSpaceGroups = (): CollectionResponses['groups'][] => 
+export const useSpaces_activeSpaceGroups = (): (CollectionResponses['groups'] & { channels: (CollectionResponses['channels'] & { threadsCount: number })[] })[] => 
   useSelector(selectors.selectActiveSpaceGroups, isEqual)
 
 export const useSpaces_activeChannelThreadNamesAndDescriptions = (): { name: string, description: string }[] => 
@@ -70,6 +70,17 @@ export const useSpaces_currentUserId = (): string | null =>
 
 export const useSpaces_messageById = (id: string): MessagesResponse => {
   const memoizedSelector = useMemo(() => selectors.selectMessageById(id), [id])
+  return useSelector(memoizedSelector, isEqual)
+}
+
+export const useSpaces_countsById = (id: string): { groups: number; channels: number; threads: number; messages: number } => {
+  const memoizedSelector = useMemo(() => {
+    return state => {
+      const counts = selectors.selectCountsBySpaceId(state)
+      return counts[id] || { groups: 0, channels: 0, threads: 0, messages: 0 }
+    }
+  }, [id])
+
   return useSelector(memoizedSelector, isEqual)
 }
 

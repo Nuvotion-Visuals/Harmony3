@@ -9,6 +9,7 @@ import * as selectors from 'redux-tk/spaces/selectors'
 import { store } from 'redux-tk/store'
 import { JsonValidator } from 'utils/JSONValidator'
 import { MessageSuggestions } from 'components/App/Suggestions/MessageSuggestions'
+import { Count } from 'components/App/Count'
 
 interface Props {
   thread: any
@@ -247,6 +248,9 @@ export const Thread = memo(({
                 onClick={toggleExpanded}
                 onMouseDown={onScrollWheelClick(() => handleDelete())}
               >
+                <Count
+                  count={thread?.messageIds?.length}
+                />
                 {
                   active 
                     ? <Button
