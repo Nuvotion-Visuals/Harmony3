@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useCallback, useMemo } from 'react'
-import { spacesAction } from './slice'
+import { spacesActions } from './slice'
 import * as selectors from './selectors'
 import { CollectionResponses, MessagesResponse, UsersResponse } from 'redux-tk/pocketbase-types'
 import { isEqual } from 'lodash'
@@ -111,29 +111,29 @@ export const useSpaces_namesByUserId = (): Record<string, string> =>
 
 export const useSpaces_setActiveSpaceIndex = () => {
   const dispatch = useDispatch()
-  return useCallback((index: number | null) => dispatch(spacesAction.setActiveSpaceIndex(index)), [dispatch])
+  return useCallback((index: number | null) => dispatch(spacesActions.setActiveSpaceIndex(index)), [dispatch])
 }
 export const useSpaces_setActiveSpaceId = () => {
   const dispatch = useDispatch()
-  return useCallback((payload: string | null) => dispatch(spacesAction.setActiveSpaceId(payload)), [dispatch])
+  return useCallback((payload: string | null) => dispatch(spacesActions.setActiveSpaceId(payload)), [dispatch])
 }
 export const useSpaces_setActiveGroupId = () => {
   const dispatch = useDispatch()
-  return useCallback((payload: string | null) => dispatch(spacesAction.setActiveGroupId(payload)), [dispatch])
+  return useCallback((payload: string | null) => dispatch(spacesActions.setActiveGroupId(payload)), [dispatch])
 }
 export const useSpaces_setActiveChannelId = () => {
   const dispatch = useDispatch()
-  return useCallback((payload: string | null) => dispatch(spacesAction.setActiveChannelId(payload)), [dispatch])
+  return useCallback((payload: string | null) => dispatch(spacesActions.setActiveChannelId(payload)), [dispatch])
 }
 export const useSpaces_setActiveThreadId = () => {
   const dispatch = useDispatch()
-  return useCallback((payload: string | null) => dispatch(spacesAction.setActiveThreadId(payload)), [dispatch])
+  return useCallback((payload: string | null) => dispatch(spacesActions.setActiveThreadId(payload)), [dispatch])
 }
 export const useSpaces_setActiveMessageId = () => {
   const dispatch = useDispatch()
-  return useCallback((payload: string | null) => dispatch(spacesAction.setActiveMessageId(payload)), [dispatch])
+  return useCallback((payload: string | null) => dispatch(spacesActions.setActiveMessageId(payload)), [dispatch])
 }
 export const useSpaces_setCurrentUser = () => {
   const dispatch = useDispatch()
-  return useCallback((payload: UsersResponse | null) => dispatch(spacesAction.setCurrentUser(payload)), [dispatch])
+  return useCallback((payload: UsersResponse | null) => dispatch(spacesActions.setCurrentUser(payload)), [dispatch])
 }

@@ -1,7 +1,7 @@
 import { pb } from 'redux-tk/pocketbase'
 import { store } from 'redux-tk/store'
 import * as selectors from 'redux-tk/spaces/selectors'
-import { spacesAction as actions } from 'redux-tk/spaces/slice'
+import { spacesActions as actions } from 'redux-tk/spaces/slice'
 
 export const sendMessage = async (text: string, newThread?: boolean) => {
   if (!text.trim()) return

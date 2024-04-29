@@ -78,6 +78,9 @@ const Main = ({ }) => {
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/" element={<App><></></App>} />
               <Route path="/profile" element={<App><RouteTracker /></App>} />
+              <Route path="/personas" element={<App><RouteTracker /></App>} />
+              <Route path="/personas/:personaid" element={<App><RouteTracker /></App>} />
+              <Route path="/personas/create" element={<App><RouteTracker /></App>} />
               <Route path="/spaces" element={<App><RouteTracker /></App>}></Route>
               <Route path="/spaces/:spaceid" element={<App><RouteTracker /></App>}>
                 <Route path="groups/:groupid" element={<App><RouteTracker /></App>}>

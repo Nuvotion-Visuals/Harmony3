@@ -4,7 +4,7 @@ import styled from "styled-components"
 interface Props {
   message: string
   name: string
-  warning: string
+  warning?: string
 }
 
 export const ConfirmationMessage = ({
@@ -16,7 +16,9 @@ export const ConfirmationMessage = ({
     <Gap gap={1}>
       <S.Message>{ message } </S.Message>
       <S.Name>{ name } </S.Name>
-      <S.Warning>{ warning } </S.Warning>
+      {
+        warning && <S.Warning>{ warning } </S.Warning>
+      }
     </Gap>
   )
 }

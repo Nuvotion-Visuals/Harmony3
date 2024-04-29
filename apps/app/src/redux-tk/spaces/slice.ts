@@ -238,7 +238,7 @@ const spacesSlice = createSlice({
   }
 })
 
-export const spacesAction = {
+export const spacesActions = {
   ...spacesSlice.actions,
   fetchSpacesAsync,
   fetchGroupsAsync,

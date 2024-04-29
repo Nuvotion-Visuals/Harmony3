@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { createLogger } from 'redux-logger'
 import spacesReducer from './spaces/slice'
+import personasReducer from './personas/slice'
 
 const logger = createLogger({
   predicate: (_, action) => ![
@@ -26,6 +27,7 @@ const batchMiddleware = (_) => (next) => (actions) => {
 export const store = configureStore({
   reducer: {
     spaces: spacesReducer,
+    personas: personasReducer
   },
   middleware: getDefaultMiddleware => 
     // @ts-ignore
@@ -34,15 +36,19 @@ export const store = configureStore({
       .concat(batchMiddleware)
 })
 
-import * as spacesAction from './spaces/slice'
+import * as spacesActions from './spaces/slice'
+import * as personasActions from './personas/slice'
+
 import { init } from './sync'
 
-store.dispatch(spacesAction.fetchSpacesAsync())
-store.dispatch(spacesAction.fetchGroupsAsync())
-store.dispatch(spacesAction.fetchChannelsAsync())
-store.dispatch(spacesAction.fetchThreadsAsync())
-store.dispatch(spacesAction.fetchMessagesAsync())
-store.dispatch(spacesAction.fetchUsersAsync())
+store.dispatch(spacesActions.fetchSpacesAsync())
+store.dispatch(spacesActions.fetchGroupsAsync())
+store.dispatch(spacesActions.fetchChannelsAsync())
+store.dispatch(spacesActions.fetchThreadsAsync())
+store.dispatch(spacesActions.fetchMessagesAsync())
+store.dispatch(spacesActions.fetchUsersAsync())
+
+store.dispatch(personasActions.fetchPersonasAsync())
 
 init()
 

@@ -18,8 +18,8 @@ importers:
   apps/app:
     dependencies:
       '@avsync.live/formation':
-        specifier: ^1.0.113
-        version: 1.0.113(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8)
+        specifier: ^1.0.114
+        version: 1.0.114(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8)
       '@fortawesome/fontawesome-svg-core':
         specifier: ^6.5.2
         version: 6.5.2
@@ -251,8 +251,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.20
     dev: true
 
-  /@avsync.live/formation@1.0.113(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8):
-    resolution: {integrity: sha512-5JxkA2zF5uDN4Co9Xd685EGR5z5Fh29ympxP2/UheGbB+Z3Zymy4b3FeF2p8nN/zy22vR6Srscw6ggv1bCjV/Q==}
+  /@avsync.live/formation@1.0.114(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8):
+    resolution: {integrity: sha512-KbNyxDrgHS4zh8Pd/Fz6HtqqgOcOscqqTvI9WtezKy01+CtmKfJUUoKFlHnVmxPU58a0hr9Nd/V0v3wdoUqF9A==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0

@@ -55,6 +55,7 @@ export type GroupsRecord = {
 }
 
 export type MessagesRecord = {
+	personaid?: RecordIdString
 	text?: string
 	threadid?: RecordIdString
 	userid?: RecordIdString

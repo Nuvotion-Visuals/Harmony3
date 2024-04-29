@@ -12,6 +12,8 @@ import { CreateSpace } from 'components/Create/CreateSpace'
 import { Space } from 'components/App/Space'
 import { Group } from 'components/App/Group'
 import { Profile } from 'components/App/Profile'
+import { Personas } from 'components/App/Personas/Personas'
+import { Persona } from 'components/App/Personas/Persona'
 
 interface Props {
   children: React.ReactNode
@@ -34,6 +36,9 @@ export const App = ({ children }: Props) => {
   }, [])
 
   const FirstPage = () => {
+    if (location.pathname.startsWith('/personas')) {
+      return <Personas />
+    }
     return <SpaceSidebar />
   }
 
@@ -46,6 +51,13 @@ export const App = ({ children }: Props) => {
 
     if (location.pathname === '/spaces/create') {
       return <CreateSpace />
+    }
+
+    if (location.pathname.startsWith('/personas')) {
+      if (location.pathname === '/personas') {
+        return <></>
+      }
+      return <Persona />
     }
 
     // Match for the specific space ID
@@ -100,14 +112,14 @@ export const App = ({ children }: Props) => {
                   iconPrefix: 'fas',
                   title: 'Spaces',
                   href: `/spaces`,
-                  active: location.pathname.includes('/spaces/')
+                  active: location.pathname.includes('/spaces')
                 },
                 {
                   icon: 'users',
                   iconPrefix: 'fas',
                   title: 'Personas',
                   href: `/personas`,
-                  active: location.pathname.includes('/personas/')
+                  active: location.pathname.includes('/personas')
                 },
                 {
                   icon: 'user-circle',
