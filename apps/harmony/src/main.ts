@@ -6,7 +6,7 @@ import { spawn } from 'child_process'
 
 import { initPocketbase } from './pocketbase'
 import { initTts } from './tts'
-import { initChat } from './chat'
+import { initServer } from './server'
 
 import eventsource from 'eventsource'
 // @ts-ignore
@@ -59,6 +59,6 @@ electron.on('ready', () => {
   initPocketbase()
   createWindow()
   initTts()
-  initChat()
+  initServer()
 })
 

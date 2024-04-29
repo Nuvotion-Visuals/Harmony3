@@ -11,7 +11,7 @@ interface PersonasState {
 
 const INITIAL_STATE: PersonasState = {
   personas: [],
-  activePersonaId: null
+  activePersonaId: localStorage.getItem('personas_activePersonaId') || null
 }
 
 export const fetchPersonasAsync = createAsyncThunk(
@@ -28,6 +28,7 @@ const personasSlice = createSlice({
   reducers: {
     setActivePersonaId: (state, action: PayloadAction<string | null>) => {
       state.activePersonaId = action.payload
+      localStorage.setItem('personas_activePersonaId', action.payload)
     },
    
     setPersonas: (state, action: PayloadAction<CollectionResponses['personas'][]>) => {

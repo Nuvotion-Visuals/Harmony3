@@ -5,6 +5,7 @@
       "components/*": ["src/components/*"],
       "redux-tk/*": ["src/redux-tk/*"],
       "language/*": ["src/language/*"],
+      "vision/*": ["src/vision/*"],
       "utils/*": ["src/utils/*"],
       "spaces/*": ["src/spaces/*"],
       "react": [ "./node_modules/@types/react" ]

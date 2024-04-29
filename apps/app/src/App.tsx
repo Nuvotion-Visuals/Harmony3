@@ -7,13 +7,13 @@ import { pb } from 'redux-tk/pocketbase'
 import { UsersResponse } from 'redux-tk/pocketbase-types'
 import { matchPath, useLocation, useNavigate } from 'react-router-dom'
 import SpacesDashboard from 'components/App/SpacesDashboard'
-import { QuickChat } from 'components/App/QuickChat'
 import { CreateSpace } from 'components/Create/CreateSpace'
 import { Space } from 'components/App/Space'
 import { Group } from 'components/App/Group'
 import { Profile } from 'components/App/Profile'
 import { Personas } from 'components/App/Personas/Personas'
 import { Persona } from 'components/App/Personas/Persona'
+import { Tools } from 'components/App/Tools/Tools'
 
 interface Props {
   children: React.ReactNode
@@ -81,7 +81,7 @@ export const App = ({ children }: Props) => {
   const ThirdPage = () => {
     switch(location.pathname) {
       default:
-        return <QuickChat />
+        return <Tools />
     }
   }
 

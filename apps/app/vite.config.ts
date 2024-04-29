@@ -20,6 +20,7 @@ export default defineConfig({
       'components': path.resolve(__dirname, 'src/components'),
       'redux-tk': path.resolve(__dirname, 'src/redux-tk'),
       'language': path.resolve(__dirname, 'src/language'),
+      'vision': path.resolve(__dirname, 'src/vision'),
       'utils': path.resolve(__dirname, 'src/utils'),
       'spaces': path.resolve(__dirname, 'src/spaces'),
     }

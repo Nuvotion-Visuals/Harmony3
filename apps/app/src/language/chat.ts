@@ -1,7 +1,7 @@
 export type ChatConfig = {
   provider?: 'openai' | 'groq' | 'ollama' | string
   model?: string
-  messages: { role: 'user' | 'assistant' | 'system', content: string }[]
+  messages: { role: 'user' | 'assistant' | 'system' | string, content: string }[]
   onPartial: ResponseCallback
   onComplete: ResponseCallback
 }

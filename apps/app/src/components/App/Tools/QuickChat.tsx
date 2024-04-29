@@ -1,9 +1,9 @@
 import React, { memo, useEffect, useState } from 'react'
-import { chat } from '../../language/chat'
+import { chat } from 'language/chat'
 import { Avatar, Box, Button, Gap, Item, StyleHTML, markdownToHTML, scrollToElementById } from '@avsync.live/formation'
 import styled from 'styled-components'
-import { speak } from '../../language/speech'
-import { TextBox } from './TextBox' 
+import { speak } from 'language/speech'
+import { TextBox } from 'components/App/TextBox' 
 import { useSpaces_currentUserId, useSpaces_namesByUserId } from 'redux-tk/spaces/hooks'
 import { usePersonas_activePersona } from 'redux-tk/personas/hooks'
 
@@ -91,7 +91,7 @@ export const QuickChat = () => {
   useEffect(() => {
     const updateHeight = () => {
       if (textBoxRef.current) {
-        const newHeight = window.innerHeight - textBoxRef.current.clientHeight - 26 - 16
+        const newHeight = window.innerHeight - textBoxRef.current.clientHeight - 26 - 16 - 40
         setTextBoxHeight(newHeight)
       }
     }
@@ -144,7 +144,6 @@ export const QuickChat = () => {
   return (<>
     <Box py={.5}>
       <Item
-        text='Quick Chat'
         compact
       >
         <Gap autoWidth>

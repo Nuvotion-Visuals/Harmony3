@@ -10,12 +10,16 @@ interface Props {
   onNewThreadId?: (threadId: string) => void
   activeThreadId?: string
   onSend?: (message: string) => void
+  disablePersonas?: boolean
+  placeholder?: string
 }
 
 export const TextBox = memo(({
   onNewThreadId,
   activeThreadId,
   onSend,
+  disablePersonas,
+  placeholder
 }: Props) => {
   const navigate = useNavigate()
   const [text, setText] = useState('')
@@ -92,51 +96,53 @@ export const TextBox = memo(({
 
   return (
     <S.Wrapper>
-      <Item
-        src={activePersona?.avatar ? `http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}` : null}
-        subtitle={activePersona?.name}
-        absoluteRightChildren
-        compact
-      >
-        <Dropdown
-          icon='ellipsis-h'
-          iconPrefix='fas'
-          maxWidth='12rem'
+      {
+        !disablePersonas && <Item
+          src={activePersona?.avatar ? `http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}` : null}
+          subtitle={activePersona?.name}
+          absoluteRightChildren
           compact
-          minimal
-          items={[
-            ...personas.map(persona => ({
-              src: persona?.avatar ? `http://localhost:8090/api/files/personas/${persona?.id}/${persona?.avatar}` : undefined,
-              text: persona?.name,
-              subtitle: `${persona?.description} · ${persona?.provider} · ${persona?.model}`,
-              onClick: () => setActivePersonaId(persona?.id),
-              absoluteRightChildren: true,
-              children: <Button
-                icon='gear'
-                iconPrefix='fas'
-                compact
-                square
-                minimal
-                onClick={() => navigate(`/personas/${persona?.id}`)}
-              />
-            })),
-            {
-              text: 'Default Assistant',
-              icon: 'user',
-              iconPrefix: 'fas',
-              compact: true,
-              onClick: () => setActivePersonaId(null),
-            },
-            {
-              text: 'Create',
-              icon: 'user-plus',
-              iconPrefix: 'fas',
-              href: '/personas/create',
-              compact: true,
-            }
-        ]}
-        />
-      </Item>
+        >
+          <Dropdown
+            icon='ellipsis-h'
+            iconPrefix='fas'
+            maxWidth='12rem'
+            compact
+            minimal
+            items={[
+              ...personas.map(persona => ({
+                src: persona?.avatar ? `http://localhost:8090/api/files/personas/${persona?.id}/${persona?.avatar}` : undefined,
+                text: persona?.name,
+                subtitle: `${persona?.description} · ${persona?.provider} · ${persona?.model}`,
+                onClick: () => setActivePersonaId(persona?.id),
+                absoluteRightChildren: true,
+                children: <Button
+                  icon='gear'
+                  iconPrefix='fas'
+                  compact
+                  square
+                  minimal
+                  onClick={() => navigate(`/personas/${persona?.id}`)}
+                />
+              })),
+              {
+                text: 'Default Assistant',
+                icon: 'user',
+                iconPrefix: 'fas',
+                compact: true,
+                onClick: () => setActivePersonaId(null),
+              },
+              {
+                text: 'Create',
+                icon: 'user-plus',
+                iconPrefix: 'fas',
+                href: '/personas/create',
+                compact: true,
+              }
+          ]}
+          />
+        </Item>
+      }
 
       {
         activeThreadId &&
@@ -180,7 +186,7 @@ export const TextBox = memo(({
               sendMessage(text.substring(0, text.length - 11))
             }
           }}
-          placeholder='Send a message'
+          placeholder={placeholder ? placeholder : 'Send a message'}
         />
         <S.Absolute>
           <Button
