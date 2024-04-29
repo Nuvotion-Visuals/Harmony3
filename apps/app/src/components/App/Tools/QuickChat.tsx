@@ -76,8 +76,12 @@ const Message = memo(({
 })
 
 export const QuickChat = () => {
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState(JSON.parse(localStorage.getItem('tools_quickChat_messages')) || [])
   const [stream, setStream] = useState('')
+
+  useEffect(() => {
+    localStorage.setItem('tools_quickChat_messages', JSON.stringify(messages))
+  }, [messages])
 
   const [textBoxHeight, setTextBoxHeight] = useState(0)
   const textBoxRef = React.createRef<HTMLDivElement>()

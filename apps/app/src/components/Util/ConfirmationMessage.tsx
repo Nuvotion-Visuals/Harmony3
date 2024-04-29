@@ -1,4 +1,4 @@
-import { Box, Gap } from "@avsync.live/formation"
+import { Gap } from "@avsync.live/formation"
 import styled from "styled-components"
 
 interface Props {

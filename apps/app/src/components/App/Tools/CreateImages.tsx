@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState } from 'react'
 import { chat } from 'language/chat'
-import { Avatar, Box, Button, Gap, Item, LoadingSpinner, StyleHTML, markdownToHTML, scrollToElementById } from '@avsync.live/formation'
+import { Avatar, Box, Button, Dropdown, Gap, Item, LoadingSpinner, NumberInput, StyleHTML, markdownToHTML, scrollToElementById } from '@avsync.live/formation'
 import styled from 'styled-components'
 import { speak } from 'language/speech'
 import { TextBox } from 'components/App/TextBox' 
@@ -20,7 +20,6 @@ const Message = memo(({
   imageUrls?: string[]
 }) => {
   const currentUserId = useSpaces_currentUserId()
-  const activePersona = usePersonas_activePersona()
   const namesByUserId = useSpaces_namesByUserId()
   const name = namesByUserId?.[currentUserId]
 
@@ -31,16 +30,22 @@ const Message = memo(({
           name={
             role === 'user' 
               ? name 
-              : activePersona?.name
-                ? activePersona?.name
+              : role === 'system'
+                ? 'System'
                 : 'Assistant'
           }
           labelColor={
             role === 'user' 
               ? 'green' 
-              : activePersona?.avatar ? null : 'red'
+              : undefined
           }
-          src={(role === 'assistant' && activePersona?.avatar) ? `http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}` : null}
+          icon={
+            role === 'user' 
+              ? undefined 
+              : role === 'system'
+                ? 'image'
+                : 'pencil'
+          }
         />
       </S.Left>
       <S.Right>
@@ -48,8 +53,8 @@ const Message = memo(({
           subtitle={
             role === 'user' 
               ? name 
-              : activePersona?.name
-                ? activePersona?.name
+              : role === 'system'
+                ? 'System'
                 : 'Assistant'
           }
           disablePadding
@@ -84,7 +89,12 @@ const Message = memo(({
 })
 
 export const CreateImages = () => {
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState(JSON.parse(localStorage.getItem('tools_createImages_messages')) || [])
+
+  useEffect(() => {
+    localStorage.setItem('tools_createImages_messages', JSON.stringify(messages))
+  }, [messages])
+
   const [stream, setStream] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -122,13 +132,17 @@ export const CreateImages = () => {
     }
   }, [textBoxRef])
 
+  const [size, setSize] = useState('1024x1024')
+  const [model, setModel] = useState('dall-e-3')
+  const [n, setN] = useState(1)
+  const [quality, setQuality] = useState('standard')
+
   const sendMessage = (message: string) => {
-    setLoading(true)
     const newMessages = [
       { 
         role: 'system', 
         content: `
-          You are in image generator. The user will request an image with a simple prompt, you will add detail that helps the user achieve the desired result. 
+          You are an image generator. The user will request an image with a simple prompt, you will add detail that helps the user achieve the desired result. 
           Sometimes the system will automatically update the prompt. Sometimes the user will have feedback for you, in which case you should update the prompt.
           You only ever respond with an image prompt, no additional commentary.
         ` 
@@ -147,15 +161,16 @@ export const CreateImages = () => {
         scrollToElementById('images_bottom', { behavior: 'auto', block: 'end'})
       },
       onComplete: response => {
+        setLoading(true)
         const completeAssistantMessage = { role: 'assistant', content: response }
         setMessages(prevHistory => [...prevHistory, completeAssistantMessage])
         setStream('')
         createImages(
           {
             prompt: response,
-            size: '1024x1024',
-            model: 'dall-e-3',
-            n: 1
+            size,
+            model,
+            n
           }, 
           (data) => {
             const image = data?.[0]
@@ -165,7 +180,7 @@ export const CreateImages = () => {
             }
             setLoading(false)
           },
-          (e) => {
+          () => {
             alert('Image creation failed')
             setLoading(false)
           }
@@ -227,7 +242,7 @@ export const CreateImages = () => {
       <div id='images_top'></div>
       <Gap>
         {
-          messages.slice(1)?.map((message, index) =>
+          messages.filter(message => !message.content.includes('You are an image generator')).map((message, index) =>
             <Message
               role={message.role}
               content={markdownToHTML(message.content)}
@@ -252,6 +267,80 @@ export const CreateImages = () => {
     </S.Content>
 
     <S.TextBoxContainer ref={textBoxRef}>
+      <Box width='100%'>
+        <Dropdown
+          text={model === 'dall-e-3' ? 'Dall-E 3' : 'Dall-E 2'}
+          compact
+          minimal
+          maxWidth='4.5rem'
+          items={[
+            {
+              text: 'Dall-E 3',
+              onClick: () => setModel('dall-e-3'),
+              active: model === 'dall-e-3',
+              compact: true
+            },
+            {
+              text: 'dall-e-2',
+              onClick: () => setModel('dall-e-2'),
+              active: model === 'dall-e-2',
+              compact: true
+            },
+          ]}
+        />
+        <Dropdown
+          text={size}
+          compact
+          maxWidth='5.5rem'
+          minimal
+          items={[
+            {
+              text: '1024x1024',
+              onClick: () => setSize('1024x1024'),
+              active: size === '1024x1024',
+              compact: true
+            },
+            {
+              text: '1792x1024',
+              onClick: () => setSize('1792x1024'),
+              active: model === '1792x1024',
+              compact: true
+            },
+            {
+              text: '1024x1792',
+              onClick: () => setSize('1024x1792'),
+              active: model === '1024x1792',
+              compact: true
+            }
+          ]}
+        />
+        <NumberInput
+          value={n}
+          onChange={val => setN(val)}
+          step={1}
+        />
+        <Dropdown
+          text={quality === 'standard' ? 'SD' : 'HD'}
+          compact
+          minimal
+          maxWidth='2.25rem'
+          items={[
+            {
+              text: 'SD',
+              onClick: () => setQuality('standard'),
+              active: quality === 'standard',
+              compact: true
+            },
+            {
+              text: 'HD',
+              onClick: () => setQuality('hd'),
+              active: quality === 'hd',
+              compact: true
+            },
+          ]}
+        />
+      </Box>
+       
       <TextBox
         onSend={(msg) => sendMessage(msg)}
         disablePersonas
@@ -285,12 +374,13 @@ const S = {
   Container: styled.div`
     margin-top: -.5rem;
   `,
-   TextBoxContainer: styled.div`
+  TextBoxContainer: styled.div`
     max-height: 50vh;
     width: 100%;
     position: relative;
     overflow: auto;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     padding: .25rem 0;
   `,

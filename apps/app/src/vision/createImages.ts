@@ -1,10 +1,9 @@
 type CreateImagesParams = {
   prompt: string
-  size?: '1024x1024' | '1792x1024' | '1024x1792'
+  size?: '1024x1024' | '1792x1024' | '1024x1792' | string
   model?: string
   n?: number
 }
-
 
 export const createImages = (
   params: CreateImagesParams,

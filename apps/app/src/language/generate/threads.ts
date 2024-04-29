@@ -17,12 +17,12 @@ export const generate_threads = ({
         role: 'system',
         content: `You are an API endpoint that provides a list of suggested messages for starting a new conversation thread based on a prompt.
         The suggestions should be distinct, naturally carrying on and advancing the conversation towards the desired goal or purpose of the channel.
-        Each message starts with an emoji and title if emojis are enabled. The titles should always be action-oriented present tense, and always a single capitalized word.
+        ${enableEmoji ? 'Each message starts with an emoji and title if emojis are enabled.' : ''} The titles should always be action-oriented present tense, and always a single capitalized word.
         You answer in the following JSON format.
         
         {
           "suggestions": [
-            "🎙️ Discuss: What are some of the design choices we should consider when developing new features?",
+            "${enableEmoji ? '🎙️ ' : ''}Discuss: What are some of the design choices we should consider when developing new features?",
             "🔍 Explore: Could we delve more into the influences of design on the functionality and efficiency of the app?",
             "📚 Research: What are some resources to learn more about effective design strategies in development?",
             "🎨 Create: How can we creatively implement user-friendly design aspects into our next project?",

@@ -62,7 +62,7 @@ library.add(
    fas.faImage, fas.faVideo, fas.faCode, fas.faEraser, fas.faFileVideo, fas.faFileCode,
    fas.faTerminal, fas.faQuoteRight, fas.faEllipsisH, fas.faReply, fas.faSave,
    fas.faDiagramProject, fas.faBoltLightning, fas.faSignOutAlt, fas.faImage,
-   fas.faCircleUp, fas.faCircleDown
+   fas.faCircleUp, fas.faCircleDown, fas.faPencil
 )
 
 const Main = ({ }) => {
@@ -103,7 +103,7 @@ const init = async () => {
   ReactDOM.createRoot(document.getElementById('root')!).render(<Main />)
 }
 
-document.addEventListener('contextmenu', event => event.preventDefault())
+// document.addEventListener('contextmenu', event => event.preventDefault())
 document.addEventListener('mousedown', event => {
   if (event.button === 1) {
     event.preventDefault()
