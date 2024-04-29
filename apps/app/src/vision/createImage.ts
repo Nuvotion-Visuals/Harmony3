@@ -1,16 +1,15 @@
-type CreateImagesParams = {
+import { ImagesResponse } from "redux-tk/pocketbase-types"
+
+type CreateImageParams = {
   prompt: string
   size?: '1024x1024' | '1792x1024' | '1024x1792' | string
   model?: string
   n?: number
 }
 
-export const createImages = (
-  params: CreateImagesParams,
-  onSuccess: (data: {
-    revised_prompt?: string,
-    url: string
-  }[]) => void,
+export const createImage = (
+  params: CreateImageParams,
+  onSuccess: (record: ImagesResponse) => void,
   onError: (error: string) => void
 ) => {
   const baseUrl = 'http://localhost:1616'

@@ -3,12 +3,17 @@ import { spawn } from 'child_process'
 import path from 'path'
 import { streamChatResponse } from './streamChatResponse'
 import { JsonValidator } from './JsonValidator'
-import { CollectionResponses, MessagesResponse } from './pocketbase-types'
+import { CollectionResponses, MessagesResponse, TypedPocketBase } from './pocketbase-types'
+
+let pb: any = null
+let systemId: string | null = null
+export const getPocketBaseClient = () => pb
+export const getSystemId = () => systemId
 
 // Pocketbase Client
-const initPocketbaseClient = async () => {
+const initPocketBaseClient = async () => {
   const PocketBase = require('pocketbase/cjs')
-  const pb = new PocketBase('http://127.0.0.1:8090')
+  pb = new PocketBase('http://127.0.0.1:8090')
   pb.autoCancellation(false)
 
   console.log('pocketbase started')
@@ -18,7 +23,7 @@ const initPocketbaseClient = async () => {
       'harmony',
       'qxIrfPYwKsMxZBQ'
     )
-    const systemId = pb.authStore.model?.id
+    systemId = pb.authStore.model?.id
 
      // Handle deletions for spaces
     pb.collection('spaces').subscribe('*', async (event: any) => {
@@ -221,7 +226,7 @@ const initPocketbaseClient = async () => {
   }
 }
 
-export const initPocketbase = () => {
+export const initPocketBase = () => {
   let basePath = electron.getAppPath()
   if (process.env.NODE_ENV === 'production') {
     basePath = path.join(process.resourcesPath)
@@ -233,7 +238,7 @@ export const initPocketbase = () => {
   pocketbaseProcess.stdout.on('data', data => {
     const output = data.toString()
     if (output.includes('Server started')) {
-      initPocketbaseClient()
+      initPocketBaseClient()
     }
   })
 

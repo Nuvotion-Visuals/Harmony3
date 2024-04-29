@@ -8,6 +8,7 @@ import { useRemoveQueryParam } from 'utils/removeEditQuery'
 import { Breadcrumbs } from './Breadcrumbs'
 import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 import { Count } from './Count'
+import { ImageDropTarget } from 'components/Util/ImageDrop'
 
 export const Group = memo(() => {
   const navigate = useNavigate()
@@ -120,22 +121,29 @@ export const Group = memo(() => {
                   <Gap disableWrap>
                     <Gap >
                       {
-                        banner && <FileDrop 
-                          onFileDrop={files => {
-                            const file = files?.[0]
-                            if (file) {
-                              setFile(file)
-                              setBanner(URL.createObjectURL(file))
-                            }
+                        banner && <ImageDropTarget
+                          onFileConverted={(file) => {
+                            setFile(file)
+                            setBanner(URL.createObjectURL(file))
                           }}
                         >
-                          <AspectRatio
-                            ratio={4/1}
-                            backgroundSrc={banner}
-                            coverBackground
-                            borderRadius={1}
-                          />
-                        </FileDrop>
+                          <FileDrop 
+                            onFileDrop={files => {
+                              const file = files?.[0]
+                              if (file) {
+                                setFile(file)
+                                setBanner(URL.createObjectURL(file))
+                              }
+                            }}
+                          >
+                            <AspectRatio
+                              ratio={4/1}
+                              backgroundSrc={banner}
+                              coverBackground
+                              borderRadius={1}
+                            />
+                          </FileDrop>
+                        </ImageDropTarget>
                       }
                       
                       <FileUpload

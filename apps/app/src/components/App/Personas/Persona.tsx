@@ -6,6 +6,7 @@ import { pb } from 'redux-tk/pocketbase'
 import { usePersonas_activePersona, usePersonas_setActivePersonaId } from 'redux-tk/personas/hooks'
 import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 import { useRemoveQueryParam } from 'utils/removeEditQuery'
+import { ImageDropTarget } from 'components/Util/ImageDrop'
 
 export const Persona = () => {
   const navigate = useNavigate()
@@ -151,21 +152,28 @@ export const Persona = () => {
                 {
                   avatar && <Box width='100%'>
                     <Box width={8}>
-                      <FileDrop 
-                        onFileDrop={files => {
-                          const file = files?.[0]
-                          if (file) {
-                            setFile(file)
-                            setAvatar(URL.createObjectURL(file))
-                          }
+                      <ImageDropTarget
+                        onFileConverted={(file) => {
+                          setFile(file)
+                          setAvatar(URL.createObjectURL(file))
                         }}
                       >
-                        <AspectRatio
-                          ratio={1}
-                          borderRadius={500}
-                          backgroundSrc={avatar}
-                        />
-                      </FileDrop>
+                        <FileDrop 
+                          onFileDrop={files => {
+                            const file = files?.[0]
+                            if (file) {
+                              setFile(file)
+                              setAvatar(URL.createObjectURL(file))
+                            }
+                          }}
+                        >
+                          <AspectRatio
+                            ratio={1}
+                            borderRadius={500}
+                            backgroundSrc={avatar}
+                          />
+                        </FileDrop>
+                      </ImageDropTarget>
                     </Box>
                   </Box>
                 }

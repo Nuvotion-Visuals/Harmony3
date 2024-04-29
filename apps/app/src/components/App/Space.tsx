@@ -8,6 +8,7 @@ import { useRemoveQueryParam } from 'utils/removeEditQuery'
 import { Breadcrumbs } from './Breadcrumbs'
 import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 import { Count } from './Count'
+import { ImageDropTarget } from 'components/Util/ImageDrop'
 
 export const Space = memo(() => {
   const navigate = useNavigate()
@@ -120,42 +121,59 @@ export const Space = memo(() => {
                   <Gap disableWrap>
                     <Gap>
                       <Gap disableWrap>
+                        
+                          {
+                            icon && <Box width={10}>
+                              <ImageDropTarget
+                                onFileConverted={(file) => {
+                                  setIconFile(file)
+                                  setIcon(URL.createObjectURL(file))
+                                }}
+                              >
+                                <FileDrop 
+                                  onFileDrop={files => {
+                                    const file = files?.[0]
+                                    if (file) {
+                                      setIconFile(file)
+                                      setIcon(URL.createObjectURL(file))
+                                    }
+                                  }}
+                                >
+                                  <AspectRatio
+                                    ratio={1}
+                                    backgroundSrc={icon}
+                                    coverBackground
+                                    borderRadius={1}
+                                  />
+                                </FileDrop>
+                              </ImageDropTarget>
+                            </Box>
+                          }
+
                         {
-                          icon && <Box width={10}><FileDrop 
-                            onFileDrop={files => {
-                              const file = files?.[0]
-                              if (file) {
-                                setIconFile(file)
-                                setIcon(URL.createObjectURL(file))
-                              }
+                          banner && <ImageDropTarget
+                            onFileConverted={(file) => {
+                              setBannerFile(file)
+                              setBanner(URL.createObjectURL(file))
                             }}
                           >
-                            <AspectRatio
-                              ratio={1}
-                              backgroundSrc={icon}
-                              coverBackground
-                              borderRadius={1}
-                            />
+                            <FileDrop 
+                              onFileDrop={files => {
+                                const file = files?.[0]
+                                if (file) {
+                                  setBannerFile(file)
+                                  setBanner(URL.createObjectURL(file))
+                                }
+                              }}
+                            >
+                              <AspectRatio
+                                ratio={4/1}
+                                backgroundSrc={banner}
+                                coverBackground
+                                borderRadius={1}
+                              />
                             </FileDrop>
-                          </Box>
-                        }
-                        {
-                          banner && <FileDrop 
-                            onFileDrop={files => {
-                              const file = files?.[0]
-                              if (file) {
-                                setBannerFile(file)
-                                setBanner(URL.createObjectURL(file))
-                              }
-                            }}
-                          >
-                            <AspectRatio
-                              ratio={4/1}
-                              backgroundSrc={banner}
-                              coverBackground
-                              borderRadius={1}
-                            />
-                          </FileDrop>
+                          </ImageDropTarget>
                         }
                       </Gap>
                      

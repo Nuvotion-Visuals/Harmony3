@@ -7,6 +7,7 @@ import { useRemoveQueryParam } from 'utils/removeEditQuery'
 import { useSpaces_countByChannelId } from 'redux-tk/spaces/hooks'
 import { Count } from './Count'
 import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
+import { ImageDropTarget } from 'components/Util/ImageDrop'
 
 interface Props {
   channel: any
@@ -112,22 +113,29 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                   <Gap disableWrap>
                     <Gap>
                       {
-                        banner && <FileDrop 
-                          onFileDrop={files => {
-                            const file = files?.[0]
-                            if (file) {
-                              setFile(file)
-                              setBanner(URL.createObjectURL(file))
-                            }
+                        banner && <ImageDropTarget
+                          onFileConverted={(file) => {
+                            setFile(file)
+                            setBanner(URL.createObjectURL(file))
                           }}
                         >
-                          <AspectRatio
-                            ratio={4/1}
-                            backgroundSrc={banner}
-                            coverBackground
-                            borderRadius={1}
-                          />
-                        </FileDrop>
+                          <FileDrop 
+                            onFileDrop={files => {
+                              const file = files?.[0]
+                              if (file) {
+                                setFile(file)
+                                setBanner(URL.createObjectURL(file))
+                              }
+                            }}
+                          >
+                            <AspectRatio
+                              ratio={4/1}
+                              backgroundSrc={banner}
+                              coverBackground
+                              borderRadius={1}
+                            />
+                          </FileDrop>
+                        </ImageDropTarget>
                       }
                     
                       <FileUpload

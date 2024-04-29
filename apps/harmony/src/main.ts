@@ -4,7 +4,7 @@ import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import { spawn } from 'child_process'
 
-import { initPocketbase } from './pocketbase'
+import { initPocketBase } from './pocketbase'
 import { initTts } from './tts'
 import { initServer } from './server'
 
@@ -56,7 +56,7 @@ const createWindow = () => {
 }
 
 electron.on('ready', () => {
-  initPocketbase()
+  initPocketBase()
   createWindow()
   initTts()
   initServer()

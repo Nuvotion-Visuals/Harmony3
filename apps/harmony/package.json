@@ -12,7 +12,7 @@
     "dev": "npm run build && electron .",
     "pack": "rm -rf ./dist && npm run build && npm run copy-assets && electron-builder --dir",
     "dist": "rm -rf ./dist && npm run build && npm run copy-assets && electron-builder",
-    "generate-types": "npx pocketbase-typegen --db dist/pb_data/data.db --out pocketbase-types.ts"
+    "generate-types": "npx pocketbase-typegen --db pocketbase/pb_data/data.db --out src/pocketbase-types.ts && cp src/pocketbase-types.ts ../app/src/redux-tk"
   },
   "build": {
     "appId": "harmony.avsync.live",

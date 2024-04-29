@@ -6,19 +6,19 @@ import { speak } from 'language/speech'
 import { TextBox } from 'components/App/TextBox' 
 import { useSpaces_currentUserId, useSpaces_namesByUserId } from 'redux-tk/spaces/hooks'
 import { usePersonas_activePersona } from 'redux-tk/personas/hooks'
-import { createImages } from 'vision/createImages'
+import { createImage } from 'vision/createImage'
 import useDynamicHeight from 'components/Hooks/useDynamicHeight'
 
 const Message = memo(({
   role,
   content,
   index,
-  imageUrls
+  imageUrl
 }: {
   role: string,
   content: string,
   index: number,
-  imageUrls?: string[]
+  imageUrl?: string
 }) => {
   const currentUserId = useSpaces_currentUserId()
   const namesByUserId = useSpaces_namesByUserId()
@@ -80,7 +80,7 @@ const Message = memo(({
           </StyleHTML>
           <Gap gap={.25}>
             {
-              imageUrls?.map(imageUrl => <S.Image src={imageUrl} />)
+              imageUrl && <S.Image src={imageUrl} />
             }
           </Gap>
         </S.Container>
@@ -140,7 +140,7 @@ export const CreateImages = () => {
         const completeAssistantMessage = { role: 'assistant', content: response }
         setMessages(prevHistory => [...prevHistory, completeAssistantMessage])
         setStream('')
-        createImages(
+        createImage(
           {
             prompt: response,
             size,
@@ -148,11 +148,16 @@ export const CreateImages = () => {
             n
           }, 
           (data) => {
-            const image = data?.[0]
-            if (image) {
-              const completeSystemMessage = { role: 'system', content: image?.revised_prompt || response, imageUrls: [image.url] }
-              setMessages(prevMessages => [...prevMessages, completeSystemMessage])
+            console.log(data)
+            
+
+            const completeSystemMessage = { 
+              role: 'system', 
+              content: data.prompt || response, 
+              imageUrl: `http://localhost:8090/api/files/images/${data.id}/${data.file}` 
             }
+            setMessages(prevMessages => [...prevMessages, completeSystemMessage])
+            
             setLoading(false)
           },
           () => {
@@ -221,7 +226,7 @@ export const CreateImages = () => {
             <Message
               role={message.role}
               content={markdownToHTML(message.content)}
-              imageUrls={message?.imageUrls}
+              imageUrl={message?.imageUrl}
               index={index}
             />)
         }
