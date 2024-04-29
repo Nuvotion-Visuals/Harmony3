@@ -19,7 +19,7 @@ interface StreamResponsePart {
 
 type StreamCallback = (data: StreamResponsePart) => void
 
-export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq', messages: any, callback: StreamCallback) => {
+export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq' | string, messages: any, callback: StreamCallback) => {
   let fullResponse: string[] = []
   const throttledCallback = throttle(callback, 16.67)
 

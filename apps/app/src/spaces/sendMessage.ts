@@ -1,15 +1,17 @@
 import { pb } from 'redux-tk/pocketbase'
 import { store } from 'redux-tk/store'
-import * as selectors from 'redux-tk/spaces/selectors'
+import * as spaceSelectors from 'redux-tk/spaces/selectors'
+import * as personaSelectors from 'redux-tk/personas/selectors'
 import { spacesActions as actions } from 'redux-tk/spaces/slice'
 
 export const sendMessage = async (text: string, newThread?: boolean) => {
   if (!text.trim()) return
 
   const state = store.getState()
-  const activeThreadId = selectors.selectActiveThreadId(state)
-  const activeChannelId = selectors.selectActiveChannelId(state)
-  const userId = selectors.selectCurrentUserId(state)
+  const activeThreadId = spaceSelectors.selectActiveThreadId(state)
+  const activeChannelId = spaceSelectors.selectActiveChannelId(state)
+  const userId = spaceSelectors.selectCurrentUserId(state)
+  const personaId = personaSelectors.selectActivePersonaId(state)
 
   let threadId = activeThreadId
 
@@ -37,7 +39,8 @@ export const sendMessage = async (text: string, newThread?: boolean) => {
       await pb.collection('messages').create({
         text,
         userid: userId,
-        threadid: threadId
+        threadid: threadId,
+        personaid: personaId
       })
     } 
     catch (error) {

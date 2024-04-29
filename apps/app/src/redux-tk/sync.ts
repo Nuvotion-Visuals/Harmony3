@@ -69,6 +69,10 @@ export const init = () => {
   })
 
   pb.collection('messages').subscribe('*', (event) => {
+    if (event.record?.system) {
+      return
+    }
+
     switch (event.action) {
       case 'create':
         store.dispatch(spacesActions.createMessage(event.record))

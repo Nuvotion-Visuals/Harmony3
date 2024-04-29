@@ -71,7 +71,7 @@ export const fetchThreadsAsync = createAsyncThunk(
 export const fetchMessagesAsync = createAsyncThunk(
   'spaces/fetchMessages',
   async () => {
-    const fetchedMessages = await pb.collection('messages').getFullList()
+    const fetchedMessages = await pb.collection('messages').getFullList({ filter: 'system=false' })
     return fetchedMessages as CollectionResponses['messages'][]
   }
 )

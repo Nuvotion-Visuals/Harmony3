@@ -4,6 +4,7 @@ import { pb } from 'redux-tk/pocketbase'
 import { speak } from '../../language/speech'
 import styled from 'styled-components'
 import { useSpaces_messageById, useSpaces_namesByUserId, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
+import { usePersonas_personaInfoById } from 'redux-tk/personas/hooks'
 
 const formatDate = (date: string): string => {
   const messageDate = new Date(date)
@@ -96,6 +97,7 @@ export const Message = memo(({
   const message = useSpaces_messageById(id)
   const namesByUserId = useSpaces_namesByUserId()
   const setActiveThreadId = useSpaces_setActiveThreadId()
+  const personaInfo = usePersonas_personaInfoById(message?.personaid)
   
   const [edit, setEdit] = useState(false)
   const [editText, setEditText] = useState(message?.text)
@@ -237,8 +239,25 @@ export const Message = memo(({
     <S.Message onMouseDown={onScrollWheelClick(() => handleDelete())} id={`message_${message.id}`}>
       <S.Left>
         <Avatar
-          name={namesByUserId[message.userid]}
-          labelColor={namesByUserId[message.userid] === 'Harmony' ? 'red' : 'green'}
+          name={
+            message?.assistant
+              ? personaInfo?.name
+                  ? personaInfo?.name
+                  : 'Assistant'
+              : namesByUserId[message.userid]
+          }
+          labelColor={
+            message?.assistant
+              ? personaInfo?.avatar
+                  ? null
+                  : 'red'
+              : 'green'
+          }
+          src={
+            (message?.assistant && personaInfo?.avatar) 
+              ? `http://localhost:8090/api/files/personas/${personaInfo?.id}/${personaInfo?.avatar}` 
+              : null
+          }
         />
       </S.Left>
       <S.Right>

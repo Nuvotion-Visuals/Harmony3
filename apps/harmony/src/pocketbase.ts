@@ -3,6 +3,7 @@ import { spawn } from 'child_process'
 import path from 'path'
 import { streamChatResponse } from './streamChatResponse'
 import { JsonValidator } from './JsonValidator'
+import { CollectionResponses, MessagesResponse } from './pocketbase-types'
 
 // Pocketbase Client
 const initPocketbaseClient = async () => {
@@ -103,35 +104,56 @@ const initPocketbaseClient = async () => {
 
     pb.collection('messages').subscribe('*', async (event: any) => {
       if (event.action === 'create' && event.record.userid !== systemId) {
-        let llmMessages
+        let messages
         const threadId = event.record.threadid
         let isFirstAssistantMessage = true
 
         try {
-          const messages = await pb.collection('messages').getFullList({
+          messages = await pb.collection('messages').getFullList({
             filter: `threadid="${threadId}"`,
             sort: 'created'
           })
 
-          llmMessages = messages.map((message: any) => ({
-            role: message.userid !== systemId ? 'user' : 'assistant',
-            content: message.text
-          }))
-
           // Check if this is the first assistant message in the thread
-          isFirstAssistantMessage = messages.every((message: any) => message.userid !== systemId)
+          isFirstAssistantMessage = messages.every((message: MessagesResponse) => message.userid !== systemId)
         }
         catch (e) {
           console.error(e)
         }
 
+        const personaId = messages?.[messages.length - 1].personaid
+        let persona: CollectionResponses['personas']  | null = null
+        if (personaId) {
+          persona = await pb.collection('personas').getOne(personaId)
+          const record = await pb.collection('messages').create({
+            text: `Your name is ${persona?.name}. System message: ${persona?.systemmessage}`, 
+            system: true,
+            userid: systemId, 
+            threadid: threadId,
+            personaid: personaId
+          })
+          messages = [...messages, record]
+        }
+        
+        let llmMessages = messages.map((message: any) => ({
+          role: message.userid !== systemId 
+            ? 'user' 
+            : message?.system
+              ? 'system'
+              : 'assistant',
+          content: message.text
+        }))
+
+        console.log('Replying to message')
         const assistantMessage = await pb.collection('messages').create({
           text: '', 
           userid: systemId, 
-          threadid: threadId
+          threadid: threadId,
+          personaid: personaId,
+          assistant: true
         })
 
-        streamChatResponse('groq', llmMessages, async (data) => {
+        streamChatResponse(persona?.provider || 'groq', llmMessages, async (data) => {
           if (data.endOfStream) {
             await pb.collection('messages').update(assistantMessage.id, {
               text: data.message.content
@@ -151,7 +173,7 @@ const initPocketbaseClient = async () => {
               }))
 
               const validator = new JsonValidator()
-              streamChatResponse('groq', [
+              streamChatResponse(persona?.provider || 'groq', [
                 {
                   role: 'system',
                   content: `You are an API endpoint that provides a name and description for message thread based on a propmt, which is a series of messages.

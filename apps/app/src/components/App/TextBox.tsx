@@ -121,6 +121,13 @@ export const TextBox = memo(({
               />
             })),
             {
+              text: 'Default Assistant',
+              icon: 'user',
+              iconPrefix: 'fas',
+              compact: true,
+              onClick: () => setActivePersonaId(null),
+            },
+            {
               text: 'Create',
               icon: 'user-plus',
               iconPrefix: 'fas',

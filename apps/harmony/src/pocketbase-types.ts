@@ -55,7 +55,9 @@ export type GroupsRecord = {
 }
 
 export type MessagesRecord = {
+	assistant?: boolean
 	personaid?: RecordIdString
+	system?: boolean
 	text?: string
 	threadid?: RecordIdString
 	userid?: RecordIdString
