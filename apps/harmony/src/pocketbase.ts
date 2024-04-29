@@ -131,7 +131,7 @@ const initPocketbaseClient = async () => {
           threadid: threadId
         })
 
-        streamChatResponse('openai', llmMessages, async (data) => {
+        streamChatResponse('groq', llmMessages, async (data) => {
           if (data.endOfStream) {
             await pb.collection('messages').update(assistantMessage.id, {
               text: data.message.content
@@ -151,7 +151,7 @@ const initPocketbaseClient = async () => {
               }))
 
               const validator = new JsonValidator()
-              streamChatResponse('openai', [
+              streamChatResponse('groq', [
                 {
                   role: 'system',
                   content: `You are an API endpoint that provides a name and description for message thread based on a propmt, which is a series of messages.

@@ -6,11 +6,13 @@ import { JsonValidator } from 'utils/JSONValidator'
 interface Props {
   name?: string
   description?: string
+  onSuggestions: (val: any) => void
 }
 
 export const SpaceSuggestions = ({
   name,
-  description
+  description,
+  onSuggestions
 }: Props) => {
   const [feedback, setFeedback] = useState('')
   const [groups, setGroups] = useState([])
@@ -45,7 +47,9 @@ export const SpaceSuggestions = ({
           const parsedGroups = jsonValidatorRef.current.parseJsonProperty(text, 'groups')
           if (Array.isArray(parsedGroups)) {
             setGroups(parsedGroups)
-          } else {
+            onSuggestions(parsedGroups)
+          } 
+          else {
             setGroups([])
             console.error('Received non-array groups data:', parsedGroups)
           }

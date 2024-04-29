@@ -44,7 +44,7 @@ export const generate_groups = ({
             }
           ]
         }
-
+        
         Prioritize the space description. Groups should always be related to the space name and description.
 
         Avoid suggesting groups which are too similar to existing groups in the space.
