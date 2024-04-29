@@ -154,30 +154,6 @@ export const Breadcrumbs = memo(({
             />
           </>
         }
-       
-        <Dropdown
-          icon='ellipsis-h'
-          iconPrefix='fas'
-          compact
-          square
-          minimal
-          items={[
-            {
-              icon: 'edit',
-              iconPrefix: 'fas',
-              compact: true,
-              text: 'Edit',
-              onClick: () => {},
-            },
-            {
-              icon: 'trash-alt',
-              iconPrefix: 'fas',
-              compact: true,
-              text: 'Delete',
-              onClick: () => {},
-            },
-          ]}
-        />
         </Box>
     </S.Breadcrumbs>
   )

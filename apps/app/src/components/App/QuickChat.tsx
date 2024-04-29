@@ -180,8 +180,7 @@ export const QuickChat = () => {
           />
         }
       </Gap>
-    <div id='quickchat_bottom'></div>
-
+      <div id='quickchat_bottom'></div>
     </S.Content>
 
     <S.TextBoxContainer ref={textBoxRef}>

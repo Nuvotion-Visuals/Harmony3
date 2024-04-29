@@ -18,7 +18,7 @@ import {
 import './index.css'
 import '@avsync.live/formation/dist/index.dark.css'
 import { App } from './App'
-import { Linker, Ripple } from '@avsync.live/formation'
+import { Dialog, DialogProvider, Linker, Ripple } from '@avsync.live/formation'
 import { Link } from 'components/Util/Link'
 import { RouteTracker } from 'components/App/RouteTracker'
 import { SignIn } from 'components/SignIn'
@@ -70,23 +70,26 @@ const Main = ({ }) => {
     <Provider store={store}>
       <BrowserRouter>
         <Linker CustomLink={Link}> 
-          <Ripple />
-          <Routes>
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/" element={<App><></></App>} />
-            <Route path="/profile" element={<App><RouteTracker /></App>} />
-            <Route path="/spaces" element={<App><RouteTracker /></App>}></Route>
-            <Route path="/spaces/:spaceid" element={<App><RouteTracker /></App>}>
-              <Route path="groups/:groupid" element={<App><RouteTracker /></App>}>
-                <Route path="channels/:channelid" element={<App><RouteTracker /></App>}>
-                  <Route path="threads/:threadid" element={<App><RouteTracker /></App>}>
-                    <Route path="messages/:messageid" element={<App><RouteTracker /></App>} />
+          <DialogProvider>
+            <Dialog />
+            <Ripple />
+            <Routes>
+              <Route path="/sign-in" element={<SignIn />} />
+              <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/" element={<App><></></App>} />
+              <Route path="/profile" element={<App><RouteTracker /></App>} />
+              <Route path="/spaces" element={<App><RouteTracker /></App>}></Route>
+              <Route path="/spaces/:spaceid" element={<App><RouteTracker /></App>}>
+                <Route path="groups/:groupid" element={<App><RouteTracker /></App>}>
+                  <Route path="channels/:channelid" element={<App><RouteTracker /></App>}>
+                    <Route path="threads/:threadid" element={<App><RouteTracker /></App>}>
+                      <Route path="messages/:messageid" element={<App><RouteTracker /></App>} />
+                    </Route>
                   </Route>
                 </Route>
               </Route>
-            </Route>
-          </Routes>
+            </Routes>
+          </DialogProvider>
         </Linker>
       </BrowserRouter>
     </Provider>

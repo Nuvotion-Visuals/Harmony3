@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from 'react'
 import styled from 'styled-components'
 import { useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
-import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, TextInput, onScrollWheelClick, scrollToElementById } from '@avsync.live/formation'
+import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, TextInput, onScrollWheelClick, scrollToElementById, useDialog } from '@avsync.live/formation'
 import { Message } from 'components/App/Message'
 import { pb } from 'redux-tk/pocketbase'
 import { generate_threadNameAndDescription } from 'language/generate/threadNameAndDescription'
@@ -10,6 +10,7 @@ import { store } from 'redux-tk/store'
 import { JsonValidator } from 'utils/JSONValidator'
 import { MessageSuggestions } from 'components/App/Suggestions/MessageSuggestions'
 import { Count } from 'components/App/Count'
+import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 
 interface Props {
   thread: any
@@ -33,6 +34,8 @@ export const Thread = memo(({
   const [name, setName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
   const [description, setDescription] = useState(thread?.description)
   const [edit, setEdit] = useState(false)
+
+  const { openDialog } = useDialog()
 
   useEffect(() => {
     setName(thread?.name)
@@ -83,6 +86,18 @@ export const Thread = memo(({
     setActiveThreadId(thread.id)
     onReply(thread.id)
   }, [thread.id])
+
+  const dialog = () => {
+    openDialog({
+      mode: 'confirm',
+      children: <ConfirmationMessage
+        message='Are you sure you want to delete this thread?'
+        name={thread?.name}
+        warning={`${thread?.messageIds?.length} messages will also be deleted.`}
+      />,
+      callback: shouldDelete => { if (shouldDelete) handleDelete() }
+    })
+  }
 
   const dropdownItems = useMemo(() => [
     {
@@ -185,11 +200,10 @@ export const Thread = memo(({
       text: 'Delete',
       onClick: (e) => {
         e.stopPropagation()
-        handleDelete()
+        dialog()
       },
     },
   ], [expanded]) as ItemProps[]
-
 
   return (
     <S.Container active={active}>
@@ -246,7 +260,7 @@ export const Thread = memo(({
                 headingText={name}
                 subtitle={description}
                 onClick={toggleExpanded}
-                onMouseDown={onScrollWheelClick(() => handleDelete())}
+                onMouseDown={onScrollWheelClick(() => dialog())}
               >
                 <Count
                   count={thread?.messageIds?.length}

@@ -2,7 +2,7 @@ import { Box, Spacer, AspectRatio, Gap, Item, Dropdown, ContextMenu, ItemProps }
 import React from 'react'
 import styled from 'styled-components'
 import { Counts } from 'components/App/Counts'
-import { useSpaces_countsById } from 'redux-tk/spaces/hooks'
+import { useSpaces_countById } from 'redux-tk/spaces/hooks'
 
 interface Props {
   id: string
@@ -37,7 +37,7 @@ export const SpaceCard = React.memo(({
     },
   ] as ItemProps[]
 
-  const count = useSpaces_countsById(id)
+  const count = useSpaces_countById(id)
 
   return (
     <AspectRatio

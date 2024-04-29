@@ -73,11 +73,33 @@ export const useSpaces_messageById = (id: string): MessagesResponse => {
   return useSelector(memoizedSelector, isEqual)
 }
 
-export const useSpaces_countsById = (id: string): { groups: number; channels: number; threads: number; messages: number } => {
+export const useSpaces_countById = (id: string): { groups: number; channels: number; threads: number; messages: number } => {
   const memoizedSelector = useMemo(() => {
     return state => {
-      const counts = selectors.selectCountsBySpaceId(state)
+      const counts = selectors.selectCountBySpaceId(state)
       return counts[id] || { groups: 0, channels: 0, threads: 0, messages: 0 }
+    }
+  }, [id])
+
+  return useSelector(memoizedSelector, isEqual)
+}
+
+export const useSpaces_countByGroupId = (id: string): { channels: number; threads: number; messages: number } => {
+  const memoizedSelector = useMemo(() => {
+    return state => {
+      const counts = selectors.selectCountsByGroupId(state)
+      return counts[id] || { channels: 0, threads: 0, messages: 0 }
+    }
+  }, [id])
+
+  return useSelector(memoizedSelector, isEqual)
+}
+
+export const useSpaces_countByChannelId = (id: string): { threads: number; messages: number } => {
+  const memoizedSelector = useMemo(() => {
+    return state => {
+      const counts = selectors.selectCountByChannelId(state)
+      return counts[id] || { threads: 0, messages: 0 }
     }
   }, [id])
 

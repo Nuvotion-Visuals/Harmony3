@@ -7,6 +7,7 @@ import {
   ContextMenu,
   ItemProps,
   LineBreak,
+  useDialog,
 } from '@avsync.live/formation'
 import { CreateChannel } from 'components/Create/CreateChannel'
 import { CreateGroup } from 'components/Create/CreateGroup'
@@ -16,6 +17,9 @@ import { useSpaces_activeChannelId, useSpaces_activeGroupId, useSpaces_activeSpa
 import { pb } from 'redux-tk/pocketbase'
 import styled from 'styled-components'
 import { Count } from 'components/App/Count'
+import * as selectors from 'redux-tk/spaces/selectors'
+import { store } from 'redux-tk/store'
+import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 
 type List = {
   id: string
@@ -60,6 +64,8 @@ const generateGroupsList = (groups, activeSpaceId, activeGroupId, activeChannelI
 
 export const Groups = React.memo(() => {
   const navigate = useNavigate()
+
+  const { openDialog } = useDialog()
 
   const activeSpace = useSpaces_activeSpace()
   const activeGroupId = useSpaces_activeGroupId()
@@ -128,7 +134,21 @@ export const Groups = React.memo(() => {
               iconPrefix: 'fas',
               compact: true,
               text: 'Delete',
-              onClick: () => handleDeleteGroup(expandableList?.id) 
+              onClick: (e) => {
+                const counts = selectors.selectCountsByGroupId(store.getState())
+                const count = counts?.[expandableList?.id]
+                e.stopPropagation()
+                openDialog({
+                  mode: 'confirm',
+                  children: <ConfirmationMessage
+                    message='Are you sure you want to delete this group?'
+                    // @ts-ignore
+                    name={expandableList?.value?.item?.text}
+                    warning={`${count?.channels} channels, ${count?.threads} threads, and ${count?.messages} messages will also be deleted.`}
+                  />,
+                  callback: shouldDelete => { if (shouldDelete) handleDeleteGroup(expandableList?.id) }
+                })
+              },
             }
           ] as ItemProps[]
 
@@ -185,8 +205,20 @@ export const Groups = React.memo(() => {
                       iconPrefix: 'fas',
                       compact: true,
                       text: 'Delete',
-                      onClick: () => handleDeleteChannel(listItem?.id)
-
+                      onClick: (e) => {
+                        const counts = selectors.selectCountByChannelId(store.getState())
+                        const count = counts?.[listItem?.id]
+                        e.stopPropagation()
+                        openDialog({
+                          mode: 'confirm',
+                          children: <ConfirmationMessage
+                            message='Are you sure you want to delete this channel?'
+                            name={listItem?.subtitle}
+                            warning={`${count?.threads} threads, and ${count?.messages} messages will also be deleted.`}
+                          />,
+                          callback: shouldDelete => { if (shouldDelete) handleDeleteChannel(listItem?.id) }
+                        })
+                      },
                     }
                   ] as ItemProps[]
                   return ({

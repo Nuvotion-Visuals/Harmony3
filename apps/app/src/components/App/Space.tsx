@@ -1,15 +1,20 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
-import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, LineBreak, AspectRatio, FileUpload, FileDrop } from '@avsync.live/formation'
+import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, LineBreak, AspectRatio, FileUpload, FileDrop, useDialog } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
-import { useSpaces_activeSpace } from 'redux-tk/spaces/hooks'
+import { useSpaces_activeSpace, useSpaces_countById } from 'redux-tk/spaces/hooks'
 import { GroupSuggestions } from './Suggestions/GroupSuggestions'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useRemoveQueryParam } from 'utils/removeEditQuery'
 import { Breadcrumbs } from './Breadcrumbs'
+import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
+import { Count } from './Count'
 
 export const Space = memo(() => {
   const navigate = useNavigate()
   const space = useSpaces_activeSpace()
+  const count = useSpaces_countById(space?.id)
+
+  const { openDialog } = useDialog()
 
   const [searchParams] = useSearchParams()
   const removeQueryParam = useRemoveQueryParam()
@@ -90,7 +95,18 @@ export const Space = memo(() => {
       iconPrefix: 'fas',
       compact: true,
       text: 'Delete',
-      onClick: handleDelete
+      onClick: (e) => {
+        e.stopPropagation()
+        openDialog({
+          mode: 'confirm',
+          children: <ConfirmationMessage
+            message='Are you sure you want to delete this space?'
+            name={space?.name}
+            warning={`${count?.groups} groups, ${count?.channels} channels, ${count?.threads} threads, and ${count?.messages} messages will also be deleted.`}
+          />,
+          callback: shouldDelete => { if (shouldDelete) handleDelete() }
+        })
+      },
     }
   ] as ItemProps[]
 
@@ -239,6 +255,10 @@ export const Space = memo(() => {
                     small
                   >
                     <Box height={'100%'}>
+                      <Count count={count?.groups} />
+                      <Count count={count?.channels} />
+                      <Count count={count?.threads} />
+                      <Count count={count?.messages} />
                       <Dropdown
                         icon='ellipsis-h'
                         iconPrefix='fas'

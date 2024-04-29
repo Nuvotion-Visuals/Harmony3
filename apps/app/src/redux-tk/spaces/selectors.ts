@@ -136,7 +136,7 @@ export const selectActiveChannelThreadsInfo = (state: State): { name: string, de
 }
 
 
-export const selectCountsBySpaceId = (state: State): Record<string, { groups: number; channels: number; threads: number; messages: number }> => {
+export const selectCountBySpaceId = (state: State): Record<string, { groups: number; channels: number; threads: number; messages: number }> => {
   const countsBySpaceId: Record<string, { groups: number; channels: number; threads: number; messages: number }> = {}
 
   // Initialize space counts structure
@@ -181,4 +181,58 @@ export const selectCountsBySpaceId = (state: State): Record<string, { groups: nu
   })
 
   return countsBySpaceId
+}
+
+export const selectCountsByGroupId = (state: State): Record<string, { channels: number; threads: number; messages: number }> => {
+  const countsByGroupId: Record<string, { channels: number; threads: number; messages: number }> = {}
+
+  state.spaces.groups.forEach(group => {
+    countsByGroupId[group.id] = { channels: 0, threads: 0, messages: 0 }
+  })
+
+  state.spaces.channels.forEach(channel => {
+    if (countsByGroupId[channel.groupid]) {
+      countsByGroupId[channel.groupid].channels++
+    }
+  })
+
+  state.spaces.threads.forEach(thread => {
+    const groupId = state.spaces.channels.find(channel => channel.id === thread.channelid)?.groupid
+    if (groupId && countsByGroupId[groupId]) {
+      countsByGroupId[groupId].threads++
+    }
+  })
+
+  state.spaces.messages.forEach(message => {
+    const channelId = state.spaces.threads.find(thread => thread.id === message.threadid)?.channelid
+    const groupId = channelId ? state.spaces.channels.find(channel => channel.id === channelId)?.groupid : undefined
+    if (groupId && countsByGroupId[groupId]) {
+      countsByGroupId[groupId].messages++
+    }
+  })
+
+  return countsByGroupId
+}
+
+export const selectCountByChannelId = (state: State): Record<string, { threads: number; messages: number }> => {
+  const countsByChannelId: Record<string, { threads: number; messages: number }> = {}
+
+  state.spaces.channels.forEach(channel => {
+    countsByChannelId[channel.id] = { threads: 0, messages: 0 }
+  })
+
+  state.spaces.threads.forEach(thread => {
+    if (countsByChannelId[thread.channelid]) {
+      countsByChannelId[thread.channelid].threads++
+    }
+  })
+
+  state.spaces.messages.forEach(message => {
+    const channelId = state.spaces.threads.find(thread => thread.id === message.threadid)?.channelid
+    if (channelId && countsByChannelId[channelId]) {
+      countsByChannelId[channelId].messages++
+    }
+  })
+
+  return countsByChannelId
 }

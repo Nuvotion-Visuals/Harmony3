@@ -1,9 +1,12 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
-import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, FileUpload, AspectRatio, LineBreak, FileDrop } from '@avsync.live/formation'
+import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, FileUpload, AspectRatio, LineBreak, FileDrop, useDialog } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { ThreadSuggestions } from 'components/App/Suggestions/ThreadSuggestions'
 import { useSearchParams } from 'react-router-dom'
 import { useRemoveQueryParam } from 'utils/removeEditQuery'
+import { useSpaces_countByChannelId } from 'redux-tk/spaces/hooks'
+import { Count } from './Count'
+import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 
 interface Props {
   channel: any
@@ -12,6 +15,9 @@ interface Props {
 export const ChannelHeader = memo(({ channel }: Props) => {
   const [searchParams] = useSearchParams()
   const removeQueryParam = useRemoveQueryParam()
+  const count = useSpaces_countByChannelId(channel?.id)
+
+  const { openDialog } = useDialog()
 
   const [edit, setEdit] = useState(!!searchParams.get('edit'))
 
@@ -82,7 +88,18 @@ export const ChannelHeader = memo(({ channel }: Props) => {
       iconPrefix: 'fas',
       compact: true,
       text: 'Delete',
-      onClick: handleDelete
+      onClick: (e) => {
+        e.stopPropagation()
+        openDialog({
+          mode: 'confirm',
+          children: <ConfirmationMessage
+            message='Are you sure you want to delete this channel?'
+            name={channel?.name}
+            warning={`${count?.threads} threads, and ${count?.messages} messages will also be deleted.`}
+          />,
+          callback: shouldDelete => { if (shouldDelete) handleDelete() }
+        })
+      },
     }
   ] as ItemProps[]
 
@@ -186,6 +203,8 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                     small
                   >
                     <Box height={'100%'}>
+                      <Count count={count?.threads} />
+                      <Count count={count?.messages} />
                       <Dropdown
                         icon='ellipsis-h'
                         iconPrefix='fas'

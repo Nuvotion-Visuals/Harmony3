@@ -1,20 +1,25 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
-import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, AspectRatio, FileUpload, LineBreak, FileDrop } from '@avsync.live/formation'
+import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, StyleHTML, markdownToHTML, RichTextEditor, AspectRatio, FileUpload, LineBreak, FileDrop, useDialog } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
-import { useSpaces_activeGroup, useSpaces_activeSpaceId, useSpaces_setActiveChannelId } from 'redux-tk/spaces/hooks'
+import { useSpaces_activeGroup, useSpaces_activeSpaceId, useSpaces_countByGroupId, useSpaces_setActiveChannelId } from 'redux-tk/spaces/hooks'
 import { ChannelSuggestions } from 'components/App/Suggestions/ChannelSuggestions'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useRemoveQueryParam } from 'utils/removeEditQuery'
 import { Breadcrumbs } from './Breadcrumbs'
+import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
+import { Count } from './Count'
 
 export const Group = memo(() => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const removeQueryParam = useRemoveQueryParam()
 
+  const { openDialog } = useDialog()
+
   const activeSpaceId = useSpaces_activeSpaceId()
   const setActiveChannelId = useSpaces_setActiveChannelId()
   const group = useSpaces_activeGroup()
+  const count = useSpaces_countByGroupId(group?.id)
 
   useEffect(() => {
     setActiveChannelId(null)
@@ -90,7 +95,18 @@ export const Group = memo(() => {
       iconPrefix: 'fas',
       compact: true,
       text: 'Delete',
-      onClick: handleDelete
+      onClick: (e) => {
+        e.stopPropagation()
+        openDialog({
+          mode: 'confirm',
+          children: <ConfirmationMessage
+            message='Are you sure you want to delete this group?'
+            name={group?.name}
+            warning={`${count?.channels} channels, ${count?.threads} threads, and ${count?.messages} messages will also be deleted.`}
+          />,
+          callback: shouldDelete => { if (shouldDelete) handleDelete() }
+        })
+      },
     }
   ] as ItemProps[]
 
@@ -195,6 +211,9 @@ export const Group = memo(() => {
                     small
                   >
                     <Box height={'100%'}>
+                      <Count count={count?.channels} />
+                      <Count count={count?.threads} />
+                      <Count count={count?.messages} />
                       <Dropdown
                         icon='ellipsis-h'
                         iconPrefix='fas'
