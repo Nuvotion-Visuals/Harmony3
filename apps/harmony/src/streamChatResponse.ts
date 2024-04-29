@@ -1,5 +1,7 @@
 import ollama from 'ollama'
 import OpenAI from 'openai'
+import { throttle } from 'lodash'
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 })
@@ -19,6 +21,7 @@ type StreamCallback = (data: StreamResponsePart) => void
 
 export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq', messages: any, callback: StreamCallback) => {
   let fullResponse: string[] = []
+  const throttledCallback = throttle(callback, 16.67)
 
   try {
     switch (provider) {
@@ -30,7 +33,7 @@ export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq',
         })
         for await (const part of ollamaResponse) {
           fullResponse.push(part.message.content)
-          callback({
+          throttledCallback({
             message: {
               content: fullResponse.join('')
             }
@@ -47,7 +50,7 @@ export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq',
         for await (const chunk of openaiStream) {
           const content = chunk.choices[0]?.delta?.content || ''
           fullResponse.push(content)
-          callback({
+          throttledCallback({
             message: {
               content: fullResponse.join('')
             }
@@ -64,7 +67,7 @@ export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq',
         for await (const chunk of groqStream) {
           const content = chunk.choices[0]?.delta?.content || ''
           fullResponse.push(content)
-          callback({
+          throttledCallback({
             message: {
               content: fullResponse.join('')
             }
@@ -73,7 +76,7 @@ export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq',
         break
     }
 
-    callback({ message: { content: fullResponse.join('') }, endOfStream: true });
+    throttledCallback({ message: { content: fullResponse.join('') }, endOfStream: true })
   } 
   catch (error) {
     console.error('Error streaming response:', error)
