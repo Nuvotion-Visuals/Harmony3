@@ -5,17 +5,19 @@ import styled from 'styled-components'
 import { speak } from '../../language/speech'
 import { TextBox } from './TextBox' 
 import { useSpaces_currentUserId, useSpaces_namesByUserId } from 'redux-tk/spaces/hooks'
+import { usePersonas_activePersona } from 'redux-tk/personas/hooks'
 
 const Message = memo(({
   role,
   content,
-  index
+  index,
 }: {
   role: string,
   content: string,
-  index: number
+  index: number,
 }) => {
   const currentUserId = useSpaces_currentUserId()
+  const activePersona = usePersonas_activePersona()
   const namesByUserId = useSpaces_namesByUserId()
   const name = namesByUserId?.[currentUserId]
 
@@ -23,13 +25,30 @@ const Message = memo(({
     <S.Message id={`quickchat_message_${index}`}>
       <S.Left>
         <Avatar
-          name={role === 'user' ? name : 'Harmony'}
-          labelColor={role === 'user' ? 'green' : 'red'}
+          name={
+            role === 'user' 
+              ? name 
+              : activePersona?.name
+                ? activePersona?.name
+                : 'Assistant'
+          }
+          labelColor={
+            role === 'user' 
+              ? 'green' 
+              : activePersona?.avatar ? null : 'red'
+          }
+          src={(role === 'assistant' && activePersona?.avatar) ? `http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}` : null}
         />
       </S.Left>
       <S.Right>
         <Item
-          subtitle={role === 'user' ? name : 'Harmony'}
+          subtitle={
+            role === 'user' 
+              ? name 
+              : activePersona?.name
+                ? activePersona?.name
+                : 'Assistant'
+          }
           disablePadding
           disableBreak
         >
@@ -63,6 +82,8 @@ export const QuickChat = () => {
   const [textBoxHeight, setTextBoxHeight] = useState(0)
   const textBoxRef = React.createRef<HTMLDivElement>()
 
+  const activePersona = usePersonas_activePersona()
+
   useEffect(() => {
     scrollToElementById('quickchat_bottom', { behavior: 'auto', block: 'end'})
   }, [messages])
@@ -94,6 +115,7 @@ export const QuickChat = () => {
 
   const sendMessage = (message: string) => {
     const newMessages = [
+      ...[{ role: 'system', content: `Your name: ${activePersona?.name}, System message: ${activePersona?.systemmessage}`}].filter(_ => activePersona?.id),
       ...messages,
       { role: 'user', content: message }
     ]
@@ -101,6 +123,8 @@ export const QuickChat = () => {
 
     chat({
       messages: newMessages,
+      provider: activePersona?.provider,
+      model: activePersona?.model,
       onPartial: response => {
         setStream(response)
         scrollToElementById('quickchat_bottom', { behavior: 'auto', block: 'end'})
@@ -165,7 +189,7 @@ export const QuickChat = () => {
       <div id='quickchat_top'></div>
       <Gap>
         {
-          messages.map((message, index) =>
+          messages.filter(message => message.role !== 'system').map((message, index) =>
             <Message
               role={message.role}
               content={markdownToHTML(message.content)}

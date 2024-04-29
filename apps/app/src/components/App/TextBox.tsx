@@ -1,8 +1,10 @@
 import { memo, useEffect, useState } from 'react'
-import { Button, Item, RichTextEditor, scrollToElementById } from '@avsync.live/formation'
+import { Button, Dropdown, Item, RichTextEditor, scrollToElementById } from '@avsync.live/formation'
 import { useSpaces_activeChannelId, useSpaces_activeThread, useSpaces_currentUserId, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
 import styled from 'styled-components'
 import { pb } from 'redux-tk/pocketbase'
+import { usePersonas_activePersona, usePersonas_personas, usePersonas_setActivePersonaId } from 'redux-tk/personas/hooks'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {
   onNewThreadId?: (threadId: string) => void
@@ -15,11 +17,15 @@ export const TextBox = memo(({
   activeThreadId,
   onSend,
 }: Props) => {
+  const navigate = useNavigate()
   const [text, setText] = useState('')
   const setActiveThreadId = useSpaces_setActiveThreadId()
   const activeChannelId = useSpaces_activeChannelId()
   const activeThread = useSpaces_activeThread()
   const userId = useSpaces_currentUserId()
+  const personas = usePersonas_personas()
+  const activePersona = usePersonas_activePersona()
+  const setActivePersonaId = usePersonas_setActivePersonaId()
 
   const sendMessage = async (text) => {
     if (onSend) {
@@ -57,7 +63,8 @@ export const TextBox = memo(({
         await pb.collection('messages').create({
           text,
           userid: userId,
-          threadid: threadId
+          threadid: threadId,
+          personaid: activePersona?.id
         })
         setText('')
       } 
@@ -85,6 +92,45 @@ export const TextBox = memo(({
 
   return (
     <S.Wrapper>
+      <Item
+        src={activePersona?.avatar ? `http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}` : null}
+        subtitle={activePersona?.name}
+        absoluteRightChildren
+        compact
+      >
+        <Dropdown
+          icon='ellipsis-h'
+          iconPrefix='fas'
+          maxWidth='12rem'
+          compact
+          minimal
+          items={[
+            ...personas.map(persona => ({
+              src: persona?.avatar ? `http://localhost:8090/api/files/personas/${persona?.id}/${persona?.avatar}` : undefined,
+              text: persona?.name,
+              subtitle: `${persona?.description} · ${persona?.provider} · ${persona?.model}`,
+              onClick: () => setActivePersonaId(persona?.id),
+              absoluteRightChildren: true,
+              children: <Button
+                icon='gear'
+                iconPrefix='fas'
+                compact
+                square
+                minimal
+                onClick={() => navigate(`/personas/${persona?.id}`)}
+              />
+            })),
+            {
+              text: 'Create',
+              icon: 'user-plus',
+              iconPrefix: 'fas',
+              href: '/personas/create',
+              compact: true,
+            }
+        ]}
+        />
+      </Item>
+
       {
         activeThreadId &&
           <Item
@@ -102,11 +148,11 @@ export const TextBox = memo(({
                 setActiveThreadId(null)
               }}
               compact
-              square
               minimal
             />
           </Item>
       }
+
       <S.TextBox onClick={() => {
          setAutoFocus(true)
          setTimeout(() => {
