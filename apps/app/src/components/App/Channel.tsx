@@ -6,6 +6,7 @@ import { TextBox } from './TextBox'
 import { Thread } from './Thread'
 import { ChannelHeader } from './ChannelHeader'
 import { Breadcrumbs } from './Breadcrumbs'
+import useDynamicHeight from 'components/Hooks/useDynamicHeight'
 
 export const Channel = () => {
   const activeChannelThreads = useSpaces_activeChannelThreads()
@@ -13,33 +14,7 @@ export const Channel = () => {
   const activeChannel = useSpaces_activeChannel()
   const setActiveThreadId = useSpaces_setActiveThreadId()
 
-  const [textBoxHeight, setTextBoxHeight] = useState(0)
-  const textBoxRef = React.createRef<HTMLDivElement>()
-
-  useEffect(() => {
-    const updateHeight = () => {
-      if (textBoxRef.current) {
-        const newHeight = window.innerHeight - textBoxRef.current.clientHeight - 26 - 16
-        setTextBoxHeight(newHeight)
-      }
-    }
-
-    const resizeObserver = new ResizeObserver(entries => {
-      for (let _ of entries) {
-        updateHeight()
-      }
-    })
-
-    if (textBoxRef.current) {
-      resizeObserver.observe(textBoxRef.current)
-    }
-
-    updateHeight()
-
-    return () => {
-      resizeObserver.disconnect()
-    }
-  }, [textBoxRef])
+  const { ref, height } = useDynamicHeight('channel_height', 41)
 
   const [expandedStates, setExpandedStates] = useState(new Array(activeChannelThreads.length).fill(false))
   const [anyExpanded, setAnyExpanded] = useState(false)
@@ -104,7 +79,7 @@ export const Channel = () => {
       anyExpanded={anyExpanded}
       toggleAll={toggleAll}
     />
-    <S.Content height={textBoxHeight}>
+    <S.Content height={height}>
       <div id='top' />
       <ChannelHeader
         channel={activeChannel}
@@ -126,7 +101,7 @@ export const Channel = () => {
       </Page>
       <div id='bottom' />
     </S.Content>
-    <S.TextBoxContainer ref={textBoxRef}>
+    <S.TextBoxContainer ref={ref}>
       <TextBox 
         onNewThreadId={handleNewThreadId}
         activeThreadId={activeThreadId}

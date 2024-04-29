@@ -7,6 +7,7 @@ import { TextBox } from 'components/App/TextBox'
 import { useSpaces_currentUserId, useSpaces_namesByUserId } from 'redux-tk/spaces/hooks'
 import { usePersonas_activePersona } from 'redux-tk/personas/hooks'
 import { createImages } from 'vision/createImages'
+import useDynamicHeight from 'components/Hooks/useDynamicHeight'
 
 const Message = memo(({
   role,
@@ -98,39 +99,13 @@ export const CreateImages = () => {
   const [stream, setStream] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const [textBoxHeight, setTextBoxHeight] = useState(0)
-  const textBoxRef = React.createRef<HTMLDivElement>()
-
   const activePersona = usePersonas_activePersona()
 
   useEffect(() => {
     scrollToElementById('images_bottom', { behavior: 'auto', block: 'end'})
   }, [messages])
 
-  useEffect(() => {
-    const updateHeight = () => {
-      if (textBoxRef.current) {
-        const newHeight = window.innerHeight - textBoxRef.current.clientHeight - 26 - 16 - 40
-        setTextBoxHeight(newHeight)
-      }
-    }
-
-    const resizeObserver = new ResizeObserver(entries => {
-      for (let _ of entries) {
-        updateHeight()
-      }
-    })
-
-    if (textBoxRef.current) {
-      resizeObserver.observe(textBoxRef.current)
-    }
-
-    updateHeight()
-
-    return () => {
-      resizeObserver.disconnect()
-    }
-  }, [textBoxRef])
+  const { ref, height } = useDynamicHeight('createImage_height', 82)
 
   const [size, setSize] = useState('1024x1024')
   const [model, setModel] = useState('dall-e-3')
@@ -238,7 +213,7 @@ export const CreateImages = () => {
         </Gap>
       </Item>
     </Box>
-    <S.Content height={textBoxHeight}>
+    <S.Content height={height}>
       <div id='images_top'></div>
       <Gap>
         {
@@ -266,7 +241,7 @@ export const CreateImages = () => {
       <div id='images_bottom'></div>
     </S.Content>
 
-    <S.TextBoxContainer ref={textBoxRef}>
+    <S.TextBoxContainer ref={ref}>
       <Box width='100%'>
         <Dropdown
           text={model === 'dall-e-3' ? 'Dall-E 3' : 'Dall-E 2'}

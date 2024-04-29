@@ -6,6 +6,7 @@ import { speak } from 'language/speech'
 import { TextBox } from 'components/App/TextBox' 
 import { useSpaces_currentUserId, useSpaces_namesByUserId } from 'redux-tk/spaces/hooks'
 import { usePersonas_activePersona } from 'redux-tk/personas/hooks'
+import useDynamicHeight from 'components/Hooks/useDynamicHeight'
 
 const Message = memo(({
   role,
@@ -83,39 +84,13 @@ export const QuickChat = () => {
     localStorage.setItem('tools_quickChat_messages', JSON.stringify(messages))
   }, [messages])
 
-  const [textBoxHeight, setTextBoxHeight] = useState(0)
-  const textBoxRef = React.createRef<HTMLDivElement>()
-
   const activePersona = usePersonas_activePersona()
 
   useEffect(() => {
     scrollToElementById('quickchat_bottom', { behavior: 'auto', block: 'end'})
   }, [messages])
 
-  useEffect(() => {
-    const updateHeight = () => {
-      if (textBoxRef.current) {
-        const newHeight = window.innerHeight - textBoxRef.current.clientHeight - 26 - 16 - 40
-        setTextBoxHeight(newHeight)
-      }
-    }
-
-    const resizeObserver = new ResizeObserver(entries => {
-      for (let _ of entries) {
-        updateHeight()
-      }
-    })
-
-    if (textBoxRef.current) {
-      resizeObserver.observe(textBoxRef.current)
-    }
-
-    updateHeight()
-
-    return () => {
-      resizeObserver.disconnect()
-    }
-  }, [textBoxRef])
+  const { ref, height } = useDynamicHeight('quickChat_height', 82)
 
   const sendMessage = (message: string) => {
     const newMessages = [
@@ -188,7 +163,7 @@ export const QuickChat = () => {
         </Gap>
       </Item>
     </Box>
-    <S.Content height={textBoxHeight}>
+    <S.Content height={height}>
       <div id='quickchat_top'></div>
       <Gap>
         {
@@ -210,7 +185,7 @@ export const QuickChat = () => {
       <div id='quickchat_bottom'></div>
     </S.Content>
 
-    <S.TextBoxContainer ref={textBoxRef}>
+    <S.TextBoxContainer ref={ref}>
       <TextBox
         onSend={(msg) => sendMessage(msg)}
       />

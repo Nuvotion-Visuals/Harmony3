@@ -81,7 +81,7 @@ const S = {
     }
   `,
   SidebarContainer: styled.div`
-    height: calc(calc(100vh - calc(1 * var(--F_Header_Height))) - .25rem);
+    height: calc(calc(100vh - calc(1 * var(--F_Header_Height))) - 6px);
     width: 100%;
     overflow-y: auto;
   `
