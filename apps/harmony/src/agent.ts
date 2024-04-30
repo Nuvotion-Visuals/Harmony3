@@ -49,8 +49,11 @@ const fetchMainContent = FunctionTool.from(
   },
 );
 
+import { argv } from 'process'
 
-async function main(debug: boolean = false) {
+async function main() {
+  const message = argv[2]
+
   const agent = new ReActAgent({
     tools: [fetchMainContent],
     chatHistory: [
@@ -72,11 +75,12 @@ async function main(debug: boolean = false) {
   })
 
   const response = await agent.chat({
-    message: "What device is used to hook up the CRTs? https://avsync.live/tutorials/making-a-crt-video-wall-controller"
+    message
   })
   console.log(JSON.stringify(response))
 }
 
-void main(true).then(() => {
+void main().then(() => {
   console.log("Done")
 })
+

@@ -12,7 +12,6 @@
     "dev": "npm run build && electron .",
     "pack": "rm -rf ./dist && npm run build && npm run copy-assets && electron-builder --dir",
     "dist": "rm -rf ./dist && npm run build && npm run copy-assets && electron-builder",
-    "agent": "cross-env GROQ_API_KEY=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 node dist/agent.js",
     "generate-types": "npx pocketbase-typegen --db pocketbase/pb_data/data.db --out src/pocketbase-types.ts && cp src/pocketbase-types.ts ../app/src/redux-tk"
   },
   "build": {
@@ -35,7 +34,6 @@
   "dependencies": {
     "@mozilla/readability": "^0.5.0",
     "cors": "^2.8.5",
-    "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "electron-log": "^5.0.3",
     "electron-updater": "^6.1.7",
@@ -60,6 +58,7 @@
     "@types/jsdom": "^21.1.6",
     "@types/lodash": "^4.17.0",
     "@types/node": "^20.9.0",
+    "cross-env": "^7.0.3",
     "electron": "^28.1.3",
     "electron-builder": "^24.9.1",
     "nodemon": "^3.0.1",
