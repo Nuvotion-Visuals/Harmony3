@@ -138,7 +138,7 @@ export const Group = memo(() => {
                             }}
                           >
                             <AspectRatio
-                              ratio={4/1}
+                              ratio={3/1}
                               backgroundSrc={banner}
                               coverBackground
                               borderRadius={1}
@@ -221,7 +221,7 @@ export const Group = memo(() => {
                 >
                   {
                     banner && <AspectRatio
-                      ratio={4/1}
+                      ratio={3/1}
                       backgroundSrc={banner}
                       coverBackground
                       borderRadius={1}

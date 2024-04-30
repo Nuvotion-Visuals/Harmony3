@@ -7,7 +7,6 @@ import { pb } from 'redux-tk/pocketbase'
 import { UsersResponse } from 'redux-tk/pocketbase-types'
 import { matchPath, useLocation, useNavigate } from 'react-router-dom'
 import SpacesDashboard from 'components/App/SpacesDashboard'
-import { CreateSpace } from 'components/Create/CreateSpace'
 import { Space } from 'components/App/Space'
 import { Group } from 'components/App/Group'
 import { Profile } from 'components/App/Profile/Profile'
@@ -54,7 +53,7 @@ export const App = ({ children }: Props) => {
     }
 
     if (location.pathname === '/spaces/create') {
-      return <CreateSpace />
+      return <Space create />
     }
 
     if (location.pathname.startsWith('/personas')) {

@@ -10,8 +10,9 @@ import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 import { Count } from './Count'
 import { ImageDropTarget } from 'components/Util/ImageDrop'
 import { ImageSuggestions } from './Suggestions/ImageSuggestions'
+import { SpaceSuggestions } from './Suggestions/SpaceSuggestions'
 
-export const Space = memo(() => {
+export const Space = memo(({ create }: { create?: boolean }) => {
   const navigate = useNavigate()
   const space = useSpaces_activeSpace()
   const count = useSpaces_countById(space?.id)
@@ -21,7 +22,7 @@ export const Space = memo(() => {
   const [searchParams] = useSearchParams()
   const removeQueryParam = useRemoveQueryParam()
 
-  const [edit, setEdit] = useState(!!searchParams.get('edit'))
+  const [edit, setEdit] = useState(!!searchParams.get('edit') || create)
 
   const [name, setName] = useState(space?.name)
   const [description, setDescription] = useState(space?.description)
@@ -32,11 +33,11 @@ export const Space = memo(() => {
   const [iconFile, setIconFile] = useState(null)
 
   useEffect(() => {
-    setName(space?.name)
-    setDescription(space?.description)
-    setBanner(space?.banner ? `http://localhost:8090/api/files/spaces/${space.id}/${space.banner}` : null)
-    setIcon(space?.icon ? `http://localhost:8090/api/files/spaces/${space.id}/${space.icon}` : null)
-  }, [space])
+    setName(create ? '' : space?.name)
+    setDescription(create ? '' : space?.description)
+    setBanner(create ? '' : space?.banner ? `http://localhost:8090/api/files/spaces/${space.id}/${space.banner}` : null)
+    setIcon(create ? '' : space?.icon ? `http://localhost:8090/api/files/spaces/${space.id}/${space.icon}` : null)
+  }, [space, create])
 
   const handleDelete = async () => {
     try {
@@ -112,17 +113,59 @@ export const Space = memo(() => {
     }
   ] as ItemProps[]
 
+  const [suggestions, setSuggestions] = useState<any[]>()
+
+  async function handleCreate() {
+    try {
+      const formData = new FormData()
+      if (bannerFile) {
+        formData.append('banner', bannerFile)
+      }
+      if (iconFile) {
+        formData.append('icon', iconFile)
+      }
+      formData.append('name', name)
+      formData.append('description', description)
+      const response = await pb.collection('spaces').create(formData)
+      if (suggestions && suggestions.length > 0 && response.id) {
+        for (const group of suggestions) {
+          const groupResponse = await pb.collection('groups').create({ 
+            name: group.name, 
+            description: group.description, 
+            spaceid: response.id 
+          })
+          for (const channel of group.channels) {
+            await pb.collection('channels').create({ 
+              name: channel.name, 
+              description: channel.description, 
+              groupid: groupResponse.id 
+            })
+          }
+        }
+      }
+      navigate(`/spaces/${response.id}`)
+    } 
+    catch (error) {
+      console.error('Failed to create space:', error)
+      alert('Error creating space. Check console for details.')
+    }
+  }
+
   return (<>
-    <Breadcrumbs />
+    {
+      !create && <Breadcrumbs />
+    }
     <Page>
-      <Box width='100%' py={.5}>
+      <Box width='100%' py={.5} wrap>
+        {
+          create && <Item pageTitle='Create space' disablePadding />
+        }
         {
             edit
               ? <Box width='100%' mt={.5}>
                   <Gap disableWrap>
                     <Gap>
                       <Gap disableWrap>
-                        
                           {
                             icon && <Box width={10}>
                               <ImageDropTarget
@@ -168,7 +211,7 @@ export const Space = memo(() => {
                               }}
                             >
                               <AspectRatio
-                                ratio={4/1}
+                                ratio={3/1}
                                 backgroundSrc={banner}
                                 coverBackground
                                 borderRadius={1}
@@ -181,9 +224,9 @@ export const Space = memo(() => {
                       <ImageSuggestions 
                         placeholder='Suggest an icon'
                         prompt={`
-                          This is for an icon. It must look good when very small.
-                          Space name: ${space?.name}
-                          Description: ${space?.description}
+                          This is for an icon. It must look good when small.
+                          Space name: ${name}
+                          Description: ${description}
                         `}
                         onFileReady={(file) => {
                           setIconFile(file)
@@ -213,8 +256,8 @@ export const Space = memo(() => {
                       <ImageSuggestions 
                         placeholder='Suggest a banner'
                         prompt={`
-                          Space name: ${space?.name}
-                          Description: ${space?.description}
+                          Space name: ${name}
+                          Description: ${description}
                         `}
                         onFileReady={(file) => {
                           setBannerFile(file)
@@ -249,18 +292,21 @@ export const Space = memo(() => {
                           onEnter={handleUpdate}
                           hero
                         />
-                        <Button
-                          icon='times'
-                          iconPrefix='fas'
-                          square
-                          onClick={handleCancelEdit}
-                          hero
-                        />
+                        {
+                          !create && <Button
+                            icon='times'
+                            iconPrefix='fas'
+                            square
+                            onClick={handleCancelEdit}
+                            hero
+                          />
+                        }
+                       
                         <Button
                           icon='check'
                           iconPrefix='fas'
                           square
-                          onClick={handleUpdate}
+                          onClick={create ? handleCreate : handleUpdate}
                           hero
                           primary
                         />
@@ -283,7 +329,7 @@ export const Space = memo(() => {
                 >
                   {
                     banner && <AspectRatio
-                      ratio={4/1}
+                      ratio={3/1}
                       backgroundSrc={banner}
                       coverBackground
                       borderRadius={1}
@@ -318,6 +364,13 @@ export const Space = memo(() => {
                 </ContextMenu> 
         }
       </Box>
+      {
+        create && <SpaceSuggestions 
+          onSuggestions={(val) => setSuggestions(val)}
+          name={name}
+          description={description}
+        />
+      }
     </Page>
   </>)
 })

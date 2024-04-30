@@ -130,7 +130,7 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                             }}
                           >
                             <AspectRatio
-                              ratio={4/1}
+                              ratio={3/1}
                               backgroundSrc={banner}
                               coverBackground
                               borderRadius={1}
@@ -212,7 +212,7 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                 >
                   {
                     banner && <AspectRatio
-                      ratio={4/1}
+                      ratio={3/1}
                       backgroundSrc={banner}
                       coverBackground
                       borderRadius={1}

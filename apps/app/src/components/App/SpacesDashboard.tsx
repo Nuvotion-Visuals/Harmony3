@@ -35,7 +35,7 @@ const SpacesDashboard = () => {
 
           <Link href='/spaces/create'>
             <S.AddContainer>
-              <AspectRatio ratio={4/1}>
+              <AspectRatio ratio={3/1}>
                 <Icon icon='plus' iconPrefix='fas' size='xl' />
               </AspectRatio>
             </S.AddContainer>

@@ -28,7 +28,6 @@ export const ImageSuggestions = ({
 
   const onSuggest = () => {
     setSuggestions([])
-    setFeedback('')
     generate_image({
       prompt: `
         ${prompt} 

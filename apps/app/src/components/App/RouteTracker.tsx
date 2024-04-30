@@ -30,7 +30,6 @@ export const RouteTracker = () => {
     setActiveMessageId(messageid)
     if (location.pathname === '/spaces') {
       const spaceId = spaces?.[0]?.id
-
         navigate(
           spaceId
           ? `/spaces/${spaceId}`

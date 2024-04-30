@@ -21,24 +21,37 @@ const Message = memo(({
   const activePersona = usePersonas_activePersona()
   const usersById = useSpaces_usersById()
   const name = usersById?.[currentUserId]?.name
+  const avatar = usersById?.[currentUserId]?.avatar
 
   return (
     <S.Message id={`quickchat_message_${index}`}>
       <S.Left>
         <Avatar
           name={
-            role === 'user' 
-              ? name 
-              : activePersona?.name
-                ? activePersona?.name
-                : 'Assistant'
+            role === 'assistant'
+              ? activePersona?.name
+                  ? activePersona?.name
+                  : 'Assistant'
+              : name
           }
           labelColor={
-            role === 'user' 
-              ? 'green' 
-              : activePersona?.avatar ? null : 'red'
+            role === 'assistant'
+              ? activePersona?.avatar
+                  ? null
+                  : 'red'
+              : avatar
+                ? null
+                : 'green'
           }
-          src={(role === 'assistant' && activePersona?.avatar) ? `http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}` : null}
+          src={
+            role === 'assistant'
+              ? (role === 'assistant' && activePersona?.avatar) 
+                  ? `http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}` 
+                  : null
+              : avatar
+                ? `http://localhost:8090/api/files/users/${currentUserId}/${avatar}` 
+                : null
+          }
         />
       </S.Left>
       <S.Right>

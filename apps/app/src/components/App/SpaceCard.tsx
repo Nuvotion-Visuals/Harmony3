@@ -41,7 +41,7 @@ export const SpaceCard = React.memo(({
 
   return (
     <AspectRatio
-      ratio={4/1}
+      ratio={3/1}
     >
     <ContextMenu
       dropdownProps={{
@@ -77,7 +77,7 @@ export const SpaceCard = React.memo(({
             
             </S.OverlayBottom>
             <AspectRatio
-              ratio={previewSrc ? 4/1 : 4/1}
+              ratio={previewSrc ? 3/1 : 3/1}
               backgroundSrc={previewSrc ? previewSrc : undefined}
               coverBackground
             />
