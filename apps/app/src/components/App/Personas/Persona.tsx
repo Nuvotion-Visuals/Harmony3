@@ -229,7 +229,7 @@ export const Persona = () => {
                       />
                     }
                     <Button
-                      icon={activePersona?.id ? 'save' : 'user-plus'}
+                      icon={activePersona?.id ? 'check' : 'user-plus'}
                       iconPrefix='fas'
                       hero
                       square
@@ -303,15 +303,18 @@ export const Persona = () => {
                 }}
               >
                 <Gap>
-                  <Box width='100%'>
-                    <Box width={8}>
-                      <AspectRatio
-                        ratio={1}
-                        borderRadius={500}
-                        backgroundSrc={avatar}
-                      />
+                  {
+                    avatar && <Box width='100%'>
+                      <Box width={8}>
+                        <AspectRatio
+                          ratio={1}
+                          borderRadius={500}
+                          backgroundSrc={avatar}
+                        />
+                      </Box>
                     </Box>
-                  </Box>
+                  }
+                  
                   <Item
                     pageTitle={activePersona?.name}
                     disablePadding

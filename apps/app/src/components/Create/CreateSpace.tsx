@@ -69,16 +69,16 @@ export const CreateSpace = () => {
             <TextInput
               value={name}
               onChange={val => setName(val)}
-              compact
-              placeholder='Space Name'
+              hero
+              label='Space Name'
               onEnter={handleCreateSpace}
               autoFocus
             />
             <Button
-              text='Create'
-              icon='arrow-right'
+              icon='check'
               iconPrefix='fas'
-              compact
+              hero
+              square
               primary={name !== ''}
               disabled={name === ''}
               onClick={handleCreateSpace}

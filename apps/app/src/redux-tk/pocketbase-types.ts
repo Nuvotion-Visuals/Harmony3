@@ -96,7 +96,9 @@ export type ThreadsRecord = {
 
 export type UsersRecord = {
 	avatar?: string
+	bio?: HTMLString
 	name?: string
+	preferences?: HTMLString
 }
 
 // Response types include system fields and match responses from the PocketBase API

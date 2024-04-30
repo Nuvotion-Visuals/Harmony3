@@ -1,8 +1,12 @@
+import { Box, Button, Gap, Item } from "@avsync.live/formation"
 import styled from "styled-components"
 
 export const ProfileSidebar = () => {
   return <S.ProfileSidebar>
-    
+    <Item
+      pageTitle='Profile'
+    >
+    </Item>
   </S.ProfileSidebar>
 }
 
