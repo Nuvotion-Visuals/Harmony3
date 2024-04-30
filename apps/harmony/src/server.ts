@@ -3,6 +3,13 @@ import express from 'express'
 import { streamChatResponse } from './streamChatResponse'
 import { generateImage } from './images'
 
+import { Groq, Settings } from 'llamaindex'
+Settings.llm = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+  temperature: 1
+})
+
+
 export const initServer = () => {
   // Chat
   const server = express()
@@ -30,10 +37,10 @@ export const initServer = () => {
       return
     }
 
-    if (!['ollama', 'openai', 'groq'].includes(payload.provider)) {
-      res.status(400).send('Invalid provider specified')
-      return
-    }
+    // if (!['ollama', 'openai', 'groq'].includes(payload.provider)) {
+    //   res.status(400).send('Invalid provider specified')
+    //   return
+    // }
 
     streamChatResponse(payload.provider, payload.messages, (data) => {
       if (data.endOfStream) {

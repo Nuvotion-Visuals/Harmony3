@@ -7,6 +7,7 @@ import { TextBox } from 'components/App/TextBox'
 import { useSpaces_currentUserId, useSpaces_usersById } from 'redux-tk/spaces/hooks'
 import { usePersonas_activePersona } from 'redux-tk/personas/hooks'
 import useDynamicHeight from 'components/Hooks/useDynamicHeight'
+import { Query } from 'components/Util/Query'
 
 const Message = memo(({
   role,
@@ -115,7 +116,7 @@ export const QuickChat = () => {
 
     chat({
       messages: newMessages,
-      provider: activePersona?.provider,
+      provider: 'llamaindex',
       model: activePersona?.model,
       onPartial: response => {
         setStream(response)
@@ -196,6 +197,8 @@ export const QuickChat = () => {
         }
       </Gap>
       <div id='quickchat_bottom'></div>
+
+      {/* <Query /> */}
     </S.Content>
 
     <S.TextBoxContainer ref={ref}>
