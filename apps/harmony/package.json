@@ -12,6 +12,7 @@
     "dev": "npm run build && electron .",
     "pack": "rm -rf ./dist && npm run build && npm run copy-assets && electron-builder --dir",
     "dist": "rm -rf ./dist && npm run build && npm run copy-assets && electron-builder",
+    "agent": "cross-env GROQ_API_KEY=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 node dist/agent.js",
     "generate-types": "npx pocketbase-typegen --db pocketbase/pb_data/data.db --out src/pocketbase-types.ts && cp src/pocketbase-types.ts ../app/src/redux-tk"
   },
   "build": {
@@ -32,7 +33,9 @@
     "artifactName": "Harmony-Setup-v${version}.${ext}"
   },
   "dependencies": {
+    "@mozilla/readability": "^0.5.0",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "electron-log": "^5.0.3",
     "electron-updater": "^6.1.7",
@@ -41,6 +44,7 @@
     "form-data": "^4.0.0",
     "form-data-encoder": "^4.0.2",
     "formdata-node": "^6.0.3",
+    "jsdom": "^24.0.0",
     "llamaindex": "^0.2.13",
     "lodash": "^4.17.21",
     "node-fetch": "^3.3.2",
@@ -53,6 +57,7 @@
     "@types/electron": "^1.6.10",
     "@types/eventsource": "^1.1.15",
     "@types/express": "^4.17.21",
+    "@types/jsdom": "^21.1.6",
     "@types/lodash": "^4.17.0",
     "@types/node": "^20.9.0",
     "electron": "^28.1.3",
