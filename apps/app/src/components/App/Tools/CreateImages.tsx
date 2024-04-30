@@ -1,10 +1,10 @@
 import React, { memo, useEffect, useState } from 'react'
 import { chat } from 'language/chat'
-import { Avatar, Box, Button, Dropdown, Gap, Item, LoadingSpinner, NumberInput, Spacer, StyleHTML, markdownToHTML, scrollToElementById } from '@avsync.live/formation'
+import { Avatar, Box, Button, Dropdown, Gap, Item, LoadingSpinner, Spacer, StyleHTML, markdownToHTML, scrollToElementById } from '@avsync.live/formation'
 import styled from 'styled-components'
 import { speak } from 'language/speech'
 import { TextBox } from 'components/App/TextBox' 
-import { useSpaces_currentUserId, useSpaces_namesByUserId } from 'redux-tk/spaces/hooks'
+import { useSpaces_currentUserId, useSpaces_usersById } from 'redux-tk/spaces/hooks'
 import { usePersonas_activePersona } from 'redux-tk/personas/hooks'
 import { createImage } from 'vision/createImage'
 import useDynamicHeight from 'components/Hooks/useDynamicHeight'
@@ -21,8 +21,8 @@ const Message = memo(({
   imageUrl?: string
 }) => {
   const currentUserId = useSpaces_currentUserId()
-  const namesByUserId = useSpaces_namesByUserId()
-  const name = namesByUserId?.[currentUserId]
+  const usersById = useSpaces_usersById()
+  const name = usersById?.[currentUserId]?.name
 
   return (
     <S.Message id={`images_message_${index}`}>
@@ -108,8 +108,8 @@ export const CreateImages = () => {
   const { ref, height } = useDynamicHeight('createImage_height', 82)
 
   const [size, setSize] = useState('1024x1024')
-  const [model, setModel] = useState('dall-e-3')
-  const [n, setN] = useState(1)
+  const [model, _] = useState('dall-e-3')
+  const [n, __] = useState(1)
   const [quality, setQuality] = useState('standard')
 
   const sendMessage = (message: string) => {

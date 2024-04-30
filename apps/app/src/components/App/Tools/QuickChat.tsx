@@ -4,7 +4,7 @@ import { Avatar, Box, Button, Gap, Item, StyleHTML, markdownToHTML, scrollToElem
 import styled from 'styled-components'
 import { speak } from 'language/speech'
 import { TextBox } from 'components/App/TextBox' 
-import { useSpaces_currentUserId, useSpaces_namesByUserId } from 'redux-tk/spaces/hooks'
+import { useSpaces_currentUserId, useSpaces_usersById } from 'redux-tk/spaces/hooks'
 import { usePersonas_activePersona } from 'redux-tk/personas/hooks'
 import useDynamicHeight from 'components/Hooks/useDynamicHeight'
 
@@ -19,8 +19,8 @@ const Message = memo(({
 }) => {
   const currentUserId = useSpaces_currentUserId()
   const activePersona = usePersonas_activePersona()
-  const namesByUserId = useSpaces_namesByUserId()
-  const name = namesByUserId?.[currentUserId]
+  const usersById = useSpaces_usersById()
+  const name = usersById?.[currentUserId]?.name
 
   return (
     <S.Message id={`quickchat_message_${index}`}>

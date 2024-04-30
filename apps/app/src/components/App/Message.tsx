@@ -3,7 +3,7 @@ import { memo, useEffect, useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { speak } from '../../language/speech'
 import styled from 'styled-components'
-import { useSpaces_messageById, useSpaces_namesByUserId, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
+import { useSpaces_messageById, useSpaces_setActiveThreadId, useSpaces_usersById } from 'redux-tk/spaces/hooks'
 import { usePersonas_personaInfoById } from 'redux-tk/personas/hooks'
 import { formatDate } from 'utils/formatDate'
 
@@ -74,7 +74,7 @@ export const Message = memo(({
   threadActive
 }: Props) => {
   const message = useSpaces_messageById(id)
-  const namesByUserId = useSpaces_namesByUserId()
+  const usersById = useSpaces_usersById()
   const setActiveThreadId = useSpaces_setActiveThreadId()
   const personaInfo = usePersonas_personaInfoById(message?.personaid)
   
@@ -207,6 +207,8 @@ export const Message = memo(({
     }
   ] as ItemProps[]
 
+  const messageUser = usersById[message.userid]
+
   return <ContextMenu
     dropdownProps={{
       items: dropdownItems,
@@ -223,26 +225,32 @@ export const Message = memo(({
               ? personaInfo?.name
                   ? personaInfo?.name
                   : 'Assistant'
-              : namesByUserId[message.userid]
+              : messageUser?.name
           }
           labelColor={
             message?.assistant
               ? personaInfo?.avatar
                   ? null
                   : 'red'
-              : 'green'
+              : messageUser?.avatar
+                ? null
+                : 'green'
           }
           src={
-            (message?.assistant && personaInfo?.avatar) 
-              ? `http://localhost:8090/api/files/personas/${personaInfo?.id}/${personaInfo?.avatar}` 
-              : null
+            message?.assistant
+              ? (message?.assistant && personaInfo?.avatar) 
+                  ? `http://localhost:8090/api/files/personas/${personaInfo?.id}/${personaInfo?.avatar}` 
+                  : null
+              : messageUser?.avatar
+                ? `http://localhost:8090/api/files/users/${messageUser?.id}/${messageUser?.avatar}` 
+                : null
           }
         />
       </S.Left>
       <S.Right>
         <MessageInfo
           key={message.id}
-          name={namesByUserId[message.userid]}
+          name={messageUser?.name}
           onSpeak={onSpeak}
           created={message.created}
           dropdownItems={dropdownItems}

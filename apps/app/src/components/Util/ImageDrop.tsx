@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 interface ImageDropTargetProps {
@@ -7,21 +7,16 @@ interface ImageDropTargetProps {
 }
 
 export const ImageDropTarget: React.FC<ImageDropTargetProps> = ({ onFileConverted, children }) => {
-  const [isHovering, setIsHovering] = useState(false)
-
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
-    setIsHovering(true)
   }
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
-    setIsHovering(false)
   }
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
-    setIsHovering(false)
     const imageUrl = e.dataTransfer.getData('text/uri-list')
 
     if (imageUrl) {

@@ -106,11 +106,11 @@ export const selectActiveSpaceGroupsInfo = (state: State): { name: string, descr
     }))
 }
 
-export const selectNamesByUserId = (state: State): Record<string, string> => {
-  return state.spaces.users.reduce((names, user) => {
-    names[user.id] = user.name
-    return names
-  }, {} as Record<string, string>)
+export const selectUsersById = (state: State): Record<string, UsersResponse> => {
+  return state.spaces.users.reduce((usersById, user) => {
+    usersById[user.id] = user
+    return usersById
+  }, {} as Record<string, UsersResponse>)
 }
 
 export const selectActiveGroupChannelsInfo = (state: State): { name: string, description: string, id: string }[] => {

@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
-import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, FileUpload, AspectRatio, LineBreak, FileDrop, useDialog, LoadingSpinner } from '@avsync.live/formation'
+import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, FileUpload, AspectRatio, LineBreak, FileDrop, useDialog } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { ThreadSuggestions } from 'components/App/Suggestions/ThreadSuggestions'
 import { useSearchParams } from 'react-router-dom'
@@ -9,7 +9,6 @@ import { Count } from './Count'
 import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 import { ImageDropTarget } from 'components/Util/ImageDrop'
 import { ImageSuggestions } from './Suggestions/ImageSuggestions'
-import { createImage } from 'vision/createImage'
 
 interface Props {
   channel: any

@@ -106,8 +106,8 @@ export const useSpaces_countByChannelId = (id: string): { threads: number; messa
   return useSelector(memoizedSelector, isEqual)
 }
 
-export const useSpaces_namesByUserId = (): Record<string, string> => 
-  useSelector(selectors.selectNamesByUserId, isEqual)
+export const useSpaces_usersById = (): Record<string, UsersResponse> => 
+  useSelector(selectors.selectUsersById, isEqual)
 
 export const useSpaces_setActiveSpaceIndex = () => {
   const dispatch = useDispatch()

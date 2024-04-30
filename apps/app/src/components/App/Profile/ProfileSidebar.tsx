@@ -1,5 +1,5 @@
-import { Box, Button, Gap, Item } from "@avsync.live/formation"
-import styled from "styled-components"
+import { Item } from '@avsync.live/formation'
+import styled from 'styled-components'
 
 export const ProfileSidebar = () => {
   return <S.ProfileSidebar>
