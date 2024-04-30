@@ -9,6 +9,7 @@ import { Breadcrumbs } from './Breadcrumbs'
 import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 import { Count } from './Count'
 import { ImageDropTarget } from 'components/Util/ImageDrop'
+import { ImageSuggestions } from './Suggestions/ImageSuggestions'
 
 export const Group = memo(() => {
   const navigate = useNavigate()
@@ -145,32 +146,63 @@ export const Group = memo(() => {
                           </FileDrop>
                         </ImageDropTarget>
                       }
+
+                      <ImageSuggestions 
+                        placeholder='Instructions'
+                        prompt={`
+                          Group name: ${group?.name}
+                          Description: ${group?.description}
+                        `}
+                        onFileReady={(file) => {
+                          setFile(file)
+                          setBanner(URL.createObjectURL(file))
+                        }}
+                      >
+                        <FileUpload
+                          minimal
+                          buttonProps={{
+                            icon: 'upload',
+                            iconPrefix: 'fas',
+                            text: 'Upload banner',
+                            compact: true,
+                            expand: true
+                          }}
+                          onFileChange={files => {
+                            const file = files?.[0]
+                            if (file) {
+                              setFile(file)
+                              setBanner(URL.createObjectURL(file))
+                            }
+                          }}
+                        />
+                      </ImageSuggestions>
                       
-                      <FileUpload
-                        minimal
-                        buttonProps={{
-                          icon: 'image',
-                          iconPrefix: 'fas',
-                          text: 'Choose banner',
-                          compact: true,
-                          expand: true
-                        }}
-                        onFileChange={files => {
-                          const file = files?.[0]
-                          if (file) {
-                            setFile(file)
-                            setBanner(URL.createObjectURL(file))
-                          }
-                        }}
-                      />
-                      <TextInput
-                        value={name}
-                        onChange={val => setName(val)}
-                        autoFocus
-                        placeholder='Name'
-                        onEnter={handleUpdate}
-                        compact
-                      />
+                      <Gap disableWrap>
+                        <TextInput
+                          value={name}
+                          onChange={val => setName(val)}
+                          autoFocus
+                          label='Name'
+                          onEnter={handleUpdate}
+                          hero
+                        />
+                         <Button
+                          icon='times'
+                          iconPrefix='fas'
+                          square
+                          onClick={handleCancelEdit}
+                          hero
+                        />
+                        <Button
+                          icon='check'
+                          iconPrefix='fas'
+                          square
+                          onClick={handleUpdate}
+                          hero
+                          primary
+                        />
+                      </Gap>
+                      
                       <RichTextEditor
                         outline
                         px={1}
@@ -179,25 +211,7 @@ export const Group = memo(() => {
                         onChange={val => setDescription(val)}
                       />
                     </Gap>
-                    <Box width='var(--F_Input_Height)' wrap>
-                      <Gap>
-                        <Button
-                          icon='save'
-                          iconPrefix='fas'
-                          square
-                          onClick={handleUpdate}
-                          compact
-                        />
-                        <Button
-                          icon='times'
-                          iconPrefix='fas'
-                          square
-                          minimal
-                          onClick={handleCancelEdit}
-                          compact
-                        />
-                      </Gap>
-                    </Box>
+
                   </Gap>
                 </Box>
               : <ContextMenu

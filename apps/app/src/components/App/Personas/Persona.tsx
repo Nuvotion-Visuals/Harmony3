@@ -1,4 +1,4 @@
-import { TextInput, Button, RichTextEditor, Page, Box, Item, FileUpload, Gap, Select, AspectRatio, FileDrop, Dropdown, StyleHTML, markdownToHTML, useDialog, ContextMenu, ItemProps, LineBreak } from '@avsync.live/formation'
+import { TextInput, Button, RichTextEditor, Page, Box, Item, FileUpload, Gap, Select, AspectRatio, FileDrop, Dropdown, StyleHTML, markdownToHTML, useDialog, ContextMenu, ItemProps, LineBreak, GroupRadius } from '@avsync.live/formation'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useSpaces_currentUserId } from 'redux-tk/spaces/hooks'
@@ -7,6 +7,7 @@ import { usePersonas_activePersona, usePersonas_setActivePersonaId } from 'redux
 import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 import { useRemoveQueryParam } from 'utils/removeEditQuery'
 import { ImageDropTarget } from 'components/Util/ImageDrop'
+import { ImageSuggestions } from 'components/App/Suggestions/ImageSuggestions'
 
 export const Persona = () => {
   const navigate = useNavigate()
@@ -177,47 +178,61 @@ export const Persona = () => {
                     </Box>
                   </Box>
                 }
-                <FileUpload
-                  minimal
-                  buttonProps={{
-                    icon: 'image',
-                    iconPrefix: 'fas',
-                    text: 'Choose Avatar',
-                    compact: true,
-                    expand: true
+                <ImageSuggestions 
+                  placeholder='Instructions'
+                  prompt={`
+                    This is for an avatar. It must look good when very small.
+                    Name: ${name}
+                    Description: ${description}
+                  `}
+                  onFileReady={(file) => {
+                    setFile(file)
+                    setAvatar(URL.createObjectURL(file))
                   }}
-                  onFileChange={files => {
-                    const file = files?.[0]
-                    if (file) {
-                      setFile(file)
-                      setAvatar(URL.createObjectURL(file))
-                    }
-                  }}
-                />
+                  square
+                >
+                  <FileUpload
+                    minimal
+                    buttonProps={{
+                      icon: 'upload',
+                      iconPrefix: 'fas',
+                      text: 'Upload avatar',
+                      compact: true,
+                      expand: true
+                    }}
+                    onFileChange={files => {
+                      const file = files?.[0]
+                      if (file) {
+                        setFile(file)
+                        setAvatar(URL.createObjectURL(file))
+                      }
+                    }}
+                  />
+                </ImageSuggestions>
+                
                 <Gap disableWrap>
                   <Gap disableWrap>
                     <TextInput
                       value={name}
                       onChange={val => setName(val)}
-                      placeholder='Name'
-                      compact
+                      label='Name'
+                      hero
                     />
                     {
                      (activePersona?.id && edit) &&
                       <Button
                         icon={'times'}
                         iconPrefix='fas'
-                        compact
+                        hero
                         square
                         onClick={handleCancelEdit}
                       />
                     }
                     <Button
-                      text={activePersona?.id ? undefined : 'Create'}
-                      icon={activePersona?.id ? 'save' : 'arrow-right'}
+                      icon={activePersona?.id ? 'save' : 'user-plus'}
                       iconPrefix='fas'
-                      compact
-                      square={!!activePersona?.id}
+                      hero
+                      square
                       primary={!!name && !!systemMessage}
                       disabled={!name || !provider || !systemMessage}
                       onClick={activePersona?.id ? handleUpdate : handleCreate}
@@ -228,8 +243,8 @@ export const Persona = () => {
                 <TextInput
                   value={description}
                   onChange={val => setDescription(val)}
-                  placeholder='Description'
-                  compact
+                  label='Description'
+                  hero
                 />
                 <Gap disableWrap>
                   <Select
@@ -288,35 +303,44 @@ export const Persona = () => {
                 }}
               >
                 <Gap>
-                    <Item
-                      pageTitle={activePersona?.name}
-                      subtitle={`${activePersona?.description} · ${activePersona?.provider} · ${activePersona?.model}`}
-                      src={avatar}
-                      absoluteRightChildren
-                    >
-                      <Box height='100%'>
-                        <Dropdown
-                          icon='ellipsis-h'
-                          iconPrefix='fas'
-                          minimal
-                          compact
-                          square
-                          items={dropdownItems}
-                        />
-                      </Box>
-                    </Item>
-                    <Box mb={-1}>
-                      <Item
-                        subtitle='System message'
-                        disablePadding
-                        compact
+                  <Box width='100%'>
+                    <Box width={8}>
+                      <AspectRatio
+                        ratio={1}
+                        borderRadius={500}
+                        backgroundSrc={avatar}
                       />
                     </Box>
-                    <StyleHTML>
-                      <div dangerouslySetInnerHTML={{ __html: markdownToHTML(systemMessage || '') || '' }} />
-                    </StyleHTML>
-                  </Gap>
-                </ContextMenu>
+                  </Box>
+                  <Item
+                    pageTitle={activePersona?.name}
+                    disablePadding
+                    subtitle={`${activePersona?.description} · ${activePersona?.provider} · ${activePersona?.model}`}
+                    absoluteRightChildren
+                  >
+                    <Box height='100%'>
+                      <Dropdown
+                        icon='ellipsis-h'
+                        iconPrefix='fas'
+                        minimal
+                        compact
+                        square
+                        items={dropdownItems}
+                      />
+                    </Box>
+                  </Item>
+                  <Box mb={-1}>
+                    <Item
+                      subtitle='System message'
+                      disablePadding
+                      compact
+                    />
+                  </Box>
+                  <StyleHTML>
+                    <div dangerouslySetInnerHTML={{ __html: markdownToHTML(systemMessage || '') || '' }} />
+                  </StyleHTML>
+                </Gap>
+              </ContextMenu>
         }
         
       </Page>

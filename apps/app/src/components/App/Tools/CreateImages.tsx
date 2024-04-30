@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState } from 'react'
 import { chat } from 'language/chat'
-import { Avatar, Box, Button, Dropdown, Gap, Item, LoadingSpinner, NumberInput, StyleHTML, markdownToHTML, scrollToElementById } from '@avsync.live/formation'
+import { Avatar, Box, Button, Dropdown, Gap, Item, LoadingSpinner, NumberInput, Spacer, StyleHTML, markdownToHTML, scrollToElementById } from '@avsync.live/formation'
 import styled from 'styled-components'
 import { speak } from 'language/speech'
 import { TextBox } from 'components/App/TextBox' 
@@ -148,9 +148,6 @@ export const CreateImages = () => {
             n
           }, 
           (data) => {
-            console.log(data)
-            
-
             const completeSystemMessage = { 
               role: 'system', 
               content: data.prompt || response, 
@@ -249,26 +246,6 @@ export const CreateImages = () => {
     <S.TextBoxContainer ref={ref}>
       <Box width='100%'>
         <Dropdown
-          text={model === 'dall-e-3' ? 'Dall-E 3' : 'Dall-E 2'}
-          compact
-          minimal
-          maxWidth='4.5rem'
-          items={[
-            {
-              text: 'Dall-E 3',
-              onClick: () => setModel('dall-e-3'),
-              active: model === 'dall-e-3',
-              compact: true
-            },
-            {
-              text: 'dall-e-2',
-              onClick: () => setModel('dall-e-2'),
-              active: model === 'dall-e-2',
-              compact: true
-            },
-          ]}
-        />
-        <Dropdown
           text={size}
           compact
           maxWidth='5.5rem'
@@ -294,11 +271,6 @@ export const CreateImages = () => {
             }
           ]}
         />
-        <NumberInput
-          value={n}
-          onChange={val => setN(val)}
-          step={1}
-        />
         <Dropdown
           text={quality === 'standard' ? 'SD' : 'HD'}
           compact
@@ -319,6 +291,7 @@ export const CreateImages = () => {
             },
           ]}
         />
+        <Spacer />
       </Box>
        
       <TextBox

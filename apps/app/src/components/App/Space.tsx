@@ -9,6 +9,7 @@ import { Breadcrumbs } from './Breadcrumbs'
 import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 import { Count } from './Count'
 import { ImageDropTarget } from 'components/Util/ImageDrop'
+import { ImageSuggestions } from './Suggestions/ImageSuggestions'
 
 export const Space = memo(() => {
   const navigate = useNavigate()
@@ -176,28 +177,50 @@ export const Space = memo(() => {
                           </ImageDropTarget>
                         }
                       </Gap>
-                     
-                      <Gap disableWrap>
-                        <Box width={10}>
-                          <FileUpload
-                            minimal
-                            buttonProps={{
-                              icon: 'image',
-                              iconPrefix: 'fas',
-                              text: 'Choose icon',
-                              compact: true,
-                              expand: true
-                            }}
-                            onFileChange={files => {
-                              const file = files?.[0]
-                              if (file) {
-                                setIconFile(file)
-                                setIcon(URL.createObjectURL(file))
-                              }
-                            }}
-                          />
-                        </Box>
-                       
+
+                      <ImageSuggestions 
+                        placeholder='Suggest an icon'
+                        prompt={`
+                          This is for an icon. It must look good when very small.
+                          Space name: ${space?.name}
+                          Description: ${space?.description}
+                        `}
+                        onFileReady={(file) => {
+                          setIconFile(file)
+                          setIcon(URL.createObjectURL(file))
+                        }}
+                        square
+                      >
+                        <FileUpload
+                          minimal
+                          buttonProps={{
+                            icon: 'image',
+                            iconPrefix: 'fas',
+                            text: 'Choose icon',
+                            compact: true,
+                            expand: true
+                          }}
+                          onFileChange={files => {
+                            const file = files?.[0]
+                            if (file) {
+                              setIconFile(file)
+                              setIcon(URL.createObjectURL(file))
+                            }
+                          }}
+                        />
+                      </ImageSuggestions>
+
+                      <ImageSuggestions 
+                        placeholder='Suggest a banner'
+                        prompt={`
+                          Space name: ${space?.name}
+                          Description: ${space?.description}
+                        `}
+                        onFileReady={(file) => {
+                          setBannerFile(file)
+                          setBanner(URL.createObjectURL(file))
+                        }}
+                      >
                         <FileUpload
                           minimal
                           buttonProps={{
@@ -215,16 +238,34 @@ export const Space = memo(() => {
                             }
                           }}
                         />
+                      </ImageSuggestions>
+                      
+                      <Gap disableWrap>
+                        <TextInput
+                          value={name}
+                          onChange={val => setName(val)}
+                          autoFocus
+                          label='Name'
+                          onEnter={handleUpdate}
+                          hero
+                        />
+                        <Button
+                          icon='times'
+                          iconPrefix='fas'
+                          square
+                          onClick={handleCancelEdit}
+                          hero
+                        />
+                        <Button
+                          icon='check'
+                          iconPrefix='fas'
+                          square
+                          onClick={handleUpdate}
+                          hero
+                          primary
+                        />
                       </Gap>
-                       
-                      <TextInput
-                        value={name}
-                        onChange={val => setName(val)}
-                        autoFocus
-                        placeholder='Name'
-                        onEnter={handleUpdate}
-                        compact
-                      />
+                      
                       <RichTextEditor
                         outline
                         px={1}
@@ -233,25 +274,6 @@ export const Space = memo(() => {
                         onChange={val => setDescription(val)}
                       />
                     </Gap>
-                    <Box width='var(--F_Input_Height)' wrap>
-                      <Gap>
-                        <Button
-                          icon='save'
-                          iconPrefix='fas'
-                          square
-                          onClick={handleUpdate}
-                          compact
-                        />
-                        <Button
-                          icon='times'
-                          iconPrefix='fas'
-                          square
-                          minimal
-                          onClick={handleCancelEdit}
-                          compact
-                        />
-                      </Gap>
-                    </Box>
                   </Gap>
                 </Box>
               : <ContextMenu

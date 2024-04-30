@@ -70,7 +70,7 @@ export const Profile = () => {
       />
       <Button
         text='Save'
-        icon='save'
+        icon='check'
         iconPrefix='fas'
         onClick={handleUpdate}
       />

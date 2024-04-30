@@ -10,10 +10,11 @@ import SpacesDashboard from 'components/App/SpacesDashboard'
 import { CreateSpace } from 'components/Create/CreateSpace'
 import { Space } from 'components/App/Space'
 import { Group } from 'components/App/Group'
-import { Profile } from 'components/App/Profile'
+import { Profile } from 'components/App/Profile/Profile'
 import { Personas } from 'components/App/Personas/Personas'
 import { Persona } from 'components/App/Personas/Persona'
 import { Tools } from 'components/App/Tools/Tools'
+import { ProfileSidebar } from 'components/App/Profile/ProfileSidebar'
 
 interface Props {
   children: React.ReactNode
@@ -38,6 +39,9 @@ export const App = ({ children }: Props) => {
   const FirstPage = () => {
     if (location.pathname.startsWith('/personas')) {
       return <Personas />
+    }
+    if (location.pathname.startsWith('/profile')) {
+      return <ProfileSidebar />
     }
     return <SpaceSidebar />
   }

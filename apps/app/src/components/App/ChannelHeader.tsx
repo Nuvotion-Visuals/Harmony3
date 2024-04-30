@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react'
-import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, FileUpload, AspectRatio, LineBreak, FileDrop, useDialog } from '@avsync.live/formation'
+import { Item, Dropdown, TextInput, Button, Box, Gap, ItemProps, ContextMenu, Page, FileUpload, AspectRatio, LineBreak, FileDrop, useDialog, LoadingSpinner } from '@avsync.live/formation'
 import { pb } from 'redux-tk/pocketbase'
 import { ThreadSuggestions } from 'components/App/Suggestions/ThreadSuggestions'
 import { useSearchParams } from 'react-router-dom'
@@ -8,6 +8,8 @@ import { useSpaces_countByChannelId } from 'redux-tk/spaces/hooks'
 import { Count } from './Count'
 import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 import { ImageDropTarget } from 'components/Util/ImageDrop'
+import { ImageSuggestions } from './Suggestions/ImageSuggestions'
+import { createImage } from 'vision/createImage'
 
 interface Props {
   channel: any
@@ -137,59 +139,71 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                           </FileDrop>
                         </ImageDropTarget>
                       }
-                    
-                      <FileUpload
-                        minimal
-                        buttonProps={{
-                          icon: 'image',
-                          iconPrefix: 'fas',
-                          text: 'Choose banner',
-                          compact: true,
-                          expand: true
+
+                      <ImageSuggestions 
+                        placeholder='Instructions'
+                        prompt={`
+                          Channel name: ${channel?.name}
+                          Description: ${channel?.description}
+                        `}
+                        onFileReady={(file) => {
+                          setFile(file)
+                          setBanner(URL.createObjectURL(file))
                         }}
-                        onFileChange={files => {
-                          const file = files?.[0]
-                          if (file) {
-                            setFile(file)
-                            setBanner(URL.createObjectURL(file))
-                          }
-                        }}
-                      />
-                      <TextInput
-                        value={name}
-                        onChange={val => setName(val)}
-                        autoFocus
-                        placeholder='Name'
-                        onEnter={handleUpdate}
-                        compact
-                      />
-                      <TextInput
-                        value={description}
-                        onChange={val => setDescription(val)}
-                        placeholder='Description'
-                        onEnter={handleUpdate}
-                        compact
-                      />
-                    </Gap>
-                    <Box width='var(--F_Input_Height)' wrap>
-                      <Gap>
-                        <Button
-                          icon='save'
-                          iconPrefix='fas'
-                          square
-                          onClick={handleUpdate}
-                          compact
+                      >
+                        <FileUpload
+                          minimal
+                          buttonProps={{
+                            icon: 'upload',
+                            iconPrefix: 'fas',
+                            text: 'Upload banner',
+                            compact: true,
+                            expand: true
+                          }}
+                          onFileChange={files => {
+                            const file = files?.[0]
+                            if (file) {
+                              setFile(file)
+                              setBanner(URL.createObjectURL(file))
+                            }
+                          }}
+                        />
+                      </ImageSuggestions>
+                     
+                     <Gap disableWrap>
+                        <TextInput
+                          value={name}
+                          onChange={val => setName(val)}
+                          autoFocus
+                          label='Name'
+                          onEnter={handleUpdate}
+                          hero
                         />
                         <Button
                           icon='times'
                           iconPrefix='fas'
                           square
-                          minimal
                           onClick={handleCancelEdit}
-                          compact
+                          hero
                         />
-                      </Gap>
-                    </Box>
+                        <Button
+                          icon='check'
+                          primary
+                          iconPrefix='fas'
+                          square
+                          onClick={handleUpdate}
+                          hero
+                        />
+                     </Gap>
+                    
+                      <TextInput
+                        value={description}
+                        onChange={val => setDescription(val)}
+                        label='Description'
+                        onEnter={handleUpdate}
+                        hero
+                      />
+                    </Gap>
                   </Gap>
                 </Box>
               : <ContextMenu
@@ -231,7 +245,9 @@ export const ChannelHeader = memo(({ channel }: Props) => {
                 </ContextMenu> 
         }
       </Box>
-      <ThreadSuggestions />
+      {
+        !edit && <ThreadSuggestions />
+      }
     </Page>
   )
 })

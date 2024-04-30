@@ -284,10 +284,11 @@ export const Message = memo(({
                     <Box width='var(--F_Input_Height)' wrap mt={1}>
                       <Gap>
                         <Button
-                          icon='save'
+                          icon='check'
                           iconPrefix='fas'
                           square
                           compact
+                          primary
                           onClick={() => handleUpdate()}
                         />
                         <Button

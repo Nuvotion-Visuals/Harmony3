@@ -176,7 +176,8 @@ export const TextBox = memo(({
           value={text}
           onChange={val => setText(val)}
           outline
-          px={1}
+          pl={1}
+          pr={2}
           minimal={true}
           autoFocus={autoFocus}
           onKeyDown={e => {

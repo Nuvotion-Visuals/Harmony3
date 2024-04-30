@@ -232,11 +232,12 @@ export const Thread = memo(({
                 <Box width='var(--F_Input_Height)' wrap>
                   <Gap>
                     <Button
-                      icon='save'
+                      icon='check'
                       iconPrefix='fas'
                       square
                       onClick={handleUpdate}
                       compact
+                      primary
                     />
                     <Button
                       icon='times'

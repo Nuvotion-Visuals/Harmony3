@@ -131,7 +131,7 @@ const initPocketBaseClient = async () => {
         if (personaId) {
           persona = await pb.collection('personas').getOne(personaId)
           const record = await pb.collection('messages').create({
-            text: `Your name is ${persona?.name}. System message: ${persona?.systemmessage}`, 
+            text: `Your name is ${persona?.name}. You MUST answer in character, not revelaing your nature is an LLM. System message: ${persona?.systemmessage}`, 
             system: true,
             userid: systemId, 
             threadid: threadId,
