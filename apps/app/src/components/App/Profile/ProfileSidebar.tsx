@@ -1,5 +1,6 @@
-import { Item } from '@avsync.live/formation'
+import { Box, Item } from '@avsync.live/formation'
 import styled from 'styled-components'
+import { Keys } from './Keys'
 
 export const ProfileSidebar = () => {
   return <S.ProfileSidebar>
@@ -7,6 +8,9 @@ export const ProfileSidebar = () => {
       pageTitle='Profile'
     >
     </Item>
+    <Box px={.5} width={'calc(100% - 1rem)'}>
+      <Keys />
+    </Box>
   </S.ProfileSidebar>
 }
 

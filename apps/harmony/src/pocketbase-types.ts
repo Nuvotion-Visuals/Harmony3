@@ -94,9 +94,10 @@ export type ThreadsRecord = {
 	userid?: RecordIdString
 }
 
-export type UsersRecord = {
+export type UsersRecord<Tkeys = unknown> = {
 	avatar?: string
 	bio?: HTMLString
+	keys?: null | Tkeys
 	name?: string
 	preferences?: HTMLString
 }
@@ -109,7 +110,7 @@ export type MessagesResponse<Texpand = unknown> = Required<MessagesRecord> & Bas
 export type PersonasResponse<Texpand = unknown> = Required<PersonasRecord> & BaseSystemFields<Texpand>
 export type SpacesResponse<Texpand = unknown> = Required<SpacesRecord> & BaseSystemFields<Texpand>
 export type ThreadsResponse<Texpand = unknown> = Required<ThreadsRecord> & BaseSystemFields<Texpand>
-export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
+export type UsersResponse<Tkeys = unknown, Texpand = unknown> = Required<UsersRecord<Tkeys>> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 

@@ -119,7 +119,6 @@ async function getStructureData(): Promise<DataStructure> {
 export async function getDocuments(): Promise<Document[]> {
   const data = await getStructureData()
   const dataStructure = await generateSpacesDataStructure()
-  console.log(dataStructure)
   return [
     new Document({ text: JSON.stringify({ spaces: data.spaces }), id_: 'spaces' }),
     new Document({ text: JSON.stringify({ groups: data.groups }), id_: 'groups' }),

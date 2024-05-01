@@ -8,6 +8,7 @@ import { ConfirmationMessage } from 'components/Util/ConfirmationMessage'
 import { useRemoveQueryParam } from 'utils/removeEditQuery'
 import { ImageDropTarget } from 'components/Util/ImageDrop'
 import { ImageSuggestions } from 'components/App/Suggestions/ImageSuggestions'
+import { languageModels } from 'language/languageModels'
 
 export const Persona = () => {
   const navigate = useNavigate()
@@ -40,8 +41,8 @@ export const Persona = () => {
     setName(activePersona?.name)
     setDescription(activePersona?.description)
     setAvatar(activePersona?.avatar ? `http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}` : null)
-    setProvider(activePersona?.provider || 'openai')
-    setModel(activePersona?.model || 'gpt4')
+    setProvider(activePersona?.provider || 'OpenAI')
+    setModel(activePersona?.model || 'gpt-4')
     setSystemMessage(activePersona?.systemmessage || '')
   }, [activePersona])
 
@@ -112,8 +113,8 @@ export const Persona = () => {
     setName(activePersona?.name)
     setDescription(activePersona?.description)
     setAvatar(activePersona?.avatar ? `http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}` : null)
-    setProvider(activePersona?.provider || 'openai')
-    setModel(activePersona?.model || 'gpt4')
+    setProvider(activePersona?.provider || 'OpenAI')
+    setModel(activePersona?.model || 'gpt-4')
     setSystemMessage(activePersona?.systemmessage || '')
     setEdit(false)
     removeQueryParam('edit')
@@ -147,6 +148,44 @@ export const Persona = () => {
       compact: true
     }
   ] as ItemProps[]
+
+  useEffect(() => {
+    const providerModels = languageModels?.[provider]
+    const modelExists = providerModels?.some(modelDetail => modelDetail.name === model)
+    if (!modelExists && providerModels?.length > 0) {
+      setModel(providerModels?.[0]?.name)
+    }
+  }, [provider, model])
+
+  const ModelDescription = () => {
+    const modelInfo = languageModels?.[provider]?.find(m => m.name == model)
+    return (
+      <Box mt={-1} width={'100%'}>
+        <StyleHTML>
+        <table>
+          <tbody>
+            <tr>
+              <td><b>Model</b></td>
+              <td>{ modelInfo?.name }</td>
+            </tr>
+            <tr>
+              <td><b>Description</b></td>
+              <td>{ modelInfo?.description }</td>
+            </tr>
+            <tr>
+              <td><b>Context</b></td>
+              <td>{ modelInfo?.contextWindow } tokens</td>
+            </tr>
+            <tr>
+              <td><b>Cost</b></td>
+              <td>Input: ${ modelInfo?.cost?.input?.toFixed(2) }/M tokens. Output: ${ modelInfo?.cost?.output.toFixed(2) }/M tokens.</td>
+            </tr>
+          </tbody>
+        </table>
+        </StyleHTML>
+      </Box>
+    )
+  }
 
   return (
     <Box mt={1}>
@@ -259,23 +298,19 @@ export const Persona = () => {
                     options={[
                       {
                         label: 'OpenAI',
-                        value: 'openai'
+                        value: 'OpenAI'
                       },
                       {
                         label: 'Groq',
-                        value: 'groq'
+                        value: 'Groq'
                       },
                       {
                         label: 'Ollama',
-                        value: 'ollama'
+                        value: 'Ollama'
                       },
                       {
-                        label: 'LlamaIndex',
-                        value: 'llamaindex'
-                      },
-                      {
-                        label: 'Agent',
-                        value: 'agent'
+                        label: 'Anthropic',
+                        value: 'Anthropic'
                       },
                     ]}
                   />
@@ -284,22 +319,14 @@ export const Persona = () => {
                     label='Model'
                     value={model}
                     onChange={val => setModel(val)}
-                    options={[
-                      {
-                        label: 'GPT4',
-                        value: 'gpt4'
-                      },
-                      {
-                        label: 'Ollama 3 70B',
-                        value: 'llama3-70b-8192'
-                      },
-                      {
-                        label: 'Ollama 3',
-                        value: 'ollama3'
-                      },
-                    ]}
+                    options={languageModels?.[provider]?.map(({ name }) => ({
+                      label: name,
+                      value: name
+                    })) || []}
                   />
                 </Gap>
+
+                <ModelDescription />
               
                 <RichTextEditor
                   px={1}
@@ -344,6 +371,9 @@ export const Persona = () => {
                       />
                     </Box>
                   </Item>
+
+                  <ModelDescription />
+
                   {
                     systemMessage && <>
                       <Box mb={-1}>

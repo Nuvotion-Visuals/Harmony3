@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react'
-import { Button, Dropdown, Item, RichTextEditor, scrollToElementById } from '@avsync.live/formation'
+import { Box, Button, ContextMenu, Dropdown, Item, ItemProps, RichTextEditor, scrollToElementById } from '@avsync.live/formation'
 import { useSpaces_activeChannelId, useSpaces_activeThread, useSpaces_currentUserId, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
 import styled from 'styled-components'
 import { pb } from 'redux-tk/pocketbase'
@@ -93,54 +93,62 @@ export const TextBox = memo(({
     }, 10)
   }, [activeThreadId])
 
+  const personaDropdownItems = [
+    ...personas.map(persona => ({
+      src: persona?.avatar ? `http://localhost:8090/api/files/personas/${persona?.id}/${persona?.avatar}` : undefined,
+      text: persona?.name,
+      subtitle: `${persona?.description} · ${persona?.provider} · ${persona?.model}`,
+      onClick: () => setActivePersonaId(persona?.id),
+      absoluteRightChildren: true,
+      children: <Button
+        icon='gear'
+        iconPrefix='fas'
+        compact
+        square
+        minimal
+        onClick={() => navigate(`/personas/${persona?.id}?edit=true`)}
+      />
+    })),
+    {
+      text: 'Default Assistant',
+      icon: 'user',
+      iconPrefix: 'fas',
+      compact: true,
+      onClick: () => setActivePersonaId(null),
+    },
+    {
+      text: 'Create',
+      icon: 'user-plus',
+      iconPrefix: 'fas',
+      href: '/personas/create',
+      compact: true,
+    }
+  ] as ItemProps[]
+
   return (
     <S.Wrapper>
       {
         !disablePersonas && 
-          <Dropdown
-            prefixChildren={activePersona?.avatar && <S.Avatar
-              src={`http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}`}
-            />}
-            disablePadding={!!activePersona?.avatar}
-            disableCenter
-            text={`${activePersona?.name} · ${activePersona?.provider} · ${activePersona?.model}`}
-            iconPrefix='fas'
-            expand
-            maxWidth='20rem'
-            compact
-            minimal
-            items={[
-              ...personas.map(persona => ({
-                src: persona?.avatar ? `http://localhost:8090/api/files/personas/${persona?.id}/${persona?.avatar}` : undefined,
-                text: persona?.name,
-                subtitle: `${persona?.description} · ${persona?.provider} · ${persona?.model}`,
-                onClick: () => setActivePersonaId(persona?.id),
-                absoluteRightChildren: true,
-                children: <Button
-                  icon='gear'
-                  iconPrefix='fas'
-                  compact
-                  square
-                  minimal
-                  onClick={() => navigate(`/personas/${persona?.id}?edit=true`)}
-                />
-              })),
-              {
-                text: 'Default Assistant',
-                icon: 'user',
-                iconPrefix: 'fas',
-                compact: true,
-                onClick: () => setActivePersonaId(null),
-              },
-              {
-                text: 'Create',
-                icon: 'user-plus',
-                iconPrefix: 'fas',
-                href: '/personas/create',
-                compact: true,
-              }
-          ]}
-          />
+          <Box width='100%' height='var(--F_Input_Height_Compact)'>
+            <ContextMenu dropdownProps={{ items: personaDropdownItems, maxWidth: '20rem' }} >
+              <Dropdown
+                prefixChildren={activePersona?.avatar && <S.Avatar
+                  src={`http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}`}
+                />}
+                disablePadding={!!activePersona?.avatar}
+                disableCenter
+                text={activePersona?.name
+                  ? `${activePersona?.name ? `${activePersona?.name} · ` : ''}${activePersona?.provider ? `${activePersona?.provider} · ` : ''}  ${activePersona?.model ? `${activePersona?.model}` : ''}`
+                  : 'Assistant' }
+                iconPrefix='fas'
+                expand
+                maxWidth='20rem'
+                compact
+                minimal
+                items={personaDropdownItems}
+              />
+            </ContextMenu>
+          </Box>
       }
 
       {

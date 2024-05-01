@@ -1,3 +1,6 @@
+import { selectCurrentUser } from 'redux-tk/spaces/selectors'
+import { store } from 'redux-tk/store'
+
 export type ChatConfig = {
   provider?: 'openai' | 'groq' | 'ollama' | string
   model?: string
@@ -9,13 +12,15 @@ export type ChatConfig = {
 export type ResponseCallback = (response: string) => void
 
 export const chat = (config: ChatConfig): () => void => {
+  const keys = selectCurrentUser(store.getState())?.keys
   const { provider = 'groq', model = 'llama3-70b-8192' } = config
   const payload = { 
     messages: config.messages, 
     provider, 
     model,
     index: true,
-    agent: false
+    agent: false,
+    keys
   }
   const eventSource = new EventSource(`http://localhost:1616/chat?data=${encodeURIComponent(JSON.stringify(payload))}`)
 

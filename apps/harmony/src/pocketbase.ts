@@ -112,8 +112,12 @@ const initPocketBaseClient = async () => {
         let messages
         const threadId = event.record.threadid
         let isFirstAssistantMessage = true
+        let keys: any = null
 
         try {
+          const sender = await pb.collection('users').getOne(event.record.userid)
+          keys = sender.keys
+
           messages = await pb.collection('messages').getFullList({
             filter: `threadid="${threadId}"`,
             sort: 'created'
@@ -160,6 +164,9 @@ const initPocketBaseClient = async () => {
 
         streamChatResponse({
           provider: persona?.provider || 'groq',
+          model: persona?.model || 'llama3-70b-8192',
+          index: true,
+          keys,
           messages: llmMessages,
           callback: async (data) => {
             if (data.endOfStream) {
@@ -183,6 +190,9 @@ const initPocketBaseClient = async () => {
                 const validator = new JsonValidator()
                 streamChatResponse({
                   provider: persona?.provider || 'groq',
+                  model: persona?.model || 'llama3-70b-8192',
+                  index: true,
+                  keys,
                   messages: [{
                       role: 'system',
                       content: `You are an API endpoint that provides a name and description for message thread based on a prompt, which is a series of messages. The description should be a very short sentence, no more than just a few words. The name starts with an emoji. You answer in the following JSON format. {

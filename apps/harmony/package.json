@@ -32,6 +32,7 @@
     "artifactName": "Harmony-Setup-v${version}.${ext}"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.8",
     "@mozilla/readability": "^0.5.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

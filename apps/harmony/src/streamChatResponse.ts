@@ -1,19 +1,11 @@
 import ollama from 'ollama'
 import OpenAI from 'openai'
 import { throttle } from 'lodash'
-import { ContextChatEngine, OpenAIAgent } from 'llamaindex'
+import { Anthropic, AnthropicAgent, ContextChatEngine, OpenAIAgent } from 'llamaindex'
 import { getDocuments } from './documents'
 import { Groq, OpenAI as LlamaOpenAI, Ollama, Settings, VectorStoreIndex } from 'llamaindex'
 import { ReActAgent } from 'llamaindex'
 import { extractWebPageContent_tool, extractYouTubeTranscript_tool } from './extract'
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
-const groq = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: 'https://api.groq.com/openai/v1'
-})
 
 interface StreamResponsePart {
   message: {
@@ -25,41 +17,61 @@ interface StreamResponsePart {
 type StreamCallback = (data: StreamResponsePart) => void
 
 interface StreamChatParams {
-  provider: 'ollama' | 'openai' | 'groq' | string
+  provider: 'Ollama' | 'OpenAI' | 'Groq' | 'Anthropic' | string
   messages: any
   callback: StreamCallback
   index?: boolean
+  keys: any,
   agent?: boolean
+  model: string
 }
 
 export const streamChatResponse = async ({ 
   provider, 
   messages, 
   callback, 
+  keys,
   index, 
-  agent 
+  agent,
+  model
 }: StreamChatParams) => {
   let fullResponse: string[] = []
   const throttledCallback = throttle(callback, 16.67)
 
+  console.log(`Provider: ${provider}, Model: ${model}`)
+  console.log(keys)
+
   switch(provider) {
-    case 'openai': {
+    case 'OpenAI': {
       Settings.llm = new LlamaOpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-        temperature: 0.5
+        apiKey: keys?.OPENAI_API_KEY,
+        temperature: 0.5,
+        model
       })
       break
     }
-    case 'groq': {
+    case 'Groq': {
       Settings.llm = new Groq({
-        apiKey: process.env.GROQ_API_KEY,
-        temperature: 0.5
+        apiKey: keys?.GROQ_API_KEY,
+        temperature: 0.5,
+        model
       })
       break
     }
-    case 'ollama': {
+    case 'Ollama': {
       Settings.llm = new Ollama({
-        model: 'llama3'
+        model,
+        options: {
+          temperature: 0.5
+        }
+      })
+    }
+    case 'Anthropic': {
+      Settings.llm = new Anthropic({
+        apiKey: keys?.ANTHROPIC_API_KEY,
+        // @ts-ignore
+        model,
+        temperature: 0.5,
       })
     }
   }
@@ -67,7 +79,7 @@ export const streamChatResponse = async ({
   let stream
 
   if (agent) {
-    const agent = new (provider === 'openai' ? OpenAIAgent : ReActAgent)({
+    const agent = new (provider === 'OpenAI' ? OpenAIAgent : provider === 'Anthropic' ? AnthropicAgent : ReActAgent)({
       tools: [
         extractWebPageContent_tool,
         extractYouTubeTranscript_tool
@@ -131,16 +143,21 @@ export const streamChatResponse = async ({
     }
   }
   else {
-    if (provider === 'ollama') {
+    if (provider === 'Ollama') {
       stream = await ollama.chat({
-        model: 'llama3',
+        model,
         messages,
         stream: true
       })
     }
+    // TODO: add Anthropic
     else {
-      stream = await (provider === 'openai' ? openai : groq).chat.completions.create({
-        model: provider === 'openai' ? 'gpt-4' : 'llama3-70b-8192',
+      const llm = new OpenAI({
+        apiKey: provider === 'OpenAI' ? keys?.OPENAI_API_KEY : keys?.GROQ_API_KEY,
+        baseURL: provider === 'OpenAI' ? undefined : 'https://api.groq.com/openai/v1'
+      })
+      stream = await llm.chat.completions.create({
+        model,
         messages,
         stream: true
       })
