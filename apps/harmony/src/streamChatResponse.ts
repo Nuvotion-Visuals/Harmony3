@@ -1,7 +1,7 @@
 import ollama from 'ollama'
 import OpenAI from 'openai'
 import { throttle } from 'lodash'
-import { Anthropic, AnthropicAgent, ContextChatEngine, OpenAIAgent } from 'llamaindex'
+import { Anthropic, AnthropicAgent, ContextChatEngine, OpenAIAgent, OpenAIEmbedding } from 'llamaindex'
 import { getDocuments } from './documents'
 import { Groq, OpenAI as LlamaOpenAI, Ollama, Settings, VectorStoreIndex } from 'llamaindex'
 import { ReActAgent } from 'llamaindex'
@@ -49,6 +49,10 @@ export const streamChatResponse = async ({
         temperature,
         model
       })
+      Settings.embedModel = new OpenAIEmbedding({
+        model: 'text-embedding-3-large',
+        dimensions: 3072
+      });
       break
     }
     case 'Groq': {
@@ -125,8 +129,10 @@ export const streamChatResponse = async ({
       },
       ...messages
     ]
+    Settings.chunkSize = 512
     const index = await VectorStoreIndex.fromDocuments(await getDocuments())
     const retriever = index.asRetriever()
+    retriever.similarityTopK = 5
     const chatEngine = new ContextChatEngine({ retriever })
     const stream = await chatEngine.chat({ 
       message: messages[messages.length - 1]?.content, 

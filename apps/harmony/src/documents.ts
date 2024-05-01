@@ -120,11 +120,11 @@ export async function getDocuments(): Promise<Document[]> {
   const data = await getStructureData()
   const dataStructure = await generateSpacesDataStructure()
   return [
-    new Document({ text: JSON.stringify({ spaces: data.spaces }), id_: 'spaces' }),
-    new Document({ text: JSON.stringify({ groups: data.groups }), id_: 'groups' }),
-    new Document({ text: JSON.stringify({ channels: data.channels }), id_: 'channels' }),
-    new Document({ text: JSON.stringify({ threads: data.threads }), id_: 'threads' }),
-    new Document({ text: JSON.stringify({ messages: data.messages }), id_: 'messages' }),
+    // new Document({ text: JSON.stringify({ spaces: data.spaces }), id_: 'spaces' }),
+    // new Document({ text: JSON.stringify({ groups: data.groups }), id_: 'groups' }),
+    // new Document({ text: JSON.stringify({ channels: data.channels }), id_: 'channels' }),
+    // new Document({ text: JSON.stringify({ threads: data.threads }), id_: 'threads' }),
+    // new Document({ text: JSON.stringify({ messages: data.messages }), id_: 'messages' }),
     new Document({ text: JSON.stringify({ structure: dataStructure }), id_: 'structure' }),
   ]
 }

@@ -159,10 +159,10 @@ const initPocketBaseClient = async () => {
           { 
             role: 'system', 
             content: `
-              The user's name is ${sender?.name} 
+              You are responding to ${sender?.name} 
               The user's bio is: ${sender?.bio}
               The user's preferences: ${sender?.preferences}
-              You know the user. You work with them closely and frequently.
+              You don't need to adknowledge these details in your response unless it's actually relevant to the query.
             ` 
           },
         ]

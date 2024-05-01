@@ -117,10 +117,10 @@ export const QuickChat = () => {
       { 
         role: 'system', 
         content: `
-          The user's name is ${currentUser?.name} 
+          You are responding to ${currentUser?.name} 
           The user's bio is: ${currentUser?.bio}
           The user's preferences: ${currentUser?.preferences}
-          You know the user. You work with them closely and frequently.
+          You don't need to adknowledge these details in your response unless it's actually relevant to the query.
         ` 
       },
       { 
