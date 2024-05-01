@@ -233,8 +233,8 @@ export const Persona = () => {
                       iconPrefix='fas'
                       hero
                       square
-                      primary={!!name && !!systemMessage}
-                      disabled={!name || !provider || !systemMessage}
+                      primary
+                      disabled={name === ''}
                       onClick={activePersona?.id ? handleUpdate : handleCreate}
                     />
                   </Gap>
@@ -264,6 +264,14 @@ export const Persona = () => {
                       {
                         label: 'Ollama',
                         value: 'ollama'
+                      },
+                      {
+                        label: 'LlamaIndex',
+                        value: 'llamaindex'
+                      },
+                      {
+                        label: 'Agent',
+                        value: 'agent'
                       },
                     ]}
                   />
@@ -318,7 +326,7 @@ export const Persona = () => {
                   <Item
                     pageTitle={activePersona?.name}
                     disablePadding
-                    subtitle={`${activePersona?.description} · ${activePersona?.provider} · ${activePersona?.model}`}
+                    subtitle={`${activePersona?.description ? `${activePersona.description} ·` : ''} ${activePersona?.provider} · ${activePersona?.model}`}
                     absoluteRightChildren
                   >
                     <Box height='100%'>

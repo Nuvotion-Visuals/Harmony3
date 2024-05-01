@@ -24,7 +24,7 @@ export const Personas = () => {
         <Item
           src={persona?.avatar ? `http://localhost:8090/api/files/personas/${persona?.id}/${persona?.avatar}` : null}
           text={persona?.name}
-          subtitle={`${persona?.description} · ${persona?.provider} · ${persona?.model}`}
+          subtitle={`${persona?.description ? `${persona.description} ·` : ''} ${persona?.provider} · ${persona?.model}`}
           href={`/personas/${persona?.id}`}
           active={activePersonaId === persona?.id}
         />

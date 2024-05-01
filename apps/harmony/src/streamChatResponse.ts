@@ -4,6 +4,8 @@ import { throttle } from 'lodash'
 import { ContextChatEngine } from 'llamaindex'
 import { generateSpacesDataStructure, getData } from './query'
 import { Document, Groq, Settings, VectorStoreIndex } from 'llamaindex'
+import { ReActAgent } from 'llamaindex'
+import { extractWebPageContent_tool, extractYouTubeTranscript_tool } from './extract'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -110,8 +112,8 @@ export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq' 
           ...messages
         ]
 
-        const retriever = index.asRetriever();
-        const chatEngine = new ContextChatEngine({ retriever });
+        const retriever = index.asRetriever()
+        const chatEngine = new ContextChatEngine({ retriever })
         const stream = await chatEngine.chat({ message: messages[messages.length - 1]?.content, chatHistory, stream: true })
 
         for await (const chunk of stream) {
@@ -124,7 +126,53 @@ export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq' 
         }
         break
       }
-        
+
+      case 'agent': {
+        Settings.llm = new Groq({
+          apiKey: process.env.GROQ_API_KEY,
+          temperature: 0,
+          model: 'llama3-70b-8192'
+        })
+
+        const chatHistory = [
+          {
+            role: 'system',
+            content: `
+              NEVER ANSWER WITHOUT PREFIXING IT LIKE THIS:
+              Answer: [your answer here]
+    
+              NEVER EVER REPLY WITHOUT A PREFIX!
+    
+              If you don't need any tools, use:
+              Input: {}
+              NOT:
+              Input: None
+
+              Any time you have completed, and have a response ready to present, you MUST finish with an Answer:
+              NEVER ANSWER WITHOUT PREFIXING IT LIKE THIS:
+              Answer: [your answer here]
+
+              Please do not shorten answers, provide your FULL comprehensive answer, presenting ALL relevant detail in the answer.
+            `
+          },
+          ...messages
+        ]
+
+        const agent = new ReActAgent({
+          tools: [
+            extractWebPageContent_tool,
+            extractYouTubeTranscript_tool
+          ],
+          chatHistory: chatHistory
+        })
+      
+        const response = await agent.chat({
+          message: messages[messages.length - 1]?.content
+        })
+        console.log(response)
+        const extractAnswer = (input: string): string => input.includes('Answer:') ? input.split('Answer:')[1].trim() : ''
+        fullResponse.push(extractAnswer(response.response.message.content as string))
+      }
     }
 
     throttledCallback({ message: { content: fullResponse.join('') }, endOfStream: true })

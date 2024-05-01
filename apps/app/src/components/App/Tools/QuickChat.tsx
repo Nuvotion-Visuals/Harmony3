@@ -116,7 +116,7 @@ export const QuickChat = () => {
 
     chat({
       messages: newMessages,
-      provider: 'llamaindex',
+      provider: activePersona?.provider,
       model: activePersona?.model,
       onPartial: response => {
         setStream(response)
