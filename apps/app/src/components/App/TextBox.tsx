@@ -93,20 +93,20 @@ export const TextBox = memo(({
     }, 10)
   }, [activeThreadId])
 
-
   return (
     <S.Wrapper>
       {
-        !disablePersonas && <Item
-          src={activePersona?.avatar ? `http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}` : null}
-          subtitle={activePersona?.name}
-          absoluteRightChildren
-          compact
-        >
+        !disablePersonas && 
           <Dropdown
-            icon='ellipsis-h'
+            prefixChildren={activePersona?.avatar && <S.Avatar
+              src={`http://localhost:8090/api/files/personas/${activePersona?.id}/${activePersona?.avatar}`}
+            />}
+            disablePadding={!!activePersona?.avatar}
+            disableCenter
+            text={`${activePersona?.name} · ${activePersona?.provider} · ${activePersona?.model}`}
             iconPrefix='fas'
-            maxWidth='12rem'
+            expand
+            maxWidth='20rem'
             compact
             minimal
             items={[
@@ -122,7 +122,7 @@ export const TextBox = memo(({
                   compact
                   square
                   minimal
-                  onClick={() => navigate(`/personas/${persona?.id}`)}
+                  onClick={() => navigate(`/personas/${persona?.id}?edit=true`)}
                 />
               })),
               {
@@ -141,7 +141,6 @@ export const TextBox = memo(({
               }
           ]}
           />
-        </Item>
       }
 
       {
@@ -222,5 +221,17 @@ const S = {
     right: 0px;
     top: 0px;
     transform: scale(.9);
-  `
+  `,
+   Avatar: styled.div<{
+    src: string
+  }>`
+    width: var(--F_Input_Height_Compact);
+    height: 100%;
+    background-image: url(${props => props.src});
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    margin-right: .25rem;
+    border-radius: 100%;
+  `,
 }

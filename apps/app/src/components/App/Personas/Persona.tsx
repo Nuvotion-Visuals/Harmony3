@@ -30,8 +30,8 @@ export const Persona = () => {
   const userId = useSpaces_currentUserId()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const [provider, setProvider] = useState('openai')
-  const [model, setModel] = useState('gpt4')
+  const [provider, setProvider] = useState('')
+  const [model, setModel] = useState('')
   const [systemMessage, setSystemMessage] = useState('')
   const [avatar, setAvatar] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
@@ -72,10 +72,14 @@ export const Persona = () => {
     if (!userId && !activePersona?.id) return
     const formData = new FormData()
     formData.append('name', name)
-    formData.append('description', description)
+    if (description) {
+      formData.append('description', description)
+    }
     formData.append('provider', provider)
     formData.append('model', model)
-    formData.append('systemmessage', systemMessage)
+    if (systemMessage) {
+      formData.append('systemmessage', systemMessage)
+    }
     formData.append('userid', userId)
     if (file) {
       formData.append('avatar', file)
@@ -340,16 +344,20 @@ export const Persona = () => {
                       />
                     </Box>
                   </Item>
-                  <Box mb={-1}>
-                    <Item
-                      subtitle='System message'
-                      disablePadding
-                      compact
-                    />
-                  </Box>
-                  <StyleHTML>
-                    <div dangerouslySetInnerHTML={{ __html: markdownToHTML(systemMessage || '') || '' }} />
-                  </StyleHTML>
+                  {
+                    systemMessage && <>
+                      <Box mb={-1}>
+                        <Item
+                          subtitle='System message'
+                          disablePadding
+                          compact
+                        />
+                      </Box>
+                      <StyleHTML>
+                        <div dangerouslySetInnerHTML={{ __html: markdownToHTML(systemMessage || '') || '' }} />
+                      </StyleHTML>
+                    </>
+                  }
                 </Gap>
               </ContextMenu>
         }
