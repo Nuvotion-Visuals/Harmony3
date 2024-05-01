@@ -28,7 +28,7 @@ export const RouteTracker = () => {
     setActiveChannelId(channelid)
     setActiveThreadId(threadid)
     setActiveMessageId(messageid)
-    if (location.pathname === '/spaces') {
+    if (location.pathname === '/spaces' || location.pathname === '/spaces/') {
       const spaceId = spaces?.[0]?.id
         navigate(
           spaceId

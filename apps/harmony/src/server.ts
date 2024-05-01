@@ -2,6 +2,9 @@ import cors from 'cors'
 import express from 'express'
 import { streamChatResponse } from './streamChatResponse'
 import { generateImage } from './images'
+import archiver from 'archiver'
+import path from 'path'
+import fs from 'fs'
 
 export const initServer = () => {
   // Chat
@@ -81,6 +84,51 @@ export const initServer = () => {
       console.error('Failed to generate image:', error)
       res.status(500).send('Failed to generate image')
     }
+  })
+
+  server.get('/export', async (req, res) => {
+    const timestamp = new Date().toISOString().replace(/[:.-]/g, '_')
+    const zipFileName = `harmony_export_${timestamp}.zip`
+    const zipFilePath = path.join(__dirname, zipFileName)
+    const dataFolderPath = path.join(__dirname, '../pocketbase/pb_data')
+    
+    const output = fs.createWriteStream(zipFilePath)
+    const archive = archiver('zip', {
+      zlib: { level: 9 } // Set the compression level
+    })
+  
+    output.on('close', () => {
+      console.log(`Created ${zipFileName} with ${archive.pointer()} total bytes`)
+      res.setHeader('Content-Disposition', `attachment; filename="${zipFileName}"`);
+      res.setHeader('Content-Type', 'application/zip');
+      res.status(200).sendFile(zipFilePath, err => {
+        if (err) {
+          console.error('Error sending file:', err)
+          res.status(500).send('Error sending file')
+        }
+        // Optionally, delete the zip file if you don't need to store it
+        fs.unlink(zipFilePath, unlinkErr => {
+          if (unlinkErr) console.error('Error deleting file:', unlinkErr)
+        })
+      })
+    })
+  
+    archive.on('warning', err => {
+      if (err.code === 'ENOENT') {
+        console.warn('Archiver warning:', err)
+      } else {
+        throw err
+      }
+    })
+  
+    archive.on('error', err => {
+      console.error('Archiver error:', err)
+      res.status(500).send('Failed to create zip file')
+    })
+  
+    archive.pipe(output)
+    archive.directory(dataFolderPath, false)
+    archive.finalize()
   })
 
   server.listen(PORT2, () => {

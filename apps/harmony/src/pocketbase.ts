@@ -3,7 +3,7 @@ import { spawn } from 'child_process'
 import path from 'path'
 import { streamChatResponse } from './streamChatResponse'
 import { JsonValidator } from './JsonValidator'
-import { CollectionResponses, MessagesResponse, TypedPocketBase } from './pocketbase-types'
+import { CollectionResponses, MessagesResponse, TypedPocketBase, UsersResponse } from './pocketbase-types'
 
 let pb: any = null
 let systemId: string | null = null
@@ -113,10 +113,13 @@ const initPocketBaseClient = async () => {
         const threadId = event.record.threadid
         let isFirstAssistantMessage = true
         let keys: any = null
+        let sender: UsersResponse | null = null
 
         try {
-          const sender = await pb.collection('users').getOne(event.record.userid)
-          keys = sender.keys
+          sender = await pb.collection('users').getOne(event.record.userid)
+          if (sender) {
+            keys = sender.keys
+          }
 
           messages = await pb.collection('messages').getFullList({
             filter: `threadid="${threadId}"`,
@@ -143,15 +146,26 @@ const initPocketBaseClient = async () => {
           })
           messages = [...messages, record]
         }
-        
-        let llmMessages = messages.map((message: any) => ({
-          role: message.userid !== systemId 
-            ? 'user' 
-            : message?.system
-              ? 'system'
-              : 'assistant',
-          content: message.text
-        }))
+
+        let llmMessages = [
+          ...messages.map((message: any) => ({
+            role: message.userid !== systemId 
+              ? 'user' 
+              : message?.system
+                ? 'system'
+                : 'assistant',
+            content: message.text
+          })),
+          { 
+            role: 'system', 
+            content: `
+              The user's name is ${sender?.name} 
+              The user's bio is: ${sender?.bio}
+              The user's preferences: ${sender?.preferences}
+              You know the user. You work with them closely and frequently.
+            ` 
+          },
+        ]
 
         console.log('Replying to message')
         const assistantMessage = await pb.collection('messages').create({

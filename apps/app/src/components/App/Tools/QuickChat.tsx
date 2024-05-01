@@ -4,10 +4,9 @@ import { Avatar, Box, Button, Gap, Item, StyleHTML, markdownToHTML, scrollToElem
 import styled from 'styled-components'
 import { speak } from 'language/speech'
 import { TextBox } from 'components/App/TextBox' 
-import { useSpaces_currentUserId, useSpaces_usersById } from 'redux-tk/spaces/hooks'
+import { useSpaces_activeChannel, useSpaces_activeGroup, useSpaces_activeSpace, useSpaces_activeThread, useSpaces_currentUser, useSpaces_currentUserId, useSpaces_usersById } from 'redux-tk/spaces/hooks'
 import { usePersonas_activePersona } from 'redux-tk/personas/hooks'
 import useDynamicHeight from 'components/Hooks/useDynamicHeight'
-import { Query } from 'components/Util/Query'
 
 const Message = memo(({
   role,
@@ -93,6 +92,12 @@ const Message = memo(({
 export const QuickChat = () => {
   const [messages, setMessages] = useState(JSON.parse(localStorage.getItem('tools_quickChat_messages')) || [])
   const [stream, setStream] = useState('')
+  const currentUser = useSpaces_currentUser()
+
+  const activeSpace = useSpaces_activeSpace()
+  const activeGroup = useSpaces_activeGroup()
+  const activeChannel = useSpaces_activeChannel()
+  const activeThread = useSpaces_activeThread()
 
   useEffect(() => {
     localStorage.setItem('tools_quickChat_messages', JSON.stringify(messages))
@@ -109,6 +114,25 @@ export const QuickChat = () => {
   const sendMessage = (message: string) => {
     const newMessages = [
       ...[{ role: 'system', content: `Your name: ${activePersona?.name}, System message: ${activePersona?.systemmessage}`}].filter(_ => activePersona?.id),
+      { 
+        role: 'system', 
+        content: `
+          The user's name is ${currentUser?.name} 
+          The user's bio is: ${currentUser?.bio}
+          The user's preferences: ${currentUser?.preferences}
+          You know the user. You work with them closely and frequently.
+        ` 
+      },
+      { 
+        role: 'system', 
+        content: `
+          We are currently located in 
+          Space: ${activeSpace?.name}
+          Group: ${activeGroup?.name}
+          Channel: ${activeChannel?.name}
+          Thread: ${activeThread?.name}
+        ` 
+      },
       ...messages,
       { role: 'user', content: message }
     ]

@@ -21,6 +21,7 @@ interface StreamChatParams {
   messages: any
   callback: StreamCallback
   index?: boolean
+  temperature?: number,
   keys: any,
   agent?: boolean
   model: string
@@ -31,6 +32,7 @@ export const streamChatResponse = async ({
   messages, 
   callback, 
   keys,
+  temperature = 0.5,
   index, 
   agent,
   model
@@ -39,13 +41,12 @@ export const streamChatResponse = async ({
   const throttledCallback = throttle(callback, 16.67)
 
   console.log(`Provider: ${provider}, Model: ${model}`)
-  console.log(keys)
 
   switch(provider) {
     case 'OpenAI': {
       Settings.llm = new LlamaOpenAI({
         apiKey: keys?.OPENAI_API_KEY,
-        temperature: 0.5,
+        temperature,
         model
       })
       break
@@ -53,7 +54,7 @@ export const streamChatResponse = async ({
     case 'Groq': {
       Settings.llm = new Groq({
         apiKey: keys?.GROQ_API_KEY,
-        temperature: 0.5,
+        temperature,
         model
       })
       break
@@ -62,7 +63,7 @@ export const streamChatResponse = async ({
       Settings.llm = new Ollama({
         model,
         options: {
-          temperature: 0.5
+          temperature
         }
       })
     }
@@ -71,7 +72,7 @@ export const streamChatResponse = async ({
         apiKey: keys?.ANTHROPIC_API_KEY,
         // @ts-ignore
         model,
-        temperature: 0.5,
+        temperature,
       })
     }
   }
@@ -147,19 +148,23 @@ export const streamChatResponse = async ({
       stream = await ollama.chat({
         model,
         messages,
-        stream: true
+        stream: true,
+        options: {
+          temperature
+        }
       })
     }
     // TODO: add Anthropic
     else {
       const llm = new OpenAI({
         apiKey: provider === 'OpenAI' ? keys?.OPENAI_API_KEY : keys?.GROQ_API_KEY,
-        baseURL: provider === 'OpenAI' ? undefined : 'https://api.groq.com/openai/v1'
+        baseURL: provider === 'OpenAI' ? undefined : 'https://api.groq.com/openai/v1',
       })
       stream = await llm.chat.completions.create({
         model,
         messages,
-        stream: true
+        stream: true,
+        temperature
       })
     }
   

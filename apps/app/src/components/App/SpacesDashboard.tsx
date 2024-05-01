@@ -1,4 +1,4 @@
-import { AspectRatio, Gap, Grid, Icon, Page, useBreakpoint } from '@avsync.live/formation'
+import { AspectRatio, Button, Gap, Grid, Icon, Page, useBreakpoint } from '@avsync.live/formation'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Link } from 'components/Util/Link'
@@ -43,6 +43,24 @@ const SpacesDashboard = () => {
       </Grid>
       </Gap>
     </S.Inner>
+    <S.Absolute>
+      <Button
+        icon='users'
+        iconPrefix='fas'
+        text='Personas'
+        href='/personas'
+        minimal
+        compact
+      />
+      <Button
+        icon='user-circle'
+        iconPrefix='fas'
+        text='Profile'
+        href='/profile'
+        minimal
+        compact
+      />
+    </S.Absolute>
   </S.SpacesDashboard>)
 }
 
@@ -50,13 +68,14 @@ export default SpacesDashboard
 
 const S = {
   SpacesDashboard: styled.div`
-    min-height: calc(100vh - 1.5rem);
+    height: 100vh;;
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     background: black;
+    position: relative;
   `,
   Inner: styled.div<{
     isDesktop: boolean
@@ -95,5 +114,15 @@ const S = {
     width: 100%;
     height: 100%;
     overflow-y: visible;
+  `,
+
+  Absolute: styled.div`
+    width: 100%;
+    height: var(--F_Input_Height_Compact);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
   `
 }
