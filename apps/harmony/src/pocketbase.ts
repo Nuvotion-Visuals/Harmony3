@@ -158,64 +158,64 @@ const initPocketBaseClient = async () => {
           assistant: true
         })
 
-        streamChatResponse(persona?.provider || 'groq', llmMessages, async (data) => {
-          if (data.endOfStream) {
-            await pb.collection('messages').update(assistantMessage.id, {
-              text: data.message.content
-            })
-
-            if (isFirstAssistantMessage) {
-              console.log('Complete response and first assistant message in thread')
-
-              const newMessages = await pb.collection('messages').getFullList({
-                filter: `threadid="${threadId}"`,
-                sort: 'created'
+        streamChatResponse({
+          provider: persona?.provider || 'groq',
+          messages: llmMessages,
+          callback: async (data) => {
+            if (data.endOfStream) {
+              await pb.collection('messages').update(assistantMessage.id, {
+                text: data.message.content
               })
-    
-              let updatedLlmMessages = newMessages.map((message: any) => ({
-                role: message.userid !== systemId ? 'user' : 'assistant',
-                content: message.text
-              }))
-
-              const validator = new JsonValidator()
-              streamChatResponse(persona?.provider || 'groq', [
-                {
-                  role: 'system',
-                  content: `You are an API endpoint that provides a name and description for message thread based on a propmt, which is a series of messages.
-                    The description should be a very short sentence, no more than just a few words.
-                    The name starts with an emoji.
-                    You answer in the following JSON format.
+        
+              if (isFirstAssistantMessage) {
+                console.log('Complete response and first assistant message in thread')
+        
+                const newMessages = await pb.collection('messages').getFullList({
+                  filter: `threadid="${threadId}"`,
+                  sort: 'created'
+                })
+        
+                let updatedLlmMessages = newMessages.map((message: any) => ({
+                  role: message.userid !== systemId ? 'user' : 'assistant',
+                  content: message.text
+                }))
+        
+                const validator = new JsonValidator()
+                streamChatResponse({
+                  provider: persona?.provider || 'groq',
+                  messages: [{
+                      role: 'system',
+                      content: `You are an API endpoint that provides a name and description for message thread based on a prompt, which is a series of messages. The description should be a very short sentence, no more than just a few words. The name starts with an emoji. You answer in the following JSON format. {
+                        "name": "Social media strategies",
+                        "description": "Craft a successful social media strategy to build your brand's online presence and drive engagement."
+                      } If user feedback is provided it must be prioritized.
+                      
+                      Answer in as a valid JSON object, no extra commentary, only the object.`
+                    }, 
                     {
-                      "name": "Social media strategies",
-                      "description": "Craft a successful social media strategy to build your brand's online presence and drive engagement."
+                      role: 'user',
+                      content: JSON.stringify(updatedLlmMessages)
                     }
-                    If user feedback is provided it must be prioritized.
-          
-                    Answer in as a valid JSON object, no extra commentary, only the object. 
-                    `
-                },
-                {
-                  role: 'user',
-                  content: JSON.stringify(updatedLlmMessages)
-                }
-              ], 
-              async (data) => {
-                const name =  validator.parseJsonProperty(data.message.content, 'name')
-                const description = validator.parseJsonProperty(data.message.content, 'description')
-
-                if (name || description) {
-                  await pb.collection('threads').update(threadId, {
-                    name,
-                    description: description ? description : ''
-                  })
-                }
+                  ],
+                  callback: async (data) => {
+                    const name = validator.parseJsonProperty(data.message.content, 'name')
+                    const description = validator.parseJsonProperty(data.message.content, 'description')
+        
+                    if (name || description) {
+                      await pb.collection('threads').update(threadId, {
+                        name,
+                        description: description ? description : ''
+                      })
+                    }
+                  }
+                })
+              }
+            } 
+            else {
+              await pb.collection('messages').update(assistantMessage.id, {
+                text: data.message.content
               })
             }
-          } 
-          else {
-            await pb.collection('messages').update(assistantMessage.id, {
-              text: data.message.content
-            })
           }
         })
       }

@@ -2,8 +2,8 @@ import ollama from 'ollama'
 import OpenAI from 'openai'
 import { throttle } from 'lodash'
 import { ContextChatEngine, OpenAIAgent } from 'llamaindex'
-import { generateSpacesDataStructure, getData } from './query'
-import { Document, Groq, OpenAI as LlamaOpenAI, Ollama, Settings, VectorStoreIndex } from 'llamaindex'
+import { getDocuments } from './documents'
+import { Groq, OpenAI as LlamaOpenAI, Ollama, Settings, VectorStoreIndex } from 'llamaindex'
 import { ReActAgent } from 'llamaindex'
 import { extractWebPageContent_tool, extractYouTubeTranscript_tool } from './extract'
 
@@ -24,7 +24,21 @@ interface StreamResponsePart {
 
 type StreamCallback = (data: StreamResponsePart) => void
 
-export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq' | string, messages: any, callback: StreamCallback, index?: boolean, agent?: boolean) => {
+interface StreamChatParams {
+  provider: 'ollama' | 'openai' | 'groq' | string
+  messages: any
+  callback: StreamCallback
+  index?: boolean
+  agent?: boolean
+}
+
+export const streamChatResponse = async ({ 
+  provider, 
+  messages, 
+  callback, 
+  index, 
+  agent 
+}: StreamChatParams) => {
   let fullResponse: string[] = []
   const throttledCallback = throttle(callback, 16.67)
 
@@ -49,9 +63,6 @@ export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq' 
       })
     }
   }
-
-  index = true
-  agent = false
 
   let stream
 
@@ -79,8 +90,7 @@ export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq' 
 
         Please do not shorten answers, provide your FULL comprehensive answer, presenting ALL relevant detail in the answer.
 
-        Again, you MUST finish with an Answer:
-        Answer: [your answer here]
+        I can't see your message unless it's prefixed with Answer:
       `
     })
   
@@ -91,38 +101,25 @@ export const streamChatResponse = async (provider: 'ollama' | 'openai' | 'groq' 
     fullResponse.push(extractAnswer(response.response.message.content as string))
   }
   else if (index) {
-    const data = await getData()
-    const dataStructure = await generateSpacesDataStructure()
-    const spaces = new Document({ text: JSON.stringify({ spaces: data.spaces }), id_: 'spaces' })
-    const groups = new Document({ text: JSON.stringify({ groups: data.groups }), id_: 'groups' })
-    const channels = new Document({ text: JSON.stringify({ channels: data.channels }), id_: 'channels' })
-    const threads = new Document({ text: JSON.stringify({ threads: data.threads }), id_: 'threads' })
-    const messages2 = new Document({ text: JSON.stringify({ messages: data.messages }), id_: 'messages' })
-    const hirearchy = new Document({ text: JSON.stringify({ structure: dataStructure }), id_: 'hirearchy' })
-    const index = await VectorStoreIndex.fromDocuments([
-      spaces,
-      groups,
-      channels,
-      threads,
-      messages2,
-      hirearchy
-    ])
-
     const chatHistory = [
       {
         role: 'system',
         content: `
-          You may be asked to answer queries about the Harmony platform. It is organized into a hirearchy of:
+          You may sometimes be asked to answer queries about the Harmony platform. It is organized into a hirearchy of:
           Spaces -> Groups -> Channels -> Threads -> Messages, which each belonging only to their parent.
           Otherwise, answer as normal.
         `
       },
       ...messages
     ]
-
+    const index = await VectorStoreIndex.fromDocuments(await getDocuments())
     const retriever = index.asRetriever()
     const chatEngine = new ContextChatEngine({ retriever })
-    const stream = await chatEngine.chat({ message: messages[messages.length - 1]?.content, chatHistory, stream: true })
+    const stream = await chatEngine.chat({ 
+      message: messages[messages.length - 1]?.content, 
+      chatHistory, 
+      stream: true 
+    })
 
     for await (const chunk of stream) {
       fullResponse.push(chunk.response)

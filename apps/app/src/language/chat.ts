@@ -13,7 +13,9 @@ export const chat = (config: ChatConfig): () => void => {
   const payload = { 
     messages: config.messages, 
     provider, 
-    model
+    model,
+    index: true,
+    agent: false
   }
   const eventSource = new EventSource(`http://localhost:1616/chat?data=${encodeURIComponent(JSON.stringify(payload))}`)
 

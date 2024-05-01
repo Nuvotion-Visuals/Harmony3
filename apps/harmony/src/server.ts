@@ -35,13 +35,19 @@ export const initServer = () => {
     //   return
     // }
 
-    streamChatResponse(payload.provider, payload.messages, (data) => {
-      if (data.endOfStream) {
-        res.write(`data: ${JSON.stringify(data)}\n\n`)
-        res.end()
-      } 
-      else {
-        res.write(`data: ${JSON.stringify(data)}\n\n`)
+    streamChatResponse({
+      index: payload.index,
+      agent: payload.agent,
+      provider: payload.provider,
+      messages: payload.messages,
+      callback: (data) => {
+        if (data.endOfStream) {
+          res.write(`data: ${JSON.stringify(data)}\n\n`)
+          res.end()
+        } 
+        else {
+          res.write(`data: ${JSON.stringify(data)}\n\n`)
+        }
       }
     })
 

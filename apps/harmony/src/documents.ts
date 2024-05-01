@@ -6,6 +6,7 @@ import type {
   ThreadsResponse
 } from './pocketbase-types'
 import { getPocketBaseClient } from './pocketbase'
+import { Document } from 'llamaindex'
 
 interface SpacesDataStructure {
   spaces: {
@@ -30,8 +31,7 @@ interface SpacesDataStructure {
 }
 
 // Initialize the data structure from the database
-
-export async function generateSpacesDataStructure(): Promise<SpacesDataStructure> {
+async function generateSpacesDataStructure(): Promise<SpacesDataStructure> {
   const pb = getPocketBaseClient()
   
   const spacesData: SpacesDataStructure = { spaces: {} }
@@ -87,7 +87,6 @@ export async function generateSpacesDataStructure(): Promise<SpacesDataStructure
   return spacesData
 }
 
-
 interface DataStructure {
   spaces: SpacesResponse[]
   groups: GroupsResponse[]
@@ -96,7 +95,7 @@ interface DataStructure {
   messages: MessagesResponse[]
 }
 
-export async function getData(): Promise<DataStructure> {
+async function getStructureData(): Promise<DataStructure> {
   const pb = getPocketBaseClient()
   
   const spaces = await pb.collection('spaces').getFullList()
@@ -117,3 +116,16 @@ export async function getData(): Promise<DataStructure> {
   }
 }
 
+export async function getDocuments(): Promise<Document[]> {
+  const data = await getStructureData()
+  const dataStructure = await generateSpacesDataStructure()
+  console.log(dataStructure)
+  return [
+    new Document({ text: JSON.stringify({ spaces: data.spaces }), id_: 'spaces' }),
+    new Document({ text: JSON.stringify({ groups: data.groups }), id_: 'groups' }),
+    new Document({ text: JSON.stringify({ channels: data.channels }), id_: 'channels' }),
+    new Document({ text: JSON.stringify({ threads: data.threads }), id_: 'threads' }),
+    new Document({ text: JSON.stringify({ messages: data.messages }), id_: 'messages' }),
+    new Document({ text: JSON.stringify({ structure: dataStructure }), id_: 'structure' }),
+  ]
+}
