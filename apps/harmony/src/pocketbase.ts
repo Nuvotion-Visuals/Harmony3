@@ -4,6 +4,7 @@ import path from 'path'
 import { streamChatResponse } from './streamChatResponse'
 import { JsonValidator } from './JsonValidator'
 import { CollectionResponses, MessagesResponse, TypedPocketBase, UsersResponse } from './pocketbase-types'
+import { createJSONDocumentStructure } from './documents'
 
 let pb: any = null
 let systemId: string | null = null
@@ -17,6 +18,8 @@ const initPocketBaseClient = async () => {
   pb.autoCancellation(false)
 
   console.log('pocketbase started')
+
+  createJSONDocumentStructure()
 
   try {
     await pb.collection('users').authWithPassword(

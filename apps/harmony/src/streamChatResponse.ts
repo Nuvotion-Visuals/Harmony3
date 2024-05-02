@@ -1,7 +1,7 @@
 import ollama from 'ollama'
 import OpenAI from 'openai'
 import { throttle } from 'lodash'
-import { Anthropic, AnthropicAgent, ChatResponseChunk, ContextChatEngine, OpenAIAgent, OpenAIEmbedding } from 'llamaindex'
+import { Anthropic, AnthropicAgent, ChatResponseChunk, ContextChatEngine, OpenAIAgent, OpenAIEmbedding, QueryEngineTool } from 'llamaindex'
 import { getDocuments } from './documents'
 import { Groq, OpenAI as LlamaOpenAI, Ollama, Settings, VectorStoreIndex } from 'llamaindex'
 import { ReActAgent } from 'llamaindex'
@@ -46,7 +46,7 @@ export const streamChatResponse = async ({
 
   console.log(`Provider: ${provider}, Model: ${model}`)
 
-  // agent = true
+  agent = true
 
   switch(provider) {
     case 'OpenAI': {
@@ -90,13 +90,27 @@ export const streamChatResponse = async ({
   let stream
 
   if (agent) {
+    // @ts-ignore
+    const index = await VectorStoreIndex.fromDocuments(await getDocuments())
+    const queryEngine = index.asQueryEngine()
+
+     // Create a QueryEngineTool with the query engine
+    const queryEngineTool = new QueryEngineTool({
+      queryEngine,
+      metadata: {
+        name: 'harmony_query_engine',
+        description: 'A query engine for the Harmony platform of Spaces, Groups, Channels, Threads, and Messages',
+      },
+    });
+
     const agent = new (provider === 'OpenAI' ? OpenAIAgent : provider === 'Anthropic' ? AnthropicAgent : ReActAgent)({
       tools: [
         fetchWebPageContent_tool,
         fetchYouTubeTranscript_tool,
         fetchWebSearchResults_tool,
         fetchForecast_tool,
-        generateImage_tool
+        generateImage_tool,
+        queryEngineTool
       ],
       chatHistory: messages
     })
@@ -151,6 +165,7 @@ export const streamChatResponse = async ({
       ...messages
     ]
     Settings.chunkSize = 512
+    // @ts-ignore
     const index = await VectorStoreIndex.fromDocuments(await getDocuments())
     const retriever = index.asRetriever()
     retriever.similarityTopK = 5

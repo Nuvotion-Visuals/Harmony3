@@ -209,6 +209,12 @@ export const Message = memo(({
 
   const messageUser = usersById[message.userid]
 
+  const name = message?.assistant
+    ? personaInfo?.name
+        ? personaInfo?.name
+        : 'Assistant'
+    : messageUser?.name
+
   return <ContextMenu
     dropdownProps={{
       items: dropdownItems,
@@ -220,13 +226,7 @@ export const Message = memo(({
     <S.Message onMouseDown={onScrollWheelClick(() => handleDelete())} id={`message_${message.id}`}>
       <S.Left>
         <Avatar
-          name={
-            message?.assistant
-              ? personaInfo?.name
-                  ? personaInfo?.name
-                  : 'Assistant'
-              : messageUser?.name
-          }
+          name={name}
           labelColor={
             message?.assistant
               ? personaInfo?.avatar
@@ -250,7 +250,7 @@ export const Message = memo(({
       <S.Right>
         <MessageInfo
           key={message.id}
-          name={messageUser?.name}
+          name={name}
           onSpeak={onSpeak}
           created={message.created}
           dropdownItems={dropdownItems}

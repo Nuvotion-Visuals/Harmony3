@@ -8,6 +8,35 @@ import type {
 import { getPocketBaseClient } from './pocketbase'
 import { Document } from 'llamaindex'
 
+interface DataStructure {
+  spaces: SpacesResponse[]
+  groups: GroupsResponse[]
+  channels: ChannelsResponse[]
+  threads: ThreadsResponse[]
+  messages: MessagesResponse[]
+}
+
+async function getStructureData(): Promise<DataStructure> {
+  const pb = getPocketBaseClient()
+  
+  const spaces = await pb.collection('spaces').getFullList()
+  const groups = await pb.collection('groups').getFullList()
+  const channels = await pb.collection('channels').getFullList()
+  const threads = await pb.collection('threads').getFullList()
+  const messages = await pb.collection('messages').getFullList({
+    filter: `system != true && threadid != null`,
+    sort: 'created'
+  })
+
+  return {
+    spaces,
+    groups,
+    channels,
+    threads,
+    messages
+  }
+}
+
 interface SpacesDataStructure {
   spaces: {
     [id: string]: SpacesResponse & {
@@ -87,44 +116,77 @@ async function generateSpacesDataStructure(): Promise<SpacesDataStructure> {
   return spacesData
 }
 
-interface DataStructure {
-  spaces: SpacesResponse[]
-  groups: GroupsResponse[]
-  channels: ChannelsResponse[]
-  threads: ThreadsResponse[]
-  messages: MessagesResponse[]
+
+
+import { promises as fs } from 'fs'
+
+interface JSONDocument {
+  text: string
+  metadata: {
+    name: string
+    description: string
+  }
+  id_: string
 }
 
-async function getStructureData(): Promise<DataStructure> {
-  const pb = getPocketBaseClient()
-  
-  const spaces = await pb.collection('spaces').getFullList()
-  const groups = await pb.collection('groups').getFullList()
-  const channels = await pb.collection('channels').getFullList()
-  const threads = await pb.collection('threads').getFullList()
-  const messages = await pb.collection('messages').getFullList({
-    filter: `system != true && threadid != null`,
-    sort: 'created'
-  })
+const createSpacesDocument = (dataStructure: SpacesDataStructure): JSONDocument => {
+  const metadata = {
+    name: 'Spaces',
+    description: 'Spaces are the broadest organizational unit of the platform. They consist of Groups, Channels, Threads, and Messages.'
+  }
+
+  const spaces = Object.values(dataStructure.spaces).map(space => ({
+    name: space.name,
+    description: space.description
+  }))
 
   return {
-    spaces,
-    groups,
-    channels,
-    threads,
-    messages
+    text: JSON.stringify(`${JSON.stringify(metadata)} ${JSON.stringify(spaces)}`),
+    id_: 'spaces',
+    metadata
+  }
+}
+const createSpaceGroupsDocument = (space: SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]): JSONDocument => {
+  const metadata = {
+    name: `Groups in ${space.name} Space`,
+    description: `The groups available for space ${space.name}, each with name and description.`
+  }
+
+  const groups = Object.values(space.groups).map(group => ({
+    name: group.name,
+    description: group.description
+  }))
+
+  return {
+    text: JSON.stringify(`${JSON.stringify(metadata)} ${JSON.stringify(groups)}`),
+    id_: `groups_in_${space.name.replace(/\s+/g, '_')}`,
+    metadata
   }
 }
 
+export async function createJSONDocumentStructure(): Promise<JSONDocument[]> {
+  const dataStructure = await generateSpacesDataStructure() 
+  const jsonDocuments: JSONDocument[] = []
+
+  jsonDocuments.push(createSpacesDocument(dataStructure))
+
+  for (const spaceId in dataStructure.spaces) {
+    const space = dataStructure.spaces[spaceId]
+    if (Object.keys(space.groups).length > 0) {
+      jsonDocuments.push(createSpaceGroupsDocument(space))
+    }
+  }
+
+  await fs.writeFile('documentStructure.json', JSON.stringify(jsonDocuments, null, 2), 'utf8')
+  console.log('Document structure has been written to documentStructure.json')
+  return jsonDocuments
+}
+
+
 export async function getDocuments(): Promise<Document[]> {
-  const data = await getStructureData()
-  const dataStructure = await generateSpacesDataStructure()
-  return [
-    // new Document({ text: JSON.stringify({ spaces: data.spaces }), id_: 'spaces' }),
-    // new Document({ text: JSON.stringify({ groups: data.groups }), id_: 'groups' }),
-    // new Document({ text: JSON.stringify({ channels: data.channels }), id_: 'channels' }),
-    // new Document({ text: JSON.stringify({ threads: data.threads }), id_: 'threads' }),
-    // new Document({ text: JSON.stringify({ messages: data.messages }), id_: 'messages' }),
-    new Document({ text: JSON.stringify({ structure: dataStructure }), id_: 'structure' }),
-  ]
+  const JSONDocuments = await createJSONDocumentStructure()
+
+  console.log(JSONDocuments)
+
+  return JSONDocuments.map(json => new Document(json))
 }
