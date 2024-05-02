@@ -9,6 +9,7 @@ import { fetchWebPageContent_tool } from './tools/fetchWebPageContent'
 import { fetchYouTubeTranscript_tool } from './tools/fetchYouTubeTranscript'
 import { fetchWebSearchResults_tool } from './tools/fetchWebSearchResults'
 import { fetchForecast_tool } from './tools/fetchForcast'
+import { generateImage_tool } from './tools/generateImage'
 
 interface StreamResponsePart {
   message: {
@@ -94,7 +95,8 @@ export const streamChatResponse = async ({
         fetchWebPageContent_tool,
         fetchYouTubeTranscript_tool,
         fetchWebSearchResults_tool,
-        fetchForecast_tool
+        fetchForecast_tool,
+        generateImage_tool
       ],
       chatHistory: messages
     })
