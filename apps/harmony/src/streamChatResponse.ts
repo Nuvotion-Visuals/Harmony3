@@ -1,11 +1,14 @@
 import ollama from 'ollama'
 import OpenAI from 'openai'
 import { throttle } from 'lodash'
-import { Anthropic, AnthropicAgent, ContextChatEngine, OpenAIAgent, OpenAIEmbedding } from 'llamaindex'
+import { Anthropic, AnthropicAgent, ChatResponseChunk, ContextChatEngine, OpenAIAgent, OpenAIEmbedding } from 'llamaindex'
 import { getDocuments } from './documents'
 import { Groq, OpenAI as LlamaOpenAI, Ollama, Settings, VectorStoreIndex } from 'llamaindex'
 import { ReActAgent } from 'llamaindex'
-import { extractWebPageContent_tool, extractYouTubeTranscript_tool } from './extract'
+import { fetchWebPageContent_tool } from './tools/fetchWebPageContent'
+import { fetchYouTubeTranscript_tool } from './tools/fetchYouTubeTranscript'
+import { fetchWebSearchResults_tool } from './tools/fetchWebSearchResults'
+import { fetchForecast_tool } from './tools/fetchForcast'
 
 interface StreamResponsePart {
   message: {
@@ -41,6 +44,8 @@ export const streamChatResponse = async ({
   const throttledCallback = throttle(callback, 16.67)
 
   console.log(`Provider: ${provider}, Model: ${model}`)
+
+  // agent = true
 
   switch(provider) {
     case 'OpenAI': {
@@ -86,36 +91,50 @@ export const streamChatResponse = async ({
   if (agent) {
     const agent = new (provider === 'OpenAI' ? OpenAIAgent : provider === 'Anthropic' ? AnthropicAgent : ReActAgent)({
       tools: [
-        extractWebPageContent_tool,
-        extractYouTubeTranscript_tool
+        fetchWebPageContent_tool,
+        fetchYouTubeTranscript_tool,
+        fetchWebSearchResults_tool,
+        fetchForecast_tool
       ],
-      chatHistory: messages,
-      systemPrompt: `
-        NEVER ANSWER WITHOUT PREFIXING IT LIKE THIS:
-        Answer: [your answer here]
-
-        NEVER EVER REPLY WITHOUT A PREFIX!
-
-        If you don't need any tools, use:
-        Input: {}
-        NOT:
-        Input: None
-
-        Any time you have completed, and have a response ready to present, you MUST finish with an Answer:
-        NEVER ANSWER WITHOUT PREFIXING IT LIKE THIS:
-        Answer: [your answer here]
-
-        Please do not shorten answers, provide your FULL comprehensive answer, presenting ALL relevant detail in the answer.
-
-        I can't see your message unless it's prefixed with Answer:
-      `
+      chatHistory: messages
     })
   
-    const response = await agent.chat({
-      message: messages[messages.length - 1]?.content
-    })
-    const extractAnswer = (input: string): string => input.includes('Answer:') ? input.split('Answer:')[1].trim() : ''
-    fullResponse.push(extractAnswer(response.response.message.content as string))
+    const task = await agent.createTask(
+      messages[messages.length - 1]?.content,
+      true
+    )
+
+    for await (const stepOutput of task) {
+      const stream = stepOutput.output as ReadableStream<ChatResponseChunk>
+      if (stepOutput.isLast) {
+        // @ts-ignore
+        for await (const chunk of stream) {
+          fullResponse.push(chunk.delta)
+          throttledCallback({
+            message: {
+              content: fullResponse.join('')
+            }
+          })
+        }
+      } 
+      else {
+        console.log("handling function call...")
+        const loggedFunctions = new Set()
+        // @ts-ignore
+        for await (const chunk of stream) {
+          const functionName = chunk?.options?.toolCall?.name
+          if (functionName && !loggedFunctions.has(functionName)) {
+            fullResponse.push(`Performing: ${functionName}. `)
+            throttledCallback({
+              message: {
+                content: fullResponse.join('')
+              }
+            })
+            loggedFunctions.add(functionName)
+          }
+        }
+      }
+    }
   }
   else if (index) {
     const chatHistory = [
