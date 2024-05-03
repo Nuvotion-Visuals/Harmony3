@@ -7,6 +7,7 @@ export type ChatConfig = {
   messages: { role: 'user' | 'assistant' | 'system' | string, content: string }[]
   onPartial: ResponseCallback
   onComplete: ResponseCallback
+  agent?: boolean
 }
 
 export type ResponseCallback = (response: string) => void
@@ -19,7 +20,7 @@ export const chat = (config: ChatConfig): () => void => {
     provider, 
     model,
     index: true,
-    agent: false,
+    agent: config?.agent,
     keys
   }
   const eventSource = new EventSource(`http://localhost:1616/chat?data=${encodeURIComponent(JSON.stringify(payload))}`)

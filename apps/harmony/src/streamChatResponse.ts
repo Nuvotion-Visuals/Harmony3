@@ -46,8 +46,6 @@ export const streamChatResponse = async ({
 
   console.log(`Provider: ${provider}, Model: ${model}`)
 
-  agent = true
-
   switch(provider) {
     case 'OpenAI': {
       Settings.llm = new LlamaOpenAI({
@@ -103,6 +101,30 @@ export const streamChatResponse = async ({
       },
     });
 
+    const chatHistory = [
+      {
+        role: 'system',
+        content: `
+          NEVER ANSWER WITHOUT PREFIXING IT LIKE THIS:
+          Answer: [your answer here]
+
+          NEVER EVER REPLY WITHOUT A PREFIX!
+
+          If you don't need any tools, use:
+          Input: {}
+          NOT:
+          Input: None
+
+          Any time you have completed, and have a response ready to present, you MUST finish with an Answer:
+          NEVER ANSWER WITHOUT PREFIXING IT LIKE THIS:
+          Answer: [your answer here]
+
+          Please do not shorten answers, provide your FULL comprehensive answer, presenting ALL relevant detail in the answer.
+        `
+      },
+      ...messages
+    ]
+
     const agent = new (provider === 'OpenAI' ? OpenAIAgent : provider === 'Anthropic' ? AnthropicAgent : ReActAgent)({
       tools: [
         fetchWebPageContent_tool,
@@ -112,7 +134,7 @@ export const streamChatResponse = async ({
         generateImage_tool,
         queryEngineTool
       ],
-      chatHistory: messages
+      chatHistory
     })
   
     const task = await agent.createTask(

@@ -142,8 +142,8 @@ importers:
         specifier: ^24.0.0
         version: 24.0.0
       llamaindex:
-        specifier: ^0.3.3
-        version: 0.3.3(@notionhq/client@2.2.15)(node-fetch@3.3.2)(readable-stream@4.5.2)(typescript@5.3.3)
+        specifier: ^0.3.4
+        version: 0.3.4(@notionhq/client@2.2.15)(node-fetch@3.3.2)(readable-stream@4.5.2)(typescript@5.3.3)
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1475,6 +1475,11 @@ packages:
     dependencies:
       gsap: 3.12.5
       react: 18.2.0
+    dev: false
+
+  /@huggingface/inference@2.6.7:
+    resolution: {integrity: sha512-vFBqvtU3LhxjufTs0jcRrDSc0nK+lah10bOgvlIn80lAH4JwMzHHPBQ4g4ECEdRD0PIt6EpTiidEZQq2sArb5Q==}
+    engines: {node: '>=18'}
     dev: false
 
   /@huggingface/jinja@0.2.2:
@@ -8016,8 +8021,8 @@ packages:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
     dev: true
 
-  /llamaindex@0.3.3(@notionhq/client@2.2.15)(node-fetch@3.3.2)(readable-stream@4.5.2)(typescript@5.3.3):
-    resolution: {integrity: sha512-ec97Xrd0yNRug6eE/zeMuFCXEZYlU9Qh2ZZJbsmUs6lqqsfBJHjt1La6YZnVXyQPa0LOoMO73GM8Us/Gv4GeUg==}
+  /llamaindex@0.3.4(@notionhq/client@2.2.15)(node-fetch@3.3.2)(readable-stream@4.5.2)(typescript@5.3.3):
+    resolution: {integrity: sha512-YbX4PeBDOGQm6F2OCvrmS609vQeU4b8uD/l5Ht+FtfUbNF4KOBV+Rzs+E8lNqQ53bcgFxSaR3Qlkth7arnTv+w==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@notionhq/client': ^2.2.15
@@ -8027,6 +8032,7 @@ packages:
       '@datastax/astra-db-ts': 1.1.0
       '@google/generative-ai': 0.8.0
       '@grpc/grpc-js': 1.10.6
+      '@huggingface/inference': 2.6.7
       '@llamaindex/cloud': 0.0.5(node-fetch@3.3.2)
       '@llamaindex/env': 0.1.0(@aws-crypto/sha256-js@5.2.0)(pathe@1.1.2)(readable-stream@4.5.2)
       '@mistralai/mistralai': 0.1.3

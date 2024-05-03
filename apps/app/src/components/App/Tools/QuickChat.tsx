@@ -142,6 +142,7 @@ export const QuickChat = () => {
       messages: newMessages,
       provider: activePersona?.provider,
       model: activePersona?.model,
+      agent: true,
       onPartial: response => {
         setStream(response)
         scrollToElementById('quickchat_bottom', { behavior: 'auto', block: 'end'})
