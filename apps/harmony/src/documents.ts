@@ -8,35 +8,6 @@ import type {
 import { getPocketBaseClient } from './pocketbase'
 import { Document } from 'llamaindex'
 
-interface DataStructure {
-  spaces: SpacesResponse[]
-  groups: GroupsResponse[]
-  channels: ChannelsResponse[]
-  threads: ThreadsResponse[]
-  messages: MessagesResponse[]
-}
-
-async function getStructureData(): Promise<DataStructure> {
-  const pb = getPocketBaseClient()
-  
-  const spaces = await pb.collection('spaces').getFullList()
-  const groups = await pb.collection('groups').getFullList()
-  const channels = await pb.collection('channels').getFullList()
-  const threads = await pb.collection('threads').getFullList()
-  const messages = await pb.collection('messages').getFullList({
-    filter: `system != true && threadid != null`,
-    sort: 'created'
-  })
-
-  return {
-    spaces,
-    groups,
-    channels,
-    threads,
-    messages
-  }
-}
-
 interface SpacesDataStructure {
   spaces: {
     [id: string]: SpacesResponse & {
@@ -103,10 +74,12 @@ async function generateSpacesDataStructure(): Promise<SpacesDataStructure> {
 
           const messages = await pb.collection('messages').getFullList({ filter: `threadid='${thread.id}'` })
           for (const message of messages) {
-            spacesData.spaces[space.id].groups[group.id].channels[channel.id].threads[thread.id].messages[message.id] = {
-              id: message.id,
-              text: message.text,
-            } as MessagesResponse
+            if (!message?.system) {
+              spacesData.spaces[space.id].groups[group.id].channels[channel.id].threads[thread.id].messages[message.id] = {
+                id: message.id,
+                text: message.text,
+              } as MessagesResponse
+            }
           }
         }
       }
@@ -116,15 +89,13 @@ async function generateSpacesDataStructure(): Promise<SpacesDataStructure> {
   return spacesData
 }
 
-
-
 import { promises as fs } from 'fs'
 
 interface JSONDocument {
   text: string
   metadata: {
     name: string
-    description: string
+    description?: string
   }
   id_: string
 }
@@ -164,16 +135,93 @@ const createSpaceGroupsDocument = (space: SpacesDataStructure['spaces'][keyof Sp
   }
 }
 
+export const createGroupChannels = (spaceName: string, group: SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups'][keyof SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups']]): JSONDocument => {
+  const metadata = {
+    name: `Channels in ${group.name} Group of ${spaceName} Space`,
+  }
+
+  const channels = Object.values(group.channels).map(channel => ({
+    name: channel.name,
+    description: channel.description
+  }))
+
+  return {
+    text: JSON.stringify(`${JSON.stringify(metadata)} ${JSON.stringify(channels)}`),
+    id_: `channels_in_${group.name.replace(/\s+/g, '_')}_of_${spaceName.replace(/\s+/g, '_')}`,
+    metadata
+  }
+}
+
+export const createChannelThreads = (spaceName: string, groupName: string, channel: SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups'][keyof SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups']]['channels'][keyof SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups'][keyof SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups']]['channels']]): JSONDocument | null => {
+  if (Object.keys(channel.threads).length > 0) {
+    const metadata = {
+      name: `Threads in ${channel.name} Channel of ${groupName} Group in ${spaceName} Space`,
+      description: `Threads listed under the channel ${channel.name} of the group ${groupName} in the space ${spaceName}`
+    }
+
+    const threads = Object.values(channel.threads).map(thread => ({
+      name: thread.name
+    }))
+
+    return {
+      text: JSON.stringify(`${JSON.stringify(metadata)} ${JSON.stringify(threads)}`),
+      id_: `threads_in_${channel.name.replace(/\s+/g, '_')}_of_${groupName.replace(/\s+/g, '_')}_in_${spaceName.replace(/\s+/g, '_')}`,
+      metadata
+    }
+  }
+  return null
+}
+
+export const createThreadMessages = (
+  spaceName: string, 
+  groupName: string, 
+  channelName: string, 
+  thread: SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups'][keyof SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups']]['channels'][keyof SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups'][keyof SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups']]['channels']]['threads'][keyof SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups'][keyof SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups']]['channels'][keyof SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups'][keyof SpacesDataStructure['spaces'][keyof SpacesDataStructure['spaces']]['groups']]['channels']]['threads']]
+): JSONDocument | null => {
+  if (Object.keys(thread.messages).length > 0) {
+    const metadata = {
+      name: `Messages in ${thread.name} Thread of ${channelName} Channel in ${groupName} Group of ${spaceName} Space`,
+      description: thread.description
+    }
+
+    const messages = Object.values(thread.messages).map(message => ({
+      text: message.text
+    }))
+
+    return {
+      text: JSON.stringify(`${JSON.stringify(metadata)} ${JSON.stringify(messages)}`),
+      id_: `messages_in_${thread.name.replace(/\s+/g, '_')}_of_${channelName.replace(/\s+/g, '_')}_in_${groupName.replace(/\s+/g, '_')}_in_${spaceName.replace(/\s+/g, '_')}`,
+      metadata
+    }
+  }
+  return null
+}
+
 export async function createJSONDocumentStructure(): Promise<JSONDocument[]> {
-  const dataStructure = await generateSpacesDataStructure() 
+  const dataStructure = await generateSpacesDataStructure()
   const jsonDocuments: JSONDocument[] = []
 
   jsonDocuments.push(createSpacesDocument(dataStructure))
 
   for (const spaceId in dataStructure.spaces) {
     const space = dataStructure.spaces[spaceId]
-    if (Object.keys(space.groups).length > 0) {
-      jsonDocuments.push(createSpaceGroupsDocument(space))
+    for (const groupId in space.groups) {
+      const group = space.groups[groupId]
+      jsonDocuments.push(createGroupChannels(space.name, group)) // Ensure this call remains
+      for (const channelId in group.channels) {
+        const channel = group.channels[channelId]
+        const channelThreadsDocument = createChannelThreads(space.name, group.name, channel)
+        if (channelThreadsDocument !== null) {
+          jsonDocuments.push(channelThreadsDocument)
+        }
+        for (const threadId in channel.threads) {
+          const thread = channel.threads[threadId]
+          const threadMessagesDocument = createThreadMessages(space.name, group.name, channel.name, thread)
+          if (threadMessagesDocument !== null) {
+            jsonDocuments.push(threadMessagesDocument)
+          }
+        }
+      }
     }
   }
 
@@ -181,7 +229,6 @@ export async function createJSONDocumentStructure(): Promise<JSONDocument[]> {
   console.log('Document structure has been written to documentStructure.json')
   return jsonDocuments
 }
-
 
 export async function getDocuments(): Promise<Document[]> {
   const JSONDocuments = await createJSONDocumentStructure()
