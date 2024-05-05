@@ -18,7 +18,7 @@ export const generate_threadNameAndDescription = ({
         content: `You are an API endpoint that provides a name and description for message thread based on a propmt, which is a series of messages.
           The description should be a very short sentence, no more than just a few words.
           ${enableEmoji && 'The name starts with an emoji'}
-          You answer in the following JSON format.
+          You answer in the following JSON format. You must alway include a concise name and meaningful description.
           {
             "name": "Social media strategies",
             "description": "Craft a successful social media strategy to build your brand's online presence and drive engagement."

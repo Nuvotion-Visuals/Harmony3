@@ -1,4 +1,4 @@
-import { Box, Button, ExpandableLists, TextInput } from '@avsync.live/formation'
+import { Box, Button, ExpandableLists, Gap, LoadingSpinner, TextInput } from '@avsync.live/formation'
 import { generate_space } from 'language/generate/space'
 import { useRef, useState, useEffect } from 'react'
 import { JsonValidator } from 'utils/JSONValidator'
@@ -18,8 +18,10 @@ export const SpaceSuggestions = ({
   const [groups, setGroups] = useState([])
   const [value, setValue] = useState<any[] | null>(null)
   const jsonValidatorRef = useRef(new JsonValidator())
+  const [loading, setLoading] = useState(false)
 
   const onSuggest = () => {
+    setLoading(true)
     generate_space({
       prompt: `
         Name: ${name}
@@ -57,6 +59,7 @@ export const SpaceSuggestions = ({
           console.error('Error parsing groups data:', error)
           setGroups([])
         }
+        setLoading(false)
       }
     })
   }
@@ -88,22 +91,37 @@ export const SpaceSuggestions = ({
   return (
     <Box wrap width={'100%'}>
       <Box width={'100%'} mb={0.5} mt={groups.length > 0 ? 0.5 : 0}>
-        <TextInput
-          value={feedback}
-          onChange={val => setFeedback(val)}
-          placeholder='Suggest groups and channels'
-          hideOutline
-          compact
-          onEnter={onSuggest}
-        />
-        <Button
-          text='Suggest'
-          icon='bolt-lightning'
-          iconPrefix='fas'
-          secondary
-          compact
-          onClick={onSuggest}
-        />
+        <Gap disableWrap>
+          <TextInput
+            value={feedback}
+            onChange={val => setFeedback(val)}
+            placeholder='Suggest groups and channels'
+            hideOutline
+            compact
+            onEnter={onSuggest}
+            canClear={feedback !== ''}
+          />
+          {
+            (loading && value?.length === 0) && <LoadingSpinner compact />
+          }
+          <Button
+            text='Suggest'
+            icon='bolt-lightning'
+            iconPrefix='fas'
+            secondary
+            compact
+            onClick={onSuggest}
+            disabled={loading}
+          />
+          {
+            (value?.length > 0 && !loading) &&
+              <Button
+                onClick={() => setValue([])}
+                text='Clear'
+                compact
+              />
+          }
+        </Gap>
       </Box>
       <Box wrap width={'100%'}>
         {

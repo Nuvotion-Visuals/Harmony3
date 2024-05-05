@@ -98,10 +98,10 @@ export const streamChatResponse = async ({
       metadata: {
         name: 'harmony_query_engine',
         description: 'A query engine for the Harmony platform of Spaces, Groups, Channels, Threads, and Messages',
-      },
-    });
+      }
+    })
 
-    const chatHistory = [
+    const chatHistory = provider === 'OpenAI' ? messages : [
       {
         role: 'system',
         content: `

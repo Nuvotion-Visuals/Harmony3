@@ -48,7 +48,7 @@ export const Export = () => {
         onClick={handleDownload}
       />
       {
-        isLoading && <LoadingSpinner small />
+        isLoading && <LoadingSpinner compact />
       }
     </Gap>
   </Gap>

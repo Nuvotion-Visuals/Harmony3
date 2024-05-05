@@ -1,4 +1,4 @@
-import { Box, Button, Item, TextInput } from '@avsync.live/formation'
+import { Box, Button, Gap, Item, LoadingSpinner, TextInput } from '@avsync.live/formation'
 import { generate_groups } from 'language/generate/groups'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -16,7 +16,7 @@ export const GroupSuggestions = () => {
   const userId = useSpaces_currentUserId()
 
   const [feedback, setFeedback] = useState('')
-
+  const [loading, setLoading] = useState(false)
   const [suggestions, setSuggestions] = useState([])
 
   useEffect(() => {
@@ -26,8 +26,7 @@ export const GroupSuggestions = () => {
   const jsonValidatorRef = useRef(new JsonValidator())
 
   const onSuggest = () => {
-    setSuggestions([])
-    setFeedback('')
+    setLoading(true)
     generate_groups({
       prompt: `
         Space name: ${activeSpace?.name}
@@ -39,6 +38,7 @@ export const GroupSuggestions = () => {
       enableEmoji: true,
       onComplete: async (text) => {
         setSuggestions(JSON.parse(text)?.suggestions)
+        setLoading(false)
       },
       onPartial: text => {
         // @ts-ignore
@@ -80,24 +80,38 @@ export const GroupSuggestions = () => {
         }
       </Box>
       <Box width={'100%'} mb={.5} mt={suggestions?.length > 0 ? .5 : 0}>
-        <TextInput
-          value={feedback}
-          onChange={val => setFeedback(val)}
-          placeholder='Suggest new groups'
-          hideOutline
-          compact
-          onEnter={onSuggest}
-        />
-        <Button
-          text='Suggest'
-          icon='bolt-lightning'
-          iconPrefix='fas'
-          secondary
-          compact
-          onClick={onSuggest}
-        />
+        <Gap disableWrap>
+          <TextInput
+            value={feedback}
+            onChange={val => setFeedback(val)}
+            placeholder='Suggest new groups'
+            hideOutline
+            compact
+            onEnter={onSuggest}
+            canClear={feedback !== ''}
+          />
+          {
+            (loading && suggestions?.length === 0) && <LoadingSpinner compact />
+          }
+          <Button
+            text='Suggest'
+            icon='bolt-lightning'
+            iconPrefix='fas'
+            secondary
+            compact
+            onClick={onSuggest}
+            disabled={loading}
+          />
+          {
+            (suggestions?.length > 0 && !loading) &&
+              <Button
+                onClick={() => setSuggestions([])}
+                text='Clear'
+                compact
+              />
+          }
+        </Gap>
       </Box>
     </Box>
-   
   )
 }

@@ -223,7 +223,7 @@ export const Message = memo(({
     }}
   >
     <div id={`message_${id}_top`} />
-    <S.Message onMouseDown={onScrollWheelClick(() => handleDelete())} id={`message_${message.id}`}>
+    <S.Message id={`message_${message.id}`}>
       <S.Left>
         <Avatar
           name={name}

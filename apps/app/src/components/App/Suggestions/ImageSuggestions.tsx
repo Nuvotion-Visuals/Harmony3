@@ -94,7 +94,7 @@ export const ImageSuggestions = ({
         {
           loading 
             ? <S.Loading>
-                <LoadingSpinner small />
+                <LoadingSpinner compact />
                 <S.Text>{chosenSuggestion}</S.Text>
               </S.Loading>
             : <>

@@ -14,7 +14,10 @@ export type ResponseCallback = (response: string) => void
 
 export const chat = (config: ChatConfig): () => void => {
   const keys = selectCurrentUser(store.getState())?.keys
-  const { provider = 'groq', model = 'llama3-70b-8192' } = config
+  const { 
+    provider = 'groq', 
+    model = 'llama3-70b-8192',
+  } = config
   const payload = { 
     messages: config.messages, 
     provider, 

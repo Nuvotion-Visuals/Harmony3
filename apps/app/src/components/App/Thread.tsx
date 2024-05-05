@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from 'react'
 import styled from 'styled-components'
 import { useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
-import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, TextInput, onScrollWheelClick, scrollToElementById, useDialog } from '@avsync.live/formation'
+import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, LoadingSpinner, TextInput, onScrollWheelClick, scrollToElementById, useDialog } from '@avsync.live/formation'
 import { Message } from 'components/App/Message'
 import { pb } from 'redux-tk/pocketbase'
 import { generate_threadNameAndDescription } from 'language/generate/threadNameAndDescription'
@@ -34,6 +34,7 @@ export const Thread = memo(({
   const [name, setName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
   const [description, setDescription] = useState(thread?.description)
   const [edit, setEdit] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const { openDialog } = useDialog()
 
@@ -154,6 +155,7 @@ export const Thread = memo(({
       text: 'Suggest',
       onClick: (e) => {
         e.stopPropagation()
+        setLoading(true)
         const threadMessagesWithRole = selectors.selectThreadMessagesWithRole(thread.id)(store.getState())
         generate_threadNameAndDescription({
           prompt: JSON.stringify(threadMessagesWithRole),
@@ -172,6 +174,7 @@ export const Thread = memo(({
               console.error('Failed to update thread:', error)
               alert('Failed to update thread')
             }
+            setLoading(false)
           },
           onPartial: text => {
             setName(jsonValidatorRef.current.parseJsonProperty(text, 'name'))
@@ -263,6 +266,9 @@ export const Thread = memo(({
                 onClick={toggleExpanded}
                 onMouseDown={onScrollWheelClick(() => dialog())}
               >
+                {
+                  loading && <LoadingSpinner compact />
+                }
                 <Count
                   count={thread?.messageIds?.length}
                 />

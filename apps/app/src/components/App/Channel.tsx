@@ -68,7 +68,7 @@ export const Channel = () => {
       }
       scrollToElementById(`thread_${activeThreadId}`, { behavior: 'smooth' })
     }
-  }, [activeThreadId, activeChannelThreads])
+  }, [activeThreadId, activeChannelThreads?.length])
 
   const handleNewThreadId = useCallback((newThreadId) => {
     setNewThreadId(newThreadId)

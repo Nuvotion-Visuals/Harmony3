@@ -1,4 +1,4 @@
-import { Box, Button, Item, TextInput } from '@avsync.live/formation'
+import { Box, Button, Gap, Item, LoadingSpinner, TextInput } from '@avsync.live/formation'
 import { generate_messages } from 'language/generate/messages'
 import * as selectors from 'redux-tk/spaces/selectors'
 import { useEffect, useRef, useState } from 'react'
@@ -13,7 +13,7 @@ export const MessageSuggestions = () => {
   const activeThread = useSpaces_activeThread()
 
   const [feedback, setFeedback] = useState('')
-
+  const [loading, setLoading] = useState(false)
   const [suggestions, setSuggestions] = useState([])
 
   useEffect(() => {
@@ -23,8 +23,8 @@ export const MessageSuggestions = () => {
   const jsonValidatorRef = useRef(new JsonValidator())
 
   const onSuggest = () => {
+    setLoading(true)
     setSuggestions([])
-    setFeedback('')
     const threadMessagesWithRole = selectors.selectThreadMessagesWithRole(activeThread.id)(store.getState())
     generate_messages({
       prompt: `
@@ -40,6 +40,7 @@ export const MessageSuggestions = () => {
       enableEmoji: true,
       onComplete: async (text) => {
         setSuggestions(JSON.parse(text)?.suggestions)
+        setLoading(false)
       },
       onPartial: text => {
         console.log(text)
@@ -68,22 +69,37 @@ export const MessageSuggestions = () => {
         }
       </Box>
       <Box width={'100%'} mb={.5} mt={suggestions?.length > 0 ? .5 : 0}>
-        <TextInput
-          value={feedback}
-          onChange={val => setFeedback(val)}
-          placeholder='Suggest new messages'
-          hideOutline
-          compact
-          onEnter={onSuggest}
-        />
-        <Button
-          text='Suggest'
-          icon='bolt-lightning'
-          iconPrefix='fas'
-          secondary
-          compact
-          onClick={onSuggest}
-        />
+        <Gap disableWrap>
+          <TextInput
+            value={feedback}
+            onChange={val => setFeedback(val)}
+            placeholder='Suggest new messages'
+            hideOutline
+            compact
+            onEnter={onSuggest}
+            canClear={feedback !== ''}
+          />
+          {
+            (loading && suggestions?.length === 0) && <LoadingSpinner compact />
+          }
+          <Button
+            text='Suggest'
+            icon='bolt-lightning'
+            iconPrefix='fas'
+            secondary
+            compact
+            onClick={onSuggest}
+            disabled={loading}
+          />
+          {
+            (suggestions?.length > 0 && !loading) &&
+              <Button
+                onClick={() => setSuggestions([])}
+                text='Clear'
+                compact
+              />
+          }
+        </Gap>
       </Box>
     </Box>
    
