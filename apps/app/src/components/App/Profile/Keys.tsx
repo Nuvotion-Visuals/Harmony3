@@ -1,11 +1,10 @@
 import { Button, Gap, TextInput, Notification } from '@avsync.live/formation'
 import { useEffect, useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
-import { useSpaces_currentUser, useSpaces_setCurrentUser } from 'redux-tk/spaces/hooks'
+import { useSpaces_currentUser } from 'redux-tk/spaces/hooks'
 
 export const Keys = () => {
   const currentUser = useSpaces_currentUser()
-  const setCurrentUser = useSpaces_setCurrentUser()
 
   const [OPENAI_API_KEY, set_OPENAI_API_KEY] = useState('') 
   const [GROQ_API_KEY, set_GROQ_API_KEY] = useState('') 

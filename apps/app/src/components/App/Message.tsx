@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, RichTextEditor, StyleHTML, markdownToHTML, onScrollWheelClick, scrollToElementById } from '@avsync.live/formation'
+import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, RichTextEditor, StyleHTML, markdownToHTML, scrollToElementById } from '@avsync.live/formation'
 import { memo, useEffect, useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
 import { speak } from '../../language/speech'

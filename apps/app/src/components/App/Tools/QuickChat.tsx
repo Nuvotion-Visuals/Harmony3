@@ -139,6 +139,7 @@ export const QuickChat = () => {
     setMessages(newMessages)
 
     chat({
+      retrieve: true,
       messages: newMessages,
       provider: activePersona?.provider,
       model: activePersona?.model,

@@ -10,6 +10,7 @@ export const generate_image = ({
   onPartial: (text: string) => void
 }) => {
   chat({
+    retrieve: false,
     messages: [
       {
         role: 'system',

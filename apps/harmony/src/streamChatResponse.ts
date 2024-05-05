@@ -24,7 +24,7 @@ interface StreamChatParams {
   provider: 'Ollama' | 'OpenAI' | 'Groq' | 'Anthropic' | string
   messages: any
   callback: StreamCallback
-  index?: boolean
+  retrieve?: boolean
   temperature?: number,
   keys: any,
   agent?: boolean
@@ -37,7 +37,7 @@ export const streamChatResponse = async ({
   callback, 
   keys,
   temperature = 0.5,
-  index, 
+  retrieve, 
   agent,
   model
 }: StreamChatParams) => {
@@ -174,7 +174,7 @@ export const streamChatResponse = async ({
       }
     }
   }
-  else if (index) {
+  else if (retrieve) {
     const chatHistory = [
       {
         role: 'system',

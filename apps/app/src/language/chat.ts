@@ -4,6 +4,7 @@ import { store } from 'redux-tk/store'
 export type ChatConfig = {
   provider?: 'openai' | 'groq' | 'ollama' | string
   model?: string
+  retrieve: boolean
   messages: { role: 'user' | 'assistant' | 'system' | string, content: string }[]
   onPartial: ResponseCallback
   onComplete: ResponseCallback
@@ -17,12 +18,13 @@ export const chat = (config: ChatConfig): () => void => {
   const { 
     provider = 'groq', 
     model = 'llama3-70b-8192',
+    retrieve
   } = config
   const payload = { 
     messages: config.messages, 
     provider, 
     model,
-    index: true,
+    retrieve,
     agent: config?.agent,
     keys
   }

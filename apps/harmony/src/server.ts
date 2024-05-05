@@ -41,7 +41,7 @@ export const initServer = () => {
     streamChatResponse({
       model: payload.model,
       keys: payload.keys,
-      index: payload.index,
+      retrieve: payload.retrieve,
       agent: payload.agent,
       provider: payload.provider,
       messages: payload.messages,

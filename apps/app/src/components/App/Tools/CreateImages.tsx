@@ -128,6 +128,7 @@ export const CreateImages = () => {
     setMessages(newMessages)
 
     chat({
+      retrieve: false,
       messages: newMessages.map(({ role, content}) => ({ role, content })),
       provider: activePersona?.provider,
       model: activePersona?.model,

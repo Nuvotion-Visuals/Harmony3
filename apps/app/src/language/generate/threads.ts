@@ -12,6 +12,7 @@ export const generate_threads = ({
   onPartial: (text: string) => void
 }) => {
   chat({
+    retrieve: true,
     messages: [
       {
         role: 'system',

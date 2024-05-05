@@ -41,6 +41,9 @@ export const useSpaces_activeMessage = (): CollectionResponses['messages'] | und
 export const useSpaces_activeSpaceIndex = (): number | null => 
   useSelector(selectors.selectActiveSpaceIndex, isEqual)
 
+export const useSpaces_activeChannelInfo = (): { name: string; description: string; id: string } | null => 
+  useSelector(selectors.selectActiveChannelInfo, isEqual)
+
 export const useSpaces_currentUser = (): UsersResponse | null => 
   useSelector(selectors.selectCurrentUser, isEqual)
 

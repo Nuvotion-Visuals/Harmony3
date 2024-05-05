@@ -12,6 +12,7 @@ export const generate_threadNameAndDescription = ({
   onPartial: (text: string) => void
 }) => {
   chat({
+    retrieve: false,
     messages: [
       {
         role: 'system',
@@ -19,6 +20,7 @@ export const generate_threadNameAndDescription = ({
           The description should be a very short sentence, no more than just a few words.
           ${enableEmoji && 'The name starts with an emoji'}
           You answer in the following JSON format. You must alway include a concise name and meaningful description.
+          The description should be a full sentence and accurately capture the PURPOSE and GOALS of the discussion.
           {
             "name": "Social media strategies",
             "description": "Craft a successful social media strategy to build your brand's online presence and drive engagement."

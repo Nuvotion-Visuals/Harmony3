@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from 'react'
 import styled from 'styled-components'
-import { useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
+import {  useSpaces_activeChannelInfo, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
 import { Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, LoadingSpinner, TextInput, onScrollWheelClick, scrollToElementById, useDialog } from '@avsync.live/formation'
 import { Message } from 'components/App/Message'
 import { pb } from 'redux-tk/pocketbase'
@@ -30,7 +30,7 @@ export const Thread = memo(({
   expanded
 }: Props) => {
   const setActiveThreadId = useSpaces_setActiveThreadId()
-
+  const activeChannelInfo = useSpaces_activeChannelInfo()
   const [name, setName] = useState(thread?.name === 'New thread' ? '' : thread?.name)
   const [description, setDescription] = useState(thread?.description)
   const [edit, setEdit] = useState(false)
@@ -158,7 +158,11 @@ export const Thread = memo(({
         setLoading(true)
         const threadMessagesWithRole = selectors.selectThreadMessagesWithRole(thread.id)(store.getState())
         generate_threadNameAndDescription({
-          prompt: JSON.stringify(threadMessagesWithRole),
+          prompt: JSON.stringify({
+            channelName: activeChannelInfo?.name,
+            description: activeChannelInfo?.description,
+            threadMessagesWithRole
+          }),
           enableEmoji: true,
           onComplete: async (text) => {
             const newName = JSON.parse(text).name

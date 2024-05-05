@@ -236,3 +236,12 @@ export const selectCountByChannelId = (state: State): Record<string, { threads: 
 
   return countsByChannelId
 }
+
+export const selectActiveChannelInfo = (state: State): { name: string; description: string; id: string } | undefined => {
+  const activeChannel = state.spaces.channels.find(channel => channel.id === state.spaces.activeChannelId)
+  return activeChannel ? {
+    name: activeChannel.name || '',
+    description: activeChannel.description || '',
+    id: activeChannel.id
+  } : null
+}
