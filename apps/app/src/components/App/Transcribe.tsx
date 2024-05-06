@@ -1,4 +1,5 @@
 import { Box, Button, Gap, LoadingSpinner } from '@avsync.live/formation'
+import { playSound } from 'hearing/sound'
 import React, { useState, useRef, useEffect } from 'react'
 
 interface Props {
@@ -102,7 +103,16 @@ export const Transcribe = ({
               circle
               minimal
               blink={recording}
-              onClick={recording ? handleStopRecording : handleStartRecording}
+              onClick={() => {
+                if (recording) {
+                  handleStopRecording()
+                  playSound('send')
+                }
+                else {
+                  handleStartRecording()
+                  playSound('listen')
+                }
+              }}
             />
       }
     </Gap>

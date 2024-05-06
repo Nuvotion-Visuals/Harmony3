@@ -107,6 +107,7 @@ export const Channel = () => {
       <TextBox 
         onNewThreadId={handleNewThreadId}
         activeThreadId={activeThreadId}
+        enableListening
       />
     </S.TextBoxContainer>
   </S.Container>)

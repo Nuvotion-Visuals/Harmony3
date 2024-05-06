@@ -9,6 +9,7 @@
       "utils/*": ["src/utils/*"],
       "spaces/*": ["src/spaces/*"],
       "voice/*": ["src/voice/*"],
+      "hearing/*": ["src/hearing/*"],
       "react": [ "./node_modules/@types/react" ]
     },
     "target": "ESNext",

@@ -24,6 +24,7 @@ export default defineConfig({
       'utils': path.resolve(__dirname, 'src/utils'),
       'spaces': path.resolve(__dirname, 'src/spaces'),
       'voice': path.resolve(__dirname, 'src/voice'),
+      'hearing': path.resolve(__dirname, 'src/hearing'),
     }
   },
 })
