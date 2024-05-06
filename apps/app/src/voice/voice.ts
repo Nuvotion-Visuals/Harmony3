@@ -1,5 +1,10 @@
 import { split } from 'sentence-splitter'
 import { HTMLToPlaintext } from '@avsync.live/formation'
+import { createWatcher } from 'redux-tk/createWatcher'
+import { store } from 'redux-tk/store'
+import { selectMessageById } from 'redux-tk/spaces/selectors'
+
+import { voiceActions } from 'redux-tk/voice/slice'
 
 const removeOldHighlights = (html: string): string => {
   const openingTag = `<span style="background-color: #312800;">`
@@ -57,9 +62,11 @@ class SpeechSynthesizer {
   private isPlaying = false
   private currentSentenceIndex = 0
   private fetchIndex = 0
+  public onComplete: () => void  // Adding the onComplete callback property
 
-  constructor(private sentences: string[], private baseUrl: string, private guid: string) {
+  constructor(private sentences: string[], private baseUrl: string, private guid: string, onComplete?: () => void) {
     this.sentences.forEach(sentence => this.audioDataMap.set(sentence, null))
+    this.onComplete = onComplete  // Initialize the onComplete callback
     this.fetchNextAudioElement()
   }
 
@@ -76,7 +83,7 @@ class SpeechSynthesizer {
       const blob = await response.blob()
       const blobUrl = URL.createObjectURL(blob)
       this.audioDataMap.set(sentence, blobUrl)
-      this.maybePlayAudio() // Check if we can start playing right away
+      this.maybePlayAudio()  // Check if we can start playing right away
     } 
     catch (error) {
       console.error(`Failed to fetch audio for sentence: ${sentence}`, error)
@@ -94,6 +101,8 @@ class SpeechSynthesizer {
       if (audioUrl) {
         this.playAudio(sentence, audioUrl)
       }
+    } else if (this.currentSentenceIndex >= this.sentences.length && !this.isPlaying) {
+      this.onComplete && this.onComplete()  // Call the onComplete callback when everything is done
     }
   }
 
@@ -110,7 +119,7 @@ class SpeechSynthesizer {
         this.isPlaying = false
         searchAndHighlight(this.guid, null)
         this.currentSentenceIndex++
-        this.maybePlayAudio() // Continue to next audio if available
+        this.maybePlayAudio()  // Continue to next audio if available
       }
     })
   }
@@ -120,7 +129,7 @@ class SpeechSynthesizer {
   }
 }
 
-export async function speak(text: string, guid: string, callback: (error: any) => void): Promise<void> {
+export async function speak(text: string, guid: string): Promise<void> {
   // Remove all markdown code blocks
   text = text.replace(/```[\s\S]*?```/g, "")
 
@@ -137,7 +146,6 @@ export async function speak(text: string, guid: string, callback: (error: any) =
   text = text.replace(/\*/g, '')
 
   if (text === '') {
-    callback(new Error('No text to speak'))
     return
   }
 
@@ -154,7 +162,20 @@ export async function speak(text: string, guid: string, callback: (error: any) =
 
   console.log(sentences)
 
-  const synthesizer = new SpeechSynthesizer(sentences, baseUrl, guid)
+  const synthesizer = new SpeechSynthesizer(sentences, baseUrl, guid, () => {
+    store.dispatch(voiceActions.setMessageId(null))
+  })
   synthesizer.speak()
-  callback(null)
 }
+
+createWatcher({
+  selectData: () => store.getState().voice.messageId,
+  onChange: (id) => {
+    const message = selectMessageById(id)(store.getState())
+    if (message) {
+      const { text } = message
+      console.log(text)
+      speak(text, `message_${id}`)
+    }
+  }
+})

@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { useSpaces_messageById, useSpaces_setActiveThreadId, useSpaces_usersById } from 'redux-tk/spaces/hooks'
 import { usePersonas_personaInfoById } from 'redux-tk/personas/hooks'
 import { formatDate } from 'utils/formatDate'
+import { useVoice_setMessageId } from 'redux-tk/voice/hooks'
 
 interface MessageInfoProps {
   created: string
@@ -20,7 +21,6 @@ const MessageInfo: React.FC<MessageInfoProps> = memo(({
   dropdownItems,
   onSpeak
 }) => {
-
   return (
     <Item
       subtitle={name}
@@ -77,6 +77,7 @@ export const Message = memo(({
   const usersById = useSpaces_usersById()
   const setActiveThreadId = useSpaces_setActiveThreadId()
   const personaInfo = usePersonas_personaInfoById(message?.personaid)
+  const setMessageId = useVoice_setMessageId()
   
   const [edit, setEdit] = useState(false)
   const [editText, setEditText] = useState(message?.text)
@@ -109,7 +110,8 @@ export const Message = memo(({
   }
 
   const onSpeak = () => {
-    speak(message.text, `message_${id}`, () => {})
+    // speak(message.text, `message_${id}`, () => {})
+    setMessageId(id)
   }
 
   const dropdownItems = [
@@ -193,7 +195,7 @@ export const Message = memo(({
       iconPrefix: 'fas',
       compact: true,
       text: 'Speak',
-      onClick: () => onSpeak()
+      onClick: () => setMessageId(id)
     },
     {
       children: <LineBreak color='var(--F_Font_Color_Disabled)'/>
