@@ -7,7 +7,7 @@ import { usePersonas_activePersona, usePersonas_activePersonaId, usePersonas_per
 import { useNavigate } from 'react-router-dom'
 import { Voice } from './Voice'
 import { Transcribe } from './Transcribe'
-import { Transcription, useHearing } from 'components/App/Transcription'
+// import { Transcription, useHearing } from 'components/App/Transcription'
 
 interface Props {
   onNewThreadId?: (threadId: string) => void
@@ -24,7 +24,7 @@ export const TextBox = memo(({
   onSend,
   disablePersonas,
   placeholder,
-  enableListening
+  // enableListening
 }: Props) => {
   const navigate = useNavigate()
   const [text, setText] = useState('')
@@ -138,11 +138,11 @@ export const TextBox = memo(({
 
   return (
     <S.Wrapper>
-      {
+      {/* {
         enableListening && <Transcription
           onTranscription={val => setText(val)}
         />
-      }
+      } */}
       {
         !disablePersonas && 
           <Box width='100%' height='var(--F_Input_Height_Compact)'>
@@ -220,7 +220,10 @@ export const TextBox = memo(({
         <S.Absolute>
           <Box>
             <Transcribe
-              onTranscription={val => setText(val)}
+              onTranscription={val => {
+                setText(val)
+                sendMessage(val)
+              }}
             />
             {
               text &&  <Button

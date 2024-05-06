@@ -1,4 +1,5 @@
-import { Box, Button, ExpandableLists, Gap, LoadingSpinner, TextInput } from '@avsync.live/formation'
+import { Box, Button, ExpandableLists, Gap, LoadingSpinner } from '@avsync.live/formation'
+import { TextInputVoice } from 'components/Input/TextInputVoice'
 import { generate_space } from 'language/generate/space'
 import { useRef, useState, useEffect } from 'react'
 import { JsonValidator } from 'utils/JSONValidator'
@@ -92,7 +93,7 @@ export const SpaceSuggestions = ({
     <Box wrap width={'100%'}>
       <Box width={'100%'} mb={0.5} mt={groups.length > 0 ? 0.5 : 0}>
         <Gap disableWrap>
-          <TextInput
+          <TextInputVoice
             value={feedback}
             onChange={val => setFeedback(val)}
             placeholder='Suggest groups and channels'
@@ -100,6 +101,7 @@ export const SpaceSuggestions = ({
             compact
             onEnter={onSuggest}
             canClear={feedback !== ''}
+            onFinishedTranscription={onSuggest}
           />
           {
             loading && <LoadingSpinner compact />

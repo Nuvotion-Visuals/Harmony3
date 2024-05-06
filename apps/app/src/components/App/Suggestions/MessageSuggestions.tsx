@@ -1,4 +1,4 @@
-import { Box, Button, Gap, Item, LoadingSpinner, TextInput } from '@avsync.live/formation'
+import { Box, Button, Gap, Item, LoadingSpinner } from '@avsync.live/formation'
 import { generate_messages } from 'language/generate/messages'
 import * as selectors from 'redux-tk/spaces/selectors'
 import { useEffect, useRef, useState } from 'react'
@@ -6,6 +6,7 @@ import { useSpaces_activeChannel, useSpaces_activeSpace, useSpaces_activeThread 
 import { store } from 'redux-tk/store'
 import { sendMessage } from 'spaces/sendMessage'
 import { JsonValidator } from 'utils/JSONValidator'
+import { TextInputVoice } from 'components/Input/TextInputVoice'
 
 export const MessageSuggestions = () => {
   const activeSpace = useSpaces_activeSpace()
@@ -70,7 +71,7 @@ export const MessageSuggestions = () => {
       </Box>
       <Box width={'100%'} mb={.5} mt={suggestions?.length > 0 ? .5 : 0}>
         <Gap disableWrap>
-          <TextInput
+          <TextInputVoice
             value={feedback}
             onChange={val => setFeedback(val)}
             placeholder='Suggest new messages'
@@ -78,6 +79,7 @@ export const MessageSuggestions = () => {
             compact
             onEnter={onSuggest}
             canClear={feedback !== ''}
+            onFinishedTranscription={onSuggest}
           />
           {
             loading && <LoadingSpinner compact />

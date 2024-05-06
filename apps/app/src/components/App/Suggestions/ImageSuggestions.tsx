@@ -1,4 +1,5 @@
-import { Box, Button, Item, LoadingSpinner, TextInput, Gap } from '@avsync.live/formation'
+import { Box, Button, Item, LoadingSpinner, Gap } from '@avsync.live/formation'
+import { TextInputVoice } from 'components/Input/TextInputVoice'
 import { generate_image } from 'language/generate/image'
 import { useRef, useState } from 'react'
 import styled from 'styled-components'
@@ -99,13 +100,14 @@ export const ImageSuggestions = ({
           </Box>
         }
         <Gap disableWrap>
-          <TextInput
+          <TextInputVoice
             value={feedback}
             onChange={val => setFeedback(val)}
             placeholder={placeholder ? placeholder : 'Suggest new image'}
             hideOutline
             compact
             onEnter={onSuggest}
+            onFinishedTranscription={onSuggest}
           />
           <Button
             text='Suggest'

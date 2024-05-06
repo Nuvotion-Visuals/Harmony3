@@ -1,10 +1,11 @@
-import { Box, Button, Gap, Item, LoadingSpinner, TextInput } from '@avsync.live/formation'
+import { Box, Button, Gap, Item, LoadingSpinner } from '@avsync.live/formation'
 import { generate_groups } from 'language/generate/groups'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSpaces_activeSpace, useSpaces_setActiveThreadId, useSpaces_currentUserId, useSpaces_activeGroup } from 'redux-tk/spaces/hooks'
 import { pb } from 'redux-tk/pocketbase'
 import { JsonValidator } from 'utils/JSONValidator'
+import { TextInputVoice } from 'components/Input/TextInputVoice'
 
 export const GroupSuggestions = () => {
   const navigate = useNavigate()
@@ -81,7 +82,7 @@ export const GroupSuggestions = () => {
       </Box>
       <Box width={'100%'} mb={.5} mt={suggestions?.length > 0 ? .5 : 0}>
         <Gap disableWrap>
-          <TextInput
+          <TextInputVoice
             value={feedback}
             onChange={val => setFeedback(val)}
             placeholder='Suggest new groups'
@@ -89,6 +90,7 @@ export const GroupSuggestions = () => {
             compact
             onEnter={onSuggest}
             canClear={feedback !== ''}
+            onFinishedTranscription={onSuggest}
           />
           {
             loading && <LoadingSpinner compact />
