@@ -5,14 +5,28 @@ import { generateImage } from './images'
 import archiver from 'archiver'
 import path from 'path'
 import fs from 'fs'
+import multer from 'multer'
+import { stt } from './stt'
 
 export const initServer = () => {
   // Chat
   const server = express()
-  const PORT2 = process.env.PORT2 || 1616
+  const PORT2 = 1616
   server.use(cors())
   server.use(express.json())
   server.use(express.urlencoded({ extended: true }))
+
+  // Configure multer for .wav file uploads
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now() + '.wav');
+    }
+  });
+
+  const upload = multer({ storage: storage });
 
   server.get('/chat', async (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream')
@@ -130,6 +144,16 @@ export const initServer = () => {
     archive.pipe(output)
     archive.directory(dataFolderPath, false)
     archive.finalize()
+  })
+
+  server.post('/transcribe', async (req, res) => {
+    try {
+      const transcript = await stt()
+      res.json(transcript)
+    } 
+    catch (error: any) {
+      res.status(500).send(error.message)
+    }
   })
 
   server.listen(PORT2, () => {

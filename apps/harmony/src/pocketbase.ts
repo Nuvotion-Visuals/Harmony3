@@ -136,7 +136,7 @@ const initPocketBaseClient = async () => {
               You must alway include a concise name, no more than a few words.
               You must always include a description, which should be a full sentence and accurately capture the PURPOSE and GOALS of the discussion.
               {
-                "name": "Social media strategies",
+                "name": "💬 Social media strategies",
                 "description": "Craft a successful social media strategy to build your brand's online presence and drive engagement."
               }
               If user feedback is provided it must be prioritized.

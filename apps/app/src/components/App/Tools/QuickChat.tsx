@@ -7,6 +7,7 @@ import { TextBox } from 'components/App/TextBox'
 import { useSpaces_activeChannel, useSpaces_activeGroup, useSpaces_activeSpace, useSpaces_activeThread, useSpaces_currentUser, useSpaces_currentUserId, useSpaces_usersById } from 'redux-tk/spaces/hooks'
 import { usePersonas_activePersona } from 'redux-tk/personas/hooks'
 import useDynamicHeight from 'components/Hooks/useDynamicHeight'
+// import { Transcribe } from '../Transcribe'
 
 const Message = memo(({
   role,
@@ -74,7 +75,7 @@ const Message = memo(({
                 compact
                 minimal
                 square
-                onClick={() => speak(content, `quickchat_message_${index}`, () => {})}
+                onClick={() => speak(content, `quickchat_message_${index}`)}
               />
             </Box>
           </Gap>
@@ -223,7 +224,7 @@ export const QuickChat = () => {
         }
       </Gap>
       <div id='quickchat_bottom'></div>
-
+      {/* <Transcribe /> */}
       {/* <Query /> */}
     </S.Content>
 
