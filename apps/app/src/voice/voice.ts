@@ -165,7 +165,7 @@ class SpeechSynthesizer {
   }
 }
 
-let synthesizer
+let synthesizer: SpeechSynthesizer | null = null
 
 export async function speak(text: string, guid: string): Promise<void> {
   // Remove all markdown code blocks
@@ -212,12 +212,15 @@ export async function speak(text: string, guid: string): Promise<void> {
 
 createWatcher({
   selectData: () => store.getState().voice.messageId,
-  onChange: (id) => {
+  onChange: id => {
     const message = selectMessageById(id)(store.getState())
     if (message) {
       const { text } = message
       console.log(text)
       speak(text, `message_${id}`)
+    }
+    else if (synthesizer) {
+      synthesizer.stop()
     }
   }
 })
