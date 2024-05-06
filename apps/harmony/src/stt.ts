@@ -24,18 +24,6 @@ export const stt = async (inputAudioPath: string) => {
     fs.mkdirSync(tempDirPath)
   }
   try {
-    await new Promise((resolve, reject) => {
-      ffmpeg()
-        .input(inputAudioPath)
-        .audioCodec('pcm_s16le')
-        .audioFrequency(16000)
-        .audioChannels(1)
-        .format('wav')
-        .on('error', (err: any) => reject(new Error('An error occurred: ' + err.message)))
-        .on('end', resolve)
-        .save(outputAudioPath)
-    })
-
     const { whisper } = require(whisperPath)
     const whisperAsync = promisify(whisper)
   

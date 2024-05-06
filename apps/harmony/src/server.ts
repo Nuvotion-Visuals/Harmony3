@@ -7,6 +7,7 @@ import path from 'path'
 import fs from 'fs'
 import multer from 'multer'
 import { stt } from './stt'
+import { initLive } from './live'
 
 export const initServer = () => {
   // Chat
@@ -158,4 +159,7 @@ export const initServer = () => {
   server.listen(PORT2, () => {
     console.log(`Server running on http://localhost:${PORT2}`)
   })
+
+
+  initLive()
 }
