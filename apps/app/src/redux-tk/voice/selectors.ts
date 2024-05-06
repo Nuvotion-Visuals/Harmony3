@@ -3,8 +3,11 @@ import { State } from '../store'
 export const selectCurrentSpeakerId = (state: State): string => 
   state.voice.currentSpeakerId
 
-export const selectSpeaking = (state: State): boolean => 
-  state.voice.speaking
+export const selectPlaying = (state: State): boolean => 
+  state.voice.playing
+
+export const selectPaused = (state: State): boolean => 
+  state.voice.paused
 
 export const selectCurrentlySpeaking = (state: State): string => 
   state.voice.currentlySpeaking

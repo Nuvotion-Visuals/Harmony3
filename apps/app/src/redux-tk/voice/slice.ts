@@ -1,9 +1,9 @@
-// voiceSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface VoiceState {
   currentSpeakerId: string
-  speaking: boolean
+  playing: boolean
+  paused: boolean
   currentlySpeaking: string
   messageId: string
   speed: number
@@ -11,10 +11,11 @@ interface VoiceState {
 
 const INITIAL_STATE: VoiceState = {
   currentSpeakerId: '',
-  speaking: false,
+  playing: false,
+  paused: false,
   currentlySpeaking: '',
   messageId: '',
-  speed: 1
+  speed: Number(localStorage.getItem('voice_speed')) || 1
 }
 
 const voiceSlice = createSlice({
@@ -24,8 +25,11 @@ const voiceSlice = createSlice({
     setCurrentSpeakerId: (state, action: PayloadAction<string>) => {
       state.currentSpeakerId = action.payload
     },
-    setSpeaking: (state, action: PayloadAction<boolean>) => {
-      state.speaking = action.payload
+    setPlaying: (state, action: PayloadAction<boolean>) => {
+      state.playing = action.payload
+    },
+    setPaused: (state, action: PayloadAction<boolean>) => {
+      state.paused = action.payload
     },
     setCurrentlySpeaking: (state, action: PayloadAction<string>) => {
       state.currentlySpeaking = action.payload
@@ -35,6 +39,7 @@ const voiceSlice = createSlice({
     },
     setSpeed: (state, action: PayloadAction<number>) => {
       state.speed = action.payload
+      localStorage.setItem('voice_speed', String(action.payload))
     }
   }
 })

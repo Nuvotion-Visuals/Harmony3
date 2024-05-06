@@ -62,12 +62,13 @@ class SpeechSynthesizer {
   private currentSentenceIndex = 0
   private fetchIndex = 0
   private currentAudioElement: HTMLAudioElement | null = null
-  public onComplete: () => void  // Callback for completion
-  public isPaused: boolean = false  // Public property to track paused state
+  public onComplete: () => void
+  public isPaused: boolean = false
+  public speed = 1  // Default playback speed
 
   constructor(private sentences: string[], private baseUrl: string, private guid: string, onComplete?: () => void) {
     this.sentences.forEach(sentence => this.audioDataMap.set(sentence, null))
-    this.onComplete = onComplete  // Initialize the onComplete callback
+    this.onComplete = onComplete
     this.fetchNextAudioElement()
   }
 
@@ -84,7 +85,7 @@ class SpeechSynthesizer {
       const blob = await response.blob()
       const blobUrl = URL.createObjectURL(blob)
       this.audioDataMap.set(sentence, blobUrl)
-      this.maybePlayAudio()  // Check if we can start playing right away
+      this.maybePlayAudio()
     } 
     catch (error) {
       console.error(`Failed to fetch audio for sentence: ${sentence}`, error)
@@ -103,14 +104,15 @@ class SpeechSynthesizer {
         this.playAudio(sentence, audioUrl)
       }
     } else if (this.currentSentenceIndex >= this.sentences.length && !this.isPlaying) {
-      this.onComplete && this.onComplete()  // Call the onComplete callback when everything is done
+      this.onComplete && this.onComplete()
     }
   }
 
   private playAudio(sentence: string, audioUrl: string): void {
     this.currentAudioElement = new Audio(audioUrl)
+    this.currentAudioElement.playbackRate = this.speed
     this.isPlaying = true
-    this.isPaused = false  // Update isPaused status
+    this.isPaused = false
     document.body.appendChild(this.currentAudioElement)
     searchAndHighlight(this.guid, sentence)
 
@@ -121,7 +123,7 @@ class SpeechSynthesizer {
         this.isPlaying = false
         searchAndHighlight(this.guid, null)
         this.currentSentenceIndex++
-        this.maybePlayAudio()  // Continue to next audio if available
+        this.maybePlayAudio()
       }
     })
   }
@@ -136,7 +138,7 @@ class SpeechSynthesizer {
     if (this.currentAudioElement && this.isPlaying) {
       this.currentAudioElement.pause()
       this.isPlaying = false
-      this.isPaused = true  // Set isPaused to true when paused
+      this.isPaused = true
     }
   }
 
@@ -144,7 +146,7 @@ class SpeechSynthesizer {
     if (this.currentAudioElement && !this.isPlaying && this.isPaused) {
       this.currentAudioElement.play()
       this.isPlaying = true
-      this.isPaused = false  // Reset isPaused when playback resumes
+      this.isPaused = false
     }
   }
 
@@ -157,15 +159,23 @@ class SpeechSynthesizer {
       URL.revokeObjectURL(this.currentAudioElement.src)
       this.currentAudioElement = null
       this.isPlaying = false
-      this.isPaused = false  // Reset isPaused when stopped
-      this.currentSentenceIndex = this.sentences.length  // Ensure no more audio plays
-      searchAndHighlight(this.guid, null)  // Remove any highlighted text
-      this.onComplete && this.onComplete()  // Trigger completion callback
+      this.isPaused = false
+      this.currentSentenceIndex = this.sentences.length
+      searchAndHighlight(this.guid, null)
+      this.onComplete && this.onComplete()
+    }
+  }
+
+  public setSpeed(newSpeed: number): void {
+    this.speed = newSpeed
+    if (this.currentAudioElement) {
+      this.currentAudioElement.playbackRate = newSpeed
     }
   }
 }
 
 let synthesizer: SpeechSynthesizer | null = null
+let currentSpeed = 1
 
 export async function speak(text: string, guid: string): Promise<void> {
   // Remove all markdown code blocks
@@ -207,6 +217,7 @@ export async function speak(text: string, guid: string): Promise<void> {
   synthesizer = new SpeechSynthesizer(sentences, baseUrl, guid, () => {
     store.dispatch(voiceActions.setMessageId(null))
   })
+  synthesizer.setSpeed(currentSpeed)
   synthesizer.speak()
 }
 
@@ -221,6 +232,16 @@ createWatcher({
     }
     else if (synthesizer) {
       synthesizer.stop()
+    }
+  }
+})
+
+createWatcher({
+  selectData: () => store.getState().voice.speed,
+  onChange: speed => {
+    if (synthesizer) {
+      currentSpeed = speed
+      synthesizer.setSpeed(speed)
     }
   }
 })
