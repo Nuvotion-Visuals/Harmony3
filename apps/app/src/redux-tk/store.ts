@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { createLogger } from 'redux-logger'
 import spacesReducer from './spaces/slice'
 import personasReducer from './personas/slice'
+import voiceReducer from './voice/slice'
 
 const logger = createLogger({
   predicate: (_, action) => ![
@@ -27,7 +28,8 @@ const batchMiddleware = (_) => (next) => (actions) => {
 export const store = configureStore({
   reducer: {
     spaces: spacesReducer,
-    personas: personasReducer
+    personas: personasReducer,
+    voice: voiceReducer
   },
   middleware: getDefaultMiddleware => 
     // @ts-ignore

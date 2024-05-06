@@ -8,6 +8,7 @@
       "vision/*": ["src/vision/*"],
       "utils/*": ["src/utils/*"],
       "spaces/*": ["src/spaces/*"],
+      "voice/*": ["src/voice/*"],
       "react": [ "./node_modules/@types/react" ]
     },
     "target": "ESNext",

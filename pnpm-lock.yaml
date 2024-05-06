@@ -18,8 +18,8 @@ importers:
   apps/app:
     dependencies:
       '@avsync.live/formation':
-        specifier: ^1.0.120
-        version: 1.0.120(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8)
+        specifier: ^1.0.121
+        version: 1.0.121(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8)
       '@fortawesome/fontawesome-svg-core':
         specifier: ^6.5.2
         version: 6.5.2
@@ -296,8 +296,8 @@ packages:
       - encoding
     dev: false
 
-  /@avsync.live/formation@1.0.120(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8):
-    resolution: {integrity: sha512-iWrgCMXSC5g+8hsWe93EGgywLRY02eliVuxWXUWWTzDrGomD9h7zmux40arsy4hoxjvjKwLhYoIMHjWuK4SkRg==}
+  /@avsync.live/formation@1.0.121(@types/react-dom@18.2.25)(@types/react@18.2.79)(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.8):
+    resolution: {integrity: sha512-bMV46CYZ7txF9nVv0AuCPHxeJXAnMHR1PqbPgkCUL/j4BCbwSPqe29SEZPjfocaqYb0FsGsbY90NHGL4/J6wZQ==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0

@@ -1,7 +1,7 @@
 import { Avatar, Box, Button, ContextMenu, Dropdown, Gap, Item, ItemProps, LineBreak, RichTextEditor, StyleHTML, markdownToHTML, scrollToElementById } from '@avsync.live/formation'
 import { memo, useEffect, useState } from 'react'
 import { pb } from 'redux-tk/pocketbase'
-import { speak } from '../../language/speech'
+import { speak } from 'voice/voice'
 import styled from 'styled-components'
 import { useSpaces_messageById, useSpaces_setActiveThreadId, useSpaces_usersById } from 'redux-tk/spaces/hooks'
 import { usePersonas_personaInfoById } from 'redux-tk/personas/hooks'

@@ -12,7 +12,7 @@
     "reformation": "pnpm remove @avsync.live/formation && rm -rf ./node_modules/@avsync.live/formation && pnpm add-formation"
   },
   "dependencies": {
-    "@avsync.live/formation": "^1.0.120",
+    "@avsync.live/formation": "^1.0.121",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-regular-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",

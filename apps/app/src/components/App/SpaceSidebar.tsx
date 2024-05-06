@@ -1,13 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { SpacesSidebar, ItemProps, Gap } from '@avsync.live/formation'
+import { SpacesSidebar, ItemProps, Gap, Box } from '@avsync.live/formation'
 import { Groups } from './Groups'
 import { SpaceCard } from './SpaceCard'
 import { Logo } from './Logo'
 import { useSpaces_activeSpace, useSpaces_activeSpaceIndex, useSpaces_setActiveSpaceIndex, useSpaces_spaces } from 'redux-tk/spaces/hooks'
 import { Link } from 'components/Util/Link'
 import { useLocation } from 'react-router-dom'
+import { Voice } from 'components/App/Voice'
 
 const SpacesSidebarComponent = () => {
   const activeSpaceIndex = useSpaces_activeSpaceIndex()
@@ -50,22 +51,28 @@ export const SpaceSidebar = React.memo(({ }: Props) => {
   const location = useLocation() 
 
   return (<S.GroupsSidebar>
-    <SpacesSidebarComponent />
-    <S.SidebarContainer>
-      <Gap>
-        {
-          (activeSpace?.id && location.pathname !== '/profile') && <SpaceCard
-            id={activeSpace.id}
-            name={activeSpace?.name}
-            previewSrc={activeSpace?.banner ? `http://localhost:8090/api/files/spaces/${activeSpace.id}/${activeSpace.banner}` : undefined}
-          />
-        }
-        {
-          !['/spaces/create', '/profile'].includes(location.pathname) &&
-            <Groups />
-        }
-      </Gap>
-    </S.SidebarContainer>
+    <Box height='calc(100% - var(--F_Input_Height))'>
+      <SpacesSidebarComponent />
+
+        <S.SidebarContainer>
+          <Gap>
+            {
+              (activeSpace?.id && location.pathname !== '/profile') && <SpaceCard
+                id={activeSpace.id}
+                name={activeSpace?.name}
+                previewSrc={activeSpace?.banner ? `http://localhost:8090/api/files/spaces/${activeSpace.id}/${activeSpace.banner}` : undefined}
+              />
+            }
+            {
+              !['/spaces/create', '/profile'].includes(location.pathname) &&
+                <Groups />
+            }
+          </Gap>
+        </S.SidebarContainer>
+    </Box>
+    <S.VoiceContainer>
+      <Voice />
+    </S.VoiceContainer>
   </S.GroupsSidebar>)
 })
 
@@ -75,14 +82,20 @@ const S = {
     height: 100%;
     width: 100%;
     align-items: flex-start;
+    flex-wrap: wrap;
     border-right: 1px solid var(--F_Surface);
     * {
       user-select: none;
     }
   `,
   SidebarContainer: styled.div`
-    height: calc(calc(100vh - calc(1 * var(--F_Header_Height))) - 6px);
+    height: calc(100vh - var(--F_Header_Height) - 6px - var(--F_Input_Height));
     width: 100%;
     overflow-y: auto;
+  `,
+  VoiceContainer: styled.div`
+    height: calc(var(--F_Input_Height) - 1px);
+    width: 100%;
+    border-top: 1px solid var(--F_Surface);
   `
 }
