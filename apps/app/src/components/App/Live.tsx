@@ -9,7 +9,39 @@ export const Live = () => {
   const [uuid, setUuid] = useState('')
   const [transcription, setTranscription] = useState('')
 
+  const connectWebSocket = () => {
+    const ws = new WebSocket('ws://localhost:1615')
+    setSocket(ws)
+    ws.onopen = () => {
+      console.log('WebSocket connection established')
+      ws.send(JSON.stringify({ uid: uuid, status: 'INIT' }))
+    }
+
+    ws.onmessage = event => {
+      const data = JSON.parse(event.data)
+      if (data.text) {
+        setTranscription(currentTranscription => currentTranscription + data.text)
+      }
+      if (data.uid !== uuid) return
+      if (data.status === 'READY') {
+        setIsServerReady(true)
+      }
+    }
+  }
+
+  const disconnectWebSocket = () => {
+    if (socket) {
+      socket.close()
+      setSocket(null)
+      setIsServerReady(false)
+    }
+  }
+
   useEffect(() => {
+    setUuid(generateUUID())
+
+    connectWebSocket()
+
     const initAudio = async () => {
       const context = new AudioContext()
       setAudioContext(context)
@@ -19,33 +51,9 @@ export const Live = () => {
     }
 
     initAudio()
-    
-    generateUUID()
-
-    const ws = new WebSocket('ws://localhost:1615')
-    setSocket(ws)
-    ws.onopen = () => {
-      console.log('WebSocket connection established')
-      ws.send(JSON.stringify({ uid: uuid, status: 'INIT' }))
-    }
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-
-      if (data.text) {
-        setTranscription(currentTranscription => currentTranscription + data.text)
-
-      }
-
-      if (data.uid !== uuid) return
-
-      if (data.status === 'READY') {
-        setIsServerReady(true)
-      } 
-    }
 
     return () => {
-      ws.close()
+      disconnectWebSocket()
       mediaStream?.getTracks().forEach(track => track.stop())
       audioContext?.close()
     }
@@ -53,24 +61,22 @@ export const Live = () => {
 
   useEffect(() => {
     if (!mediaStream || !audioContext || !isServerReady) return
-  
+
     const source = audioContext.createMediaStreamSource(mediaStream)
     const processor = audioContext.createScriptProcessor(4096, 1, 1)
-  
+
     processor.onaudioprocess = event => {
       const inputData = event.inputBuffer.getChannelData(0)
       const resampledData = resampleTo16kHz(inputData, audioContext.sampleRate)
-  
       const outputBuffer = new Int16Array(resampledData.length)
       for (let i = 0; i < resampledData.length; i++) {
         outputBuffer[i] = Math.max(-1, Math.min(1, resampledData[i])) * 32767
       }
-  
       const binaryString = new Uint8Array(outputBuffer.buffer).reduce((acc, val) => acc + String.fromCharCode(val), '')
       const base64String = btoa(binaryString)
       socket.send(JSON.stringify({ audioChunk: base64String }))
     }
-  
+
     source.connect(processor)
     processor.connect(audioContext.destination)
   }, [mediaStream, audioContext, isServerReady, socket])
@@ -98,7 +104,9 @@ export const Live = () => {
       <h1>Live Audio Processing</h1>
       <p>Status: {isServerReady ? 'Server Ready' : 'Connecting...'}</p>
       <p>{transcription}</p>
+      <button onClick={connectWebSocket}>Reconnect</button>
+      <button onClick={disconnectWebSocket}>Disconnect</button>
+      <button onClick={() => setTranscription('')}>Clear</button>
     </div>
   )
 }
-

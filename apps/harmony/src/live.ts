@@ -19,16 +19,27 @@ import { FileWriter } from 'wav'
 
 const wssServer = createServer(server)
 const wss = new WebSocket.Server({ server: wssServer })
-const clients = new Map()
+
+interface ClientData {
+  audioChunks: Buffer[],
+  intervalHandle: NodeJS.Timeout | null,
+  processingStarted: boolean,
+  filePath: string
+}
+
+const clients = new Map<number, ClientData>()
 
 wss.on('connection', function connection(ws) {
   const id = Date.now()
-  const audioChunks: Buffer[] = []
-  let intervalHandle: NodeJS.Timeout | null = null
-  let processingStarted = false
+  const clientData = {
+    audioChunks: [],
+    intervalHandle: null,
+    processingStarted: false,
+    filePath: path.join(__dirname, `audio_${id}.wav`)
+  } as ClientData
+  clients.set(id, clientData)
 
   console.log(`Client connected: ${id}`)
-  clients.set(id, ws)
 
   ws.on('message', function incoming(message) {
     const messageData = message.toString('utf8')
@@ -40,7 +51,7 @@ wss.on('connection', function connection(ws) {
       } 
       else if (data.audioChunk) {
         const audioBuffer = Buffer.from(data.audioChunk, 'base64')
-        audioChunks.push(audioBuffer)
+        clientData.audioChunks.push(audioBuffer)
         console.log(`Buffering audio chunk from client ${id}`)
       }
     } 
@@ -50,47 +61,43 @@ wss.on('connection', function connection(ws) {
     }
   })
 
-  if (!intervalHandle) {
-    intervalHandle = setInterval(async () => {
-      if (audioChunks.length > 0 && !processingStarted) {
-        processingStarted = true
-        const filePath = path.join(__dirname, `audio_${id}.wav`)
-        const sampleRate = 16000
-        const bitDepth = 16
-        const channels = 1
+  if (!clientData.intervalHandle) {
+    clientData.intervalHandle = setInterval(async () => {
+      if (clientData.audioChunks.length > 0 && !clientData.processingStarted) {
+        clientData.processingStarted = true
 
-        const writer = new FileWriter(filePath, {
-          sampleRate,
-          channels,
-          bitDepth
+        const writer = new FileWriter(clientData.filePath, {
+          sampleRate: 16000,
+          channels: 1,
+          bitDepth: 16
         })
 
-        audioChunks.forEach(chunk => writer.write(chunk))
+        clientData.audioChunks.forEach(chunk => writer.write(chunk))
         writer.end()
-        audioChunks.length = 0
+        clientData.audioChunks.length = 0
 
-        console.log(`Audio file written: ${filePath}`)
+        console.log(`Audio file written: ${clientData.filePath}`)
 
         const result = await whisperAsync({
           language: 'en',
           model: modelPath,
-          fname_inp: filePath,
+          fname_inp: clientData.filePath,
           use_gpu: true,
           no_timestamps: true
         })
         const text = result?.[0]?.[2]
-        if (!text?.includes('[BLANK_AUDIO]')) {
+        if (text && !text.includes('[BLANK_AUDIO]')) {
           ws.send(JSON.stringify({ text }))
         }
         console.log(`Transcription sent to client ${id}`)
-        processingStarted = false
+        clientData.processingStarted = false
       }
     }, 1000)
   }
 
   ws.on('close', () => {
-    if (intervalHandle) {
-      clearInterval(intervalHandle)
+    if (clientData.intervalHandle) {
+      clearInterval(clientData.intervalHandle)
     }
     clients.delete(id)
     console.log(`Client disconnected: ${id}`)
