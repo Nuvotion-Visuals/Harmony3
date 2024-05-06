@@ -117,7 +117,7 @@ const initPocketBaseClient = async () => {
         let isFirstAssistantMessage = true
         let keys: any = null
         let sender: UsersResponse | null = null
-
+        let spaceId = null
         try {
           sender = await pb.collection('users').getOne(event.record.userid)
           if (sender) {
@@ -129,7 +129,8 @@ const initPocketBaseClient = async () => {
             sort: 'created'
           })
 
-          // Check if this is the first assistant message in the thread
+          spaceId = messages?.[messages.length - 1]?.spaceid
+
           isFirstAssistantMessage = messages.every((message: MessagesResponse) => message.userid !== systemId)
         }
         catch (e) {
@@ -178,6 +179,7 @@ const initPocketBaseClient = async () => {
           provider: persona?.provider || 'groq',
           model: persona?.model || 'llama3-70b-8192',
           retrieve: true,
+          spaceId: spaceId, // only get retrieve context for the active space
           keys,
           messages: llmMessages,
           callback: async (data) => {

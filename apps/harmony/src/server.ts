@@ -43,6 +43,7 @@ export const initServer = () => {
       keys: payload.keys,
       retrieve: payload.retrieve,
       agent: payload.agent,
+      spaceId: payload.spaceId,
       provider: payload.provider,
       messages: payload.messages,
       callback: (data) => {

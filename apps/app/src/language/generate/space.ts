@@ -12,7 +12,7 @@ export const generate_space = ({
   onPartial: (text: string) => void
 }) => {
   chat({
-    retrieve: true,
+    retrieve: false,
     messages: [
       {
         role: 'system',

@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react'
 import { Box, Button, ContextMenu, Dropdown, Item, ItemProps, RichTextEditor, scrollToElementById } from '@avsync.live/formation'
-import { useSpaces_activeChannelId, useSpaces_activeThread, useSpaces_currentUserId, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
+import { useSpaces_activeChannelId, useSpaces_activeSpace, useSpaces_activeThread, useSpaces_currentUserId, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
 import styled from 'styled-components'
 import { pb } from 'redux-tk/pocketbase'
 import { usePersonas_activePersona, usePersonas_personas, usePersonas_setActivePersonaId } from 'redux-tk/personas/hooks'
@@ -28,6 +28,7 @@ export const TextBox = memo(({
   const activeThread = useSpaces_activeThread()
   const userId = useSpaces_currentUserId()
   const personas = usePersonas_personas()
+  const activeSpace = useSpaces_activeSpace()
   const activePersona = usePersonas_activePersona()
   const setActivePersonaId = usePersonas_setActivePersonaId()
 
@@ -68,7 +69,8 @@ export const TextBox = memo(({
           text,
           userid: userId,
           threadid: threadId,
-          personaid: activePersona?.id
+          personaid: activePersona?.id,
+          spaceid: activeSpace?.id
         })
         setText('')
       } 

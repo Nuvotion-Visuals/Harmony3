@@ -31,12 +31,20 @@ interface SpacesDataStructure {
 }
 
 // Initialize the data structure from the database
-async function generateSpacesDataStructure(): Promise<SpacesDataStructure> {
+async function generateSpacesDataStructure(spaceId?: string): Promise<SpacesDataStructure> {
   const pb = getPocketBaseClient()
   
   const spacesData: SpacesDataStructure = { spaces: {} }
 
-  const spaces = await pb.collection('spaces').getFullList()
+  let spaces
+
+  if (spaceId) {
+    const space = await pb.collection('spaces').getOne(spaceId)
+    spaces = [space]
+  }
+  else {
+    spaces = await pb.collection('spaces').getFullList()
+  }
   for (const space of spaces) {
     spacesData.spaces[space.id] = {
       id: space.id,
@@ -197,8 +205,8 @@ export const createThreadMessages = (
   return null
 }
 
-export async function createJSONDocumentStructure(): Promise<JSONDocument[]> {
-  const dataStructure = await generateSpacesDataStructure()
+export async function createJSONDocumentStructure(spaceId?: string): Promise<JSONDocument[]> {
+  const dataStructure = await generateSpacesDataStructure(spaceId)
   const jsonDocuments: JSONDocument[] = []
 
   jsonDocuments.push(createSpacesDocument(dataStructure))
@@ -229,7 +237,7 @@ export async function createJSONDocumentStructure(): Promise<JSONDocument[]> {
   return jsonDocuments
 }
 
-export async function getDocuments(): Promise<Document[]> {
-  const JSONDocuments = await createJSONDocumentStructure()
+export async function getDocuments(spaceId: string): Promise<Document[]> {
+  const JSONDocuments = await createJSONDocumentStructure(spaceId)
   return JSONDocuments.map(json => new Document(json))
 }

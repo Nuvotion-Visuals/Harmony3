@@ -26,6 +26,7 @@ interface StreamChatParams {
   callback: StreamCallback
   retrieve?: boolean
   temperature?: number,
+  spaceId?: string,
   keys: any,
   agent?: boolean
   model: string
@@ -36,6 +37,7 @@ export const streamChatResponse = async ({
   messages, 
   callback, 
   keys,
+  spaceId,
   temperature = 0.5,
   retrieve, 
   agent,
@@ -188,7 +190,7 @@ export const streamChatResponse = async ({
     ]
     Settings.chunkSize = 512
     // @ts-ignore
-    const index = await VectorStoreIndex.fromDocuments(await getDocuments())
+    const index = await VectorStoreIndex.fromDocuments(await getDocuments(spaceId))
     const retriever = index.asRetriever()
     retriever.similarityTopK = 5
     const chatEngine = new ContextChatEngine({ retriever })

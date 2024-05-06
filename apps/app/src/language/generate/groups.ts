@@ -1,4 +1,6 @@
 import { chat } from 'language/chat'
+import { selectActiveSpaceId } from 'redux-tk/spaces/selectors'
+import { store } from 'redux-tk/store'
 
 export const generate_groups = ({
   prompt,
@@ -11,8 +13,10 @@ export const generate_groups = ({
   onComplete: (text: string) => void,
   onPartial: (text: string) => void
 }) => {
+  const activeSpaceId = selectActiveSpaceId(store.getState())
   chat({
     retrieve: true,
+    spaceId: activeSpaceId,
     messages: [
       {
         role: 'system',

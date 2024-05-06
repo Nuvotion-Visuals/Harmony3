@@ -5,6 +5,7 @@ export type ChatConfig = {
   provider?: 'openai' | 'groq' | 'ollama' | string
   model?: string
   retrieve: boolean
+  spaceId?: string,
   messages: { role: 'user' | 'assistant' | 'system' | string, content: string }[]
   onPartial: ResponseCallback
   onComplete: ResponseCallback
@@ -18,7 +19,7 @@ export const chat = (config: ChatConfig): () => void => {
   const { 
     provider = 'groq', 
     model = 'llama3-70b-8192',
-    retrieve
+    retrieve,
   } = config
   const payload = { 
     messages: config.messages, 
@@ -26,6 +27,7 @@ export const chat = (config: ChatConfig): () => void => {
     model,
     retrieve,
     agent: config?.agent,
+    spaceId: config?.spaceId,
     keys
   }
   const eventSource = new EventSource(`http://localhost:1616/chat?data=${encodeURIComponent(JSON.stringify(payload))}`)
