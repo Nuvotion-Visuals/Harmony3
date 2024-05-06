@@ -16,18 +16,6 @@ export const initServer = () => {
   server.use(express.json())
   server.use(express.urlencoded({ extended: true }))
 
-  // Configure multer for .wav file uploads
-  const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now() + '.wav');
-    }
-  });
-
-  const upload = multer({ storage: storage });
-
   server.get('/chat', async (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream')
     res.setHeader('Cache-Control', 'no-cache')
@@ -146,10 +134,21 @@ export const initServer = () => {
     archive.finalize()
   })
 
-  server.post('/transcribe', async (req, res) => {
+  const upload = multer({ dest: 'uploads/' })
+
+  server.post('/transcribe', upload.single('file'), async (req, res) => {
     try {
-      const transcript = await stt()
+      if (!req.file) {
+        res.status(400).send('No file uploaded')
+        return
+      }
+      const transcript = await stt(req.file.path)
       res.json(transcript)
+      fs.unlink(req.file.path, err => {
+        if (err) {
+          console.error('Error removing file:', err)
+        }
+      })
     } 
     catch (error: any) {
       res.status(500).send(error.message)

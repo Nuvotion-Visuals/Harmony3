@@ -1,11 +1,29 @@
-import React, { useState, useRef } from 'react'
+import { Box, Button, Gap, LoadingSpinner } from '@avsync.live/formation'
+import React, { useState, useRef, useEffect } from 'react'
 
-export const Transcribe = () => {
+interface Props {
+  onTranscription: (text: string) => void
+}
+
+export const Transcribe = ({
+  onTranscription
+}: Props) => {
   const [recording, setRecording] = useState(false)
   const [transcript, setTranscript] = useState(null)
   const [error, setError] = useState(null)
   const mediaRecorderRef = useRef(null)
   const audioChunksRef = useRef([])
+  const isMounted = useRef(true)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.stop()
+      }
+    }
+  }, [])
 
   const handleStartRecording = async () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -36,7 +54,7 @@ export const Transcribe = () => {
       const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' })
       const audioUrl = URL.createObjectURL(audioBlob)
       audioChunksRef.current = []
-
+      setLoading(true)
       try {
         const formData = new FormData()
         formData.append('file', audioBlob, 'recording.wav')
@@ -48,12 +66,22 @@ export const Transcribe = () => {
         const data = await response.json()
 
         if (response.ok) {
-          setTranscript(data)
-        } else {
-          setError('Failed to transcribe audio.')
+          if (isMounted.current) {
+            setTranscript(data.text)
+            onTranscription(data.text)
+            setLoading(false)
+          }
+        } 
+        else {
+          setLoading(false)
+          throw new Error('Failed to transcribe audio.')
         }
-      } catch (err) {
-        setError('Failed to upload the recording.')
+      } 
+      catch (err) {
+        setLoading(false)
+        if (isMounted.current) {
+          setError(err.message)
+        }
       }
 
       setRecording(false)
@@ -62,19 +90,21 @@ export const Transcribe = () => {
   }
 
   return (
-    <div>
-      <div>
-        {recording ? (
-          <button onClick={handleStopRecording}>Stop Recording</button>
-        ) : (
-          <button onClick={handleStartRecording}>Start Recording</button>
-        )}
-      </div>
-      {error && <p>Error: {error}</p>}
-      {transcript && <div>
-        <h3>Transcription:</h3>
-        <p>{transcript.speech}</p> {/* Adjust according to your API response */}
-      </div>}
-    </div>
+    <Gap>
+      {
+        loading 
+          ? <Box width='var(--F_Input_Height)' height='var(--F_Input_Height)'>
+              <LoadingSpinner compact />
+            </Box>
+          : <Button
+              icon='microphone'
+              iconPrefix='fas'
+              circle
+              minimal
+              blink={recording}
+              onClick={recording ? handleStopRecording : handleStartRecording}
+            />
+      }
+    </Gap>
   )
 }

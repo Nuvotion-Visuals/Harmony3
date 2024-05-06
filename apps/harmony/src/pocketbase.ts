@@ -230,6 +230,7 @@ const initPocketBaseClient = async () => {
               The user's preferences: ${sender?.preferences}
               You don't need to adknowledge these details in your response unless it's actually relevant to the query.
               Please DO NOT INTRODUCE YOURSELF.
+              Please do not confuse the user's bio with the purpose of the space/group/channel/thread.
             ` 
           },
         ]

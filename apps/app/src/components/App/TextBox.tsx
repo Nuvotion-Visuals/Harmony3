@@ -6,6 +6,7 @@ import { pb } from 'redux-tk/pocketbase'
 import { usePersonas_activePersona, usePersonas_activePersonaId, usePersonas_personas, usePersonas_setActivePersonaId } from 'redux-tk/personas/hooks'
 import { useNavigate } from 'react-router-dom'
 import { Voice } from './Voice'
+import { Transcribe } from './Transcribe'
 
 interface Props {
   onNewThreadId?: (threadId: string) => void
@@ -196,7 +197,7 @@ export const TextBox = memo(({
           onChange={val => setText(val)}
           outline
           pl={1}
-          pr={2}
+          pr={4}
           minimal={true}
           autoFocus={autoFocus}
           onKeyDown={e => {
@@ -209,16 +210,21 @@ export const TextBox = memo(({
           placeholder={placeholder ? placeholder : 'Send a message'}
         />
         <S.Absolute>
-          <Button
-            icon='arrow-up'
-            iconPrefix='fas'
-            onClick={() => sendMessage(text)}
-            circle
-            minimal
-          />
+          <Box>
+            <Transcribe
+              onTranscription={val => setText(val)}
+            />
+            {
+              text &&  <Button
+                icon='arrow-up'
+                iconPrefix='fas'
+                onClick={() => sendMessage(text)}
+                circle
+                minimal
+              />
+            }
+          </Box>
         </S.Absolute>
-       
-       
       </S.TextBox>
     </S.Wrapper>
   )
