@@ -3,7 +3,7 @@ import { spawn } from 'child_process'
 import path from 'path'
 import { streamChatResponse } from './streamChatResponse'
 import { JsonValidator } from './JsonValidator'
-import { CollectionResponses, MessagesResponse, TypedPocketBase, UsersResponse } from './pocketbase-types'
+import { CollectionResponses, MessagesResponse, PersonasResponse, TypedPocketBase, UsersResponse } from './pocketbase-types'
 import { createJSONDocumentStructure } from './documents'
 
 let pb: any = null
@@ -110,6 +110,59 @@ const initPocketBaseClient = async () => {
       }
     })
 
+    const suggestThreadNameAndDescription = ({
+      keys,
+      persona,
+      messages,
+      threadId
+    }: {
+      keys: string[],
+      persona?: PersonasResponse,
+      messages: { role: string, content: string },
+      threadId: string
+    }) => {
+      const validator = new JsonValidator()
+      streamChatResponse({
+        provider: persona?.provider || 'groq',
+        model: persona?.model || 'llama3-70b-8192',
+        retrieve: false,
+        keys,
+        messages: [
+          {
+            role: 'system',
+            content: `You are an API endpoint that provides a name and description for message thread based on a propmt, which is a series of messages.
+              The name starts with an emoji.
+              You answer in the following JSON format. 
+              You must alway include a concise name, no more than a few words.
+              You must always include a description, which should be a full sentence and accurately capture the PURPOSE and GOALS of the discussion.
+              {
+                "name": "Social media strategies",
+                "description": "Craft a successful social media strategy to build your brand's online presence and drive engagement."
+              }
+              If user feedback is provided it must be prioritized.
+    
+              Answer in as a valid JSON object, no extra commentary, only the object. 
+            `
+          }, 
+          {
+            role: 'user',
+            content: JSON.stringify(messages)
+          }
+        ],
+        callback: async (data) => {
+          const name = validator.parseJsonProperty(data.message.content, 'name')
+          const description = validator.parseJsonProperty(data.message.content, 'description')
+
+          if (name || description) {
+            await pb.collection('threads').update(threadId, {
+              name,
+              description: description ? description : ''
+            })
+          }
+        }
+      })
+    }
+
     pb.collection('messages').subscribe('*', async (event: any) => {
       if (event.action === 'create' && event.record.userid !== systemId) {
         let messages
@@ -138,7 +191,17 @@ const initPocketBaseClient = async () => {
         }
 
         const personaId = messages?.[messages.length - 1].personaid
-        let persona: CollectionResponses['personas']  | null = null
+
+        if (!personaId) {
+          suggestThreadNameAndDescription({
+            keys,
+            messages,
+            threadId
+          })
+          return
+        }
+
+        let persona: CollectionResponses['personas'] | undefined = undefined
         if (personaId) {
           persona = await pb.collection('personas').getOne(personaId)
         }
@@ -157,9 +220,8 @@ const initPocketBaseClient = async () => {
             content: `
               Your name is ${persona?.name}. 
               You MUST answer in character, not revelaing your nature is an LLM. 
-              Please do not introduce yourself unless asked.
               System message: ${persona?.systemmessage}`, 
-          }].filter(_ => !!personaId),
+          }],
           { 
             role: 'system', 
             content: `
@@ -167,6 +229,7 @@ const initPocketBaseClient = async () => {
               The user's bio is: ${sender?.bio}
               The user's preferences: ${sender?.preferences}
               You don't need to adknowledge these details in your response unless it's actually relevant to the query.
+              Please DO NOT INTRODUCE YOURSELF.
             ` 
           },
         ]
@@ -205,45 +268,11 @@ const initPocketBaseClient = async () => {
                   content: message.text
                 }))
         
-                const validator = new JsonValidator()
-                streamChatResponse({
-                  provider: persona?.provider || 'groq',
-                  model: persona?.model || 'llama3-70b-8192',
-                  retrieve: false,
+                suggestThreadNameAndDescription({
                   keys,
-                  messages: [
-                    {
-                      role: 'system',
-                      content: `You are an API endpoint that provides a name and description for message thread based on a propmt, which is a series of messages.
-                        The name starts with an emoji.
-                        You answer in the following JSON format. 
-                        You must alway include a concise name, no more than a few words.
-                        You must always include a description, which should be a full sentence and accurately capture the PURPOSE and GOALS of the discussion.
-                        {
-                          "name": "Social media strategies",
-                          "description": "Craft a successful social media strategy to build your brand's online presence and drive engagement."
-                        }
-                        If user feedback is provided it must be prioritized.
-              
-                        Answer in as a valid JSON object, no extra commentary, only the object. 
-                      `
-                    }, 
-                    {
-                      role: 'user',
-                      content: JSON.stringify(updatedLlmMessages)
-                    }
-                  ],
-                  callback: async (data) => {
-                    const name = validator.parseJsonProperty(data.message.content, 'name')
-                    const description = validator.parseJsonProperty(data.message.content, 'description')
-        
-                    if (name || description) {
-                      await pb.collection('threads').update(threadId, {
-                        name,
-                        description: description ? description : ''
-                      })
-                    }
-                  }
+                  persona,
+                  messages: updatedLlmMessages,
+                  threadId
                 })
               }
             } 

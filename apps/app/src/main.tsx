@@ -62,7 +62,7 @@ library.add(
    fas.faImage, fas.faVideo, fas.faCode, fas.faEraser, fas.faFileVideo, fas.faFileCode,
    fas.faTerminal, fas.faQuoteRight, fas.faEllipsisH, fas.faReply, fas.faSave,
    fas.faDiagramProject, fas.faBoltLightning, fas.faSignOutAlt, fas.faImage,
-   fas.faCircleUp, fas.faCircleDown, fas.faPencil, fas.faStop
+   fas.faCircleUp, fas.faCircleDown, fas.faPencil, fas.faStop, fas.faUserSlash
 )
 
 const Main = ({ }) => {

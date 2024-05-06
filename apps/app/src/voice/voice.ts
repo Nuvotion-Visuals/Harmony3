@@ -206,7 +206,6 @@ export async function speak(text: string, guid: string): Promise<void> {
 
   // Manually splitting on semicolons and new lines
   const chunks = normalizedText.split(/[:\n;]/).filter(chunk => chunk.trim().length > 0)
-
   // Use the split function on each chunk separately and flatten the results
   const sentences = chunks.flatMap(chunk =>
     split(chunk).filter(item => item.type === 'Sentence').map(item => item.raw)

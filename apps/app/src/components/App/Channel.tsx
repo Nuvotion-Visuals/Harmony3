@@ -74,7 +74,9 @@ export const Channel = () => {
     setNewThreadId(newThreadId)
   }, [])
 
-  return (<>
+  return (<S.Container>
+    <S.Shadow />
+
     <Breadcrumbs
       anyExpanded={anyExpanded}
       toggleAll={toggleAll}
@@ -107,7 +109,7 @@ export const Channel = () => {
         activeThreadId={activeThreadId}
       />
     </S.TextBoxContainer>
-  </>)
+  </S.Container>)
 }
 
 const S = {
@@ -120,6 +122,20 @@ const S = {
     margin: .25rem 0;
     padding: .25rem 0;
     border-bottom: 1px solid var(--F_Surface_0);
+    position: relative;
+  `,
+  Container: styled.div`
+    width: 100%;
+    height: 100%;
+    position: relative;
+  `,
+  Shadow: styled.div`
+    width: 100%;
+    height: 12px;
+    position: absolute;
+    z-index: 1;
+    top: calc(var(--F_Input_Height));
+    background: linear-gradient(to bottom, black, transparent);
   `,
   Bottom: styled.div`
     width: 100%;
@@ -137,6 +153,7 @@ const S = {
     width: 100%;
     position: relative;
     overflow: auto;
+    box-shadow: 0px -12px 12px black;
     display: flex;
     justify-content: center;
     padding: .25rem 0;

@@ -3,7 +3,7 @@ import { Box, Button, ContextMenu, Dropdown, Item, ItemProps, RichTextEditor, Sp
 import { useSpaces_activeChannelId, useSpaces_activeSpace, useSpaces_activeThread, useSpaces_currentUserId, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
 import styled from 'styled-components'
 import { pb } from 'redux-tk/pocketbase'
-import { usePersonas_activePersona, usePersonas_personas, usePersonas_setActivePersonaId } from 'redux-tk/personas/hooks'
+import { usePersonas_activePersona, usePersonas_activePersonaId, usePersonas_personas, usePersonas_setActivePersonaId } from 'redux-tk/personas/hooks'
 import { useNavigate } from 'react-router-dom'
 import { Voice } from './Voice'
 
@@ -31,6 +31,7 @@ export const TextBox = memo(({
   const personas = usePersonas_personas()
   const activeSpace = useSpaces_activeSpace()
   const activePersona = usePersonas_activePersona()
+  const activePersonaId = usePersonas_activePersonaId()
   const setActivePersonaId = usePersonas_setActivePersonaId()
 
   const sendMessage = async (text) => {
@@ -74,6 +75,9 @@ export const TextBox = memo(({
           spaceid: activeSpace?.id
         })
         setText('')
+        setTimeout(() => {
+          scrollToElementById(`thread_${activeThread?.id}_bottom`, { behavior: 'smooth'})
+        }, 100)
       } 
       catch (error) {
         console.error('Failed to send message:', error)
@@ -113,8 +117,8 @@ export const TextBox = memo(({
       />
     })),
     {
-      text: 'Default Assistant',
-      icon: 'user',
+      text: 'No Response',
+      icon: 'user-slash',
       iconPrefix: 'fas',
       compact: true,
       onClick: () => setActivePersonaId(null),
@@ -142,7 +146,10 @@ export const TextBox = memo(({
                 disableCenter
                 text={activePersona?.name
                   ? `${activePersona?.name ? `${activePersona?.name} · ` : ''}${activePersona?.provider ? `${activePersona?.provider} · ` : ''}  ${activePersona?.model ? `${activePersona?.model}` : ''}`
-                  : 'Assistant' }
+                  : activePersonaId
+                    ? 'Assistant'
+                    : 'No Response'
+                }
                 iconPrefix='fas'
                 expand
                 maxWidth='20rem'

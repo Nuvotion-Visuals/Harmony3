@@ -44,7 +44,7 @@ export const streamChatResponse = async ({
   model
 }: StreamChatParams) => {
   let fullResponse: string[] = []
-  const throttledCallback = throttle(callback, 16.67)
+  const throttledCallback = throttle(callback, 50)
 
   console.log(`Provider: ${provider}, Model: ${model}`)
 
