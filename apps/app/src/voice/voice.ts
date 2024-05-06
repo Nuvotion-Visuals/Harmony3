@@ -56,13 +56,14 @@ const highlightText = (html: string, currentlySpeaking: string | null): string =
   return highlightedHtml
 }
 
-
 class SpeechSynthesizer {
   private audioDataMap: Map<string, string | null> = new Map()
   private isPlaying = false
   private currentSentenceIndex = 0
   private fetchIndex = 0
-  public onComplete: () => void  // Adding the onComplete callback property
+  private currentAudioElement: HTMLAudioElement | null = null
+  public onComplete: () => void  // Callback for completion
+  public isPaused: boolean = false  // Public property to track paused state
 
   constructor(private sentences: string[], private baseUrl: string, private guid: string, onComplete?: () => void) {
     this.sentences.forEach(sentence => this.audioDataMap.set(sentence, null))
@@ -107,14 +108,15 @@ class SpeechSynthesizer {
   }
 
   private playAudio(sentence: string, audioUrl: string): void {
-    const audioElement = new Audio(audioUrl)
+    this.currentAudioElement = new Audio(audioUrl)
     this.isPlaying = true
-    document.body.appendChild(audioElement)
+    this.isPaused = false  // Update isPaused status
+    document.body.appendChild(this.currentAudioElement)
     searchAndHighlight(this.guid, sentence)
 
-    audioElement.play().then(() => {
-      audioElement.onended = () => {
-        document.body.removeChild(audioElement)
+    this.currentAudioElement.play().then(() => {
+      this.currentAudioElement!.onended = () => {
+        document.body.removeChild(this.currentAudioElement!)
         URL.revokeObjectURL(audioUrl)
         this.isPlaying = false
         searchAndHighlight(this.guid, null)
@@ -125,9 +127,45 @@ class SpeechSynthesizer {
   }
 
   public speak(): void {
-    this.maybePlayAudio()
+    if (!this.isPlaying && !this.isPaused) {
+      this.maybePlayAudio()
+    }
+  }
+
+  public pause(): void {
+    if (this.currentAudioElement && this.isPlaying) {
+      this.currentAudioElement.pause()
+      this.isPlaying = false
+      this.isPaused = true  // Set isPaused to true when paused
+    }
+  }
+
+  public play(): void {
+    if (this.currentAudioElement && !this.isPlaying && this.isPaused) {
+      this.currentAudioElement.play()
+      this.isPlaying = true
+      this.isPaused = false  // Reset isPaused when playback resumes
+    }
+  }
+
+  public stop(): void {
+    if (this.currentAudioElement) {
+      this.currentAudioElement.pause()
+      if (this.currentAudioElement.parentNode) {
+        document.body.removeChild(this.currentAudioElement)
+      }
+      URL.revokeObjectURL(this.currentAudioElement.src)
+      this.currentAudioElement = null
+      this.isPlaying = false
+      this.isPaused = false  // Reset isPaused when stopped
+      this.currentSentenceIndex = this.sentences.length  // Ensure no more audio plays
+      searchAndHighlight(this.guid, null)  // Remove any highlighted text
+      this.onComplete && this.onComplete()  // Trigger completion callback
+    }
   }
 }
+
+let synthesizer
 
 export async function speak(text: string, guid: string): Promise<void> {
   // Remove all markdown code blocks
@@ -162,7 +200,11 @@ export async function speak(text: string, guid: string): Promise<void> {
 
   console.log(sentences)
 
-  const synthesizer = new SpeechSynthesizer(sentences, baseUrl, guid, () => {
+  if (synthesizer) {
+    synthesizer.stop()
+  }
+
+  synthesizer = new SpeechSynthesizer(sentences, baseUrl, guid, () => {
     store.dispatch(voiceActions.setMessageId(null))
   })
   synthesizer.speak()

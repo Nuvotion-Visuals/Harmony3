@@ -27,31 +27,33 @@ const MessageInfo: React.FC<MessageInfoProps> = memo(({
       disablePadding
       disableBreak
     >
-      <Gap autoWidth>
-        <S.Sender>
-          { formatDate(created) }
-        </S.Sender>
-        <Box>
-          <Button
-            icon='play'
-            iconPrefix='fas'
-            compact
-            minimal
-            square
-            onClick={() => onSpeak()}
-          />
-          <Dropdown
-            icon='ellipsis-h'
-            iconPrefix='fas'
-            compact
-            square
-            minimal
-            items={dropdownItems}
-            maxWidth='10rem'
-            disableSearch
-          />
-        </Box>
-      </Gap>
+      <S.MessageInfo>
+        <Gap autoWidth>
+          <S.Sender>
+            { formatDate(created) }
+          </S.Sender>
+          <Box>
+            <Button
+              icon='play'
+              iconPrefix='fas'
+              compact
+              minimal
+              square
+              onClick={() => onSpeak()}
+            />
+            <Dropdown
+              icon='ellipsis-h'
+              iconPrefix='fas'
+              compact
+              square
+              minimal
+              items={dropdownItems}
+              maxWidth='10rem'
+              disableSearch
+            />
+          </Box>
+        </Gap>
+      </S.MessageInfo>
     </Item>
   )
 })
@@ -319,6 +321,10 @@ const S = {
   `,
   Container: styled.div`
     margin-top: -.5rem;
+  `,
+  MessageInfo: styled.div`
+    display: flex;
+    overflow: hidden;
   `,
   Sender: styled.div`
     font-size: 12px;
