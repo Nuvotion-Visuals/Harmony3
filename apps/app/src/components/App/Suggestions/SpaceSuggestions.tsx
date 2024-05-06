@@ -102,7 +102,7 @@ export const SpaceSuggestions = ({
             canClear={feedback !== ''}
           />
           {
-            (loading && value?.length === 0) && <LoadingSpinner compact />
+            loading && <LoadingSpinner compact />
           }
           <Button
             text='Suggest'

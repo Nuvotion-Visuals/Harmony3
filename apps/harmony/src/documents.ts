@@ -226,14 +226,10 @@ export async function createJSONDocumentStructure(): Promise<JSONDocument[]> {
   }
 
   await fs.writeFile('documentStructure.json', JSON.stringify(jsonDocuments, null, 2), 'utf8')
-  console.log('Document structure has been written to documentStructure.json')
   return jsonDocuments
 }
 
 export async function getDocuments(): Promise<Document[]> {
   const JSONDocuments = await createJSONDocumentStructure()
-
-  console.log(JSONDocuments)
-
   return JSONDocuments.map(json => new Document(json))
 }

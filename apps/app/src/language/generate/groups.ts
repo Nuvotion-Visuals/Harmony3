@@ -50,6 +50,8 @@ export const generate_groups = ({
 
         Avoid suggesting groups which are too similar to existing groups in the space.
 
+        All suggested groups must be ENTIRELY NEW, not already existing in the space.
+
         If user feedback is provided, it must be prioritized. Answer in as a valid JSON object, no extra commentary, only the object. Ensure each key is wrapped in double quotes to conform to the JSON specification.`
       },
       {

@@ -1,4 +1,4 @@
-import { Box, Button, Item, LoadingSpinner, TextInput } from '@avsync.live/formation'
+import { Box, Button, Item, LoadingSpinner, TextInput, Gap } from '@avsync.live/formation'
 import { generate_image } from 'language/generate/image'
 import { useRef, useState } from 'react'
 import styled from 'styled-components'
@@ -27,7 +27,6 @@ export const ImageSuggestions = ({
   const [loading, setLoading] = useState(false)
 
   const onSuggest = () => {
-    setSuggestions([])
     generate_image({
       prompt: `
         ${prompt} 
@@ -76,53 +75,56 @@ export const ImageSuggestions = ({
     <Box wrap width={'100%'}>
       <Box wrap width={'100%'}>
         {
-          suggestions?.map(suggestion =>
-            <Item
-              icon='image'
+          suggestions?.map(suggestion => {
+            const loadingSuggestion = (loading && suggestion === chosenSuggestion)
+            return <Item
+              icon={loadingSuggestion ? undefined : 'image'}
+              prefixChildren={loadingSuggestion ? <LoadingSpinner compact /> : undefined}
               iconPrefix='fas'
               subtitle={suggestion}
               key={suggestion}
-              onClick={() => {
+              onClick={loading ? undefined : () => {
                 onPickSuggestion(suggestion)
-                setSuggestions([])
               }}
             />
-          )
+          })
         }
       </Box>
       <Box width={'100%'} mt={suggestions?.length > 0 ? .5 : 0}>
         {
-          loading 
-            ? <S.Loading>
-                <LoadingSpinner compact />
-                <S.Text>{chosenSuggestion}</S.Text>
-              </S.Loading>
-            : <>
-                {
-                  children && <Box width={15}>
-                    {
-                      children
-                    }
-                  </Box>
-                }
-                <TextInput
-                  value={feedback}
-                  onChange={val => setFeedback(val)}
-                  placeholder={placeholder ? placeholder : 'Suggest new image'}
-                  hideOutline
-                  compact
-                  onEnter={onSuggest}
-                />
-                <Button
-                  text='Suggest'
-                  icon='bolt-lightning'
-                  iconPrefix='fas'
-                  secondary
-                  compact
-                  onClick={onSuggest}
-                />
-              </>
+          children && <Box width={13}>
+            {
+              children
+            }
+          </Box>
         }
+        <Gap disableWrap>
+          <TextInput
+            value={feedback}
+            onChange={val => setFeedback(val)}
+            placeholder={placeholder ? placeholder : 'Suggest new image'}
+            hideOutline
+            compact
+            onEnter={onSuggest}
+          />
+          <Button
+            text='Suggest'
+            icon='bolt-lightning'
+            iconPrefix='fas'
+            secondary
+            compact
+            onClick={onSuggest}
+            disabled={loading}
+          />
+          {
+            (suggestions?.length > 0 && !loading) &&
+              <Button
+                onClick={() => setSuggestions([])}
+                text='Clear'
+                compact
+              />
+          } 
+        </Gap>    
       </Box>
     </Box>
    

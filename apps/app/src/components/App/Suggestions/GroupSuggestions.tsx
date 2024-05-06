@@ -91,7 +91,7 @@ export const GroupSuggestions = () => {
             canClear={feedback !== ''}
           />
           {
-            (loading && suggestions?.length === 0) && <LoadingSpinner compact />
+            loading && <LoadingSpinner compact />
           }
           <Button
             text='Suggest'
