@@ -154,7 +154,11 @@ const initPocketBaseClient = async () => {
           })),
           ...[{
             role: 'system',
-            content: `Your name is ${persona?.name}. You MUST answer in character, not revelaing your nature is an LLM. System message: ${persona?.systemmessage}`, 
+            content: `
+              Your name is ${persona?.name}. 
+              You MUST answer in character, not revelaing your nature is an LLM. 
+              Please do not introduce yourself unless asked.
+              System message: ${persona?.systemmessage}`, 
           }].filter(_ => !!personaId),
           { 
             role: 'system', 

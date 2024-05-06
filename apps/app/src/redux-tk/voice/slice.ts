@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface VoiceState {
   currentSpeakerId: string
-  playing: boolean
   paused: boolean
   currentlySpeaking: string
   messageId: string
@@ -11,7 +10,6 @@ interface VoiceState {
 
 const INITIAL_STATE: VoiceState = {
   currentSpeakerId: '',
-  playing: false,
   paused: false,
   currentlySpeaking: '',
   messageId: '',
@@ -24,9 +22,6 @@ const voiceSlice = createSlice({
   reducers: {
     setCurrentSpeakerId: (state, action: PayloadAction<string>) => {
       state.currentSpeakerId = action.payload
-    },
-    setPlaying: (state, action: PayloadAction<boolean>) => {
-      state.playing = action.payload
     },
     setPaused: (state, action: PayloadAction<boolean>) => {
       state.paused = action.payload

@@ -51,28 +51,23 @@ export const SpaceSidebar = React.memo(({ }: Props) => {
   const location = useLocation() 
 
   return (<S.GroupsSidebar>
-    <Box height='calc(100% - var(--F_Input_Height))'>
-      <SpacesSidebarComponent />
+    <SpacesSidebarComponent />
 
-        <S.SidebarContainer>
-          <Gap>
-            {
-              (activeSpace?.id && location.pathname !== '/profile') && <SpaceCard
-                id={activeSpace.id}
-                name={activeSpace?.name}
-                previewSrc={activeSpace?.banner ? `http://localhost:8090/api/files/spaces/${activeSpace.id}/${activeSpace.banner}` : undefined}
-              />
-            }
-            {
-              !['/spaces/create', '/profile'].includes(location.pathname) &&
-                <Groups />
-            }
-          </Gap>
-        </S.SidebarContainer>
-    </Box>
-    <S.VoiceContainer>
-      <Voice />
-    </S.VoiceContainer>
+    <S.SidebarContainer>
+      <Gap>
+        {
+          (activeSpace?.id && location.pathname !== '/profile') && <SpaceCard
+            id={activeSpace.id}
+            name={activeSpace?.name}
+            previewSrc={activeSpace?.banner ? `http://localhost:8090/api/files/spaces/${activeSpace.id}/${activeSpace.banner}` : undefined}
+          />
+        }
+        {
+          !['/spaces/create', '/profile'].includes(location.pathname) &&
+            <Groups />
+        }
+      </Gap>
+    </S.SidebarContainer>
   </S.GroupsSidebar>)
 })
 
@@ -82,7 +77,6 @@ const S = {
     height: 100%;
     width: 100%;
     align-items: flex-start;
-    flex-wrap: wrap;
     border-right: 1px solid var(--F_Surface);
     * {
       user-select: none;

@@ -1,10 +1,11 @@
 import { memo, useEffect, useState } from 'react'
-import { Box, Button, ContextMenu, Dropdown, Item, ItemProps, RichTextEditor, scrollToElementById } from '@avsync.live/formation'
+import { Box, Button, ContextMenu, Dropdown, Item, ItemProps, RichTextEditor, Spacer, scrollToElementById } from '@avsync.live/formation'
 import { useSpaces_activeChannelId, useSpaces_activeSpace, useSpaces_activeThread, useSpaces_currentUserId, useSpaces_setActiveThreadId } from 'redux-tk/spaces/hooks'
 import styled from 'styled-components'
 import { pb } from 'redux-tk/pocketbase'
 import { usePersonas_activePersona, usePersonas_personas, usePersonas_setActivePersonaId } from 'redux-tk/personas/hooks'
 import { useNavigate } from 'react-router-dom'
+import { Voice } from './Voice'
 
 interface Props {
   onNewThreadId?: (threadId: string) => void
@@ -150,6 +151,8 @@ export const TextBox = memo(({
                 items={personaDropdownItems}
               />
             </ContextMenu>
+            <Spacer />
+            <Voice />
           </Box>
       }
 

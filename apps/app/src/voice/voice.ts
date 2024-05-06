@@ -97,6 +97,10 @@ class SpeechSynthesizer {
   }
 
   private maybePlayAudio(): void {
+    // Add a check to ensure playback doesn't resume if paused
+    if (this.isPaused) {
+      return
+    }
     if (!this.isPlaying && this.currentSentenceIndex < this.sentences.length) {
       const sentence = this.sentences[this.currentSentenceIndex]
       const audioUrl = this.audioDataMap.get(sentence)
@@ -239,9 +243,25 @@ createWatcher({
 createWatcher({
   selectData: () => store.getState().voice.speed,
   onChange: speed => {
+    currentSpeed = speed
     if (synthesizer) {
-      currentSpeed = speed
       synthesizer.setSpeed(speed)
+    }
+  }
+})
+
+createWatcher({
+  selectData: () => store.getState().voice.paused,
+  onChange: paused => {
+    if (synthesizer) {
+      if (paused) {
+        console.log('pause')
+        synthesizer.pause()
+      }
+      else {
+        synthesizer.play()
+        console.log('play')
+      }
     }
   }
 })
