@@ -10,7 +10,7 @@ const basePath = process.env.NODE_ENV === 'production'
   : process.cwd()
 
 const whisperPath = path.join(basePath, 'whisper', 'bin', 'Release', 'addon.node')
-const modelPath = path.join(basePath, 'whisper', 'models', 'ggml-base.en.bin')
+const modelPath = path.join(basePath, 'whisper', 'models', 'ggml-tiny.en-q5_1.bin')
 
 const whisperAsync = promisify(require(whisperPath).whisper)
 
@@ -21,23 +21,49 @@ const wssServer = createServer(server)
 const wss = new WebSocket.Server({ server: wssServer })
 
 interface ClientData {
-  audioChunks: Buffer[],
-  intervalHandle: NodeJS.Timeout | null,
-  processingStarted: boolean,
-  filePath: string,
+  audioChunks: Buffer[]
+  intervalHandle: NodeJS.Timeout | null
+  processingStarted: boolean
+  filePath: string
   bufferStartTime: number | null
-}
-
-interface ClientData {
-  audioChunks: Buffer[],
-  intervalHandle: NodeJS.Timeout | null,
-  processingStarted: boolean,
-  filePath: string,
-  bufferStartTime: number | null,
   lastProcessedTime: number
+  transcripts: string[]
+  finalTranscript: string
+  confirmedTranscript: string  // Added to track parts of the transcript that are confirmed
 }
 
 const clients = new Map<number, ClientData>()
+
+function mergeTranscripts(clientData: ClientData, newTranscript: string): string {
+  const wordsConfirmed = clientData.confirmedTranscript.split(' ')
+  const wordsNew = newTranscript.split(' ')
+  let commonEndIndex = 0
+
+  // Check if the entire new transcript is already appended
+  if (clientData.confirmedTranscript.trim() === newTranscript.trim()) {
+    return clientData.confirmedTranscript  // Return as is, no changes needed
+  }
+
+  // Try to find overlap between confirmed transcript and new transcript
+  for (let i = 1; i <= wordsConfirmed.length; i++) {
+    const confirmedEnd = wordsConfirmed.slice(-i).join(' ')
+    const newStart = wordsNew.slice(0, i).join(' ')
+    if (confirmedEnd === newStart) {
+      commonEndIndex = i
+      break  // Stop at the first match
+    }
+  }
+
+  // Update the confirmed part if fully matched, append new information otherwise
+  if (commonEndIndex > 0) {
+    clientData.confirmedTranscript += ' ' + wordsNew.slice(commonEndIndex).join(' ')
+  } 
+  else {
+    clientData.confirmedTranscript = newTranscript  // Reset if no overlap
+  }
+
+  return clientData.confirmedTranscript.trim().replace(/\s{2,}/g, ' ')
+}
 
 wss.on('connection', function connection(ws) {
   const id = Date.now()
@@ -47,70 +73,60 @@ wss.on('connection', function connection(ws) {
     processingStarted: false,
     filePath: path.join(__dirname, `audio_${id}.wav`),
     bufferStartTime: null,
-    lastProcessedTime: Date.now() // Initialize with current time
+    lastProcessedTime: Date.now(),
+    transcripts: [],
+    finalTranscript: '',
+    confirmedTranscript: ''
   }
   clients.set(id, clientData)
-
-  console.log(`Client connected: ${id}`)
 
   ws.on('message', function incoming(message) {
     const messageData = message.toString('utf8')
     try {
       const data = JSON.parse(messageData)
       if (data.status === 'INIT') {
-        clientData.bufferStartTime = Date.now() + 500 // Initial delay of 500ms
+        clientData.bufferStartTime = Date.now() + 500 // Initial delay
         ws.send(JSON.stringify({ uid: data.uid, status: 'READY' }))
-        console.log(`Sent READY status to client ${id}`)
       }
       else if (data.audioChunk) {
         const audioBuffer = Buffer.from(data.audioChunk, 'base64')
         clientData.audioChunks.push(audioBuffer)
-        console.log(`Buffering audio chunk from client ${id}`)
       }
     }
     catch (error) {
-      console.error(`Error handling message from client ${id}:`, error)
       ws.send(JSON.stringify({ error: 'Error processing your message. Please send valid JSON.' }))
     }
   })
 
   if (!clientData.intervalHandle) {
     clientData.intervalHandle = setInterval(async () => {
-      const currentTime = Date.now()
-      if (clientData.bufferStartTime && currentTime > clientData.bufferStartTime) {
-        if (clientData.audioChunks.length > 0 && !clientData.processingStarted) {
-          clientData.processingStarted = true
-    
-          const writer = new FileWriter(clientData.filePath, {
-            sampleRate: 16000,
-            channels: 1,
-            bitDepth: 16
-          })
-    
-          // Only include the latest 5000ms of audio chunks
-          const relevantChunks = clientData.audioChunks.slice(-Math.ceil(5000 / 100)) // Assuming 100ms per chunk
-          relevantChunks.forEach(chunk => writer.write(chunk))
-          writer.end()
-    
-          console.log(`Audio file written: ${clientData.filePath}`)
-    
-          const result = await whisperAsync({
-            language: 'en',
-            model: modelPath,
-            fname_inp: clientData.filePath,
-            use_gpu: true,
-            no_timestamps: true
-          })
-          const text = result?.[0]?.[2]
-          if (text && !text.includes('[BLANK_AUDIO]')) {
-            ws.send(JSON.stringify({ text }))
-          }
-          console.log(`Transcription sent to client ${id}`)
-          clientData.lastProcessedTime = currentTime
-          clientData.processingStarted = false
+      if (clientData.bufferStartTime && Date.now() > clientData.bufferStartTime && !clientData.processingStarted) {
+        clientData.processingStarted = true
+  
+        const writer = new FileWriter(clientData.filePath, {
+          sampleRate: 16000,
+          channels: 1,
+          bitDepth: 16
+        })
+  
+        clientData.audioChunks.forEach(chunk => writer.write(chunk))
+        writer.end()
+  
+        const result = await whisperAsync({
+          language: 'en',
+          model: modelPath,
+          fname_inp: clientData.filePath,
+          use_gpu: true,
+          no_timestamps: true
+        })
+        const newTranscript = result?.[0]?.[2] || ''
+        if (newTranscript) {
+          clientData.finalTranscript = mergeTranscripts(clientData, newTranscript)
+          ws.send(JSON.stringify({ text: clientData.finalTranscript }))
         }
+        clientData.processingStarted = false
       }
-    }, 1000)
+    }, 500)
   }
 
   ws.on('close', () => {
@@ -118,7 +134,6 @@ wss.on('connection', function connection(ws) {
       clearInterval(clientData.intervalHandle)
     }
     clients.delete(id)
-    console.log(`Client disconnected: ${id}`)
   })
 })
 
