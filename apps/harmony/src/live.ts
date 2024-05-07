@@ -74,6 +74,8 @@ wss.on('connection', function connection(ws) {
     try {
       const data = JSON.parse(messageData)
       if (data.status === 'INIT') {
+        console.log(`client ${data.uid} connected`)
+
         clientData = {
           uid: data.uid,
           audioChunks: [],
@@ -93,6 +95,7 @@ wss.on('connection', function connection(ws) {
       else if (data.audioChunk) {
         const audioBuffer = Buffer.from(data.audioChunk, 'base64')
         clientData.audioChunks.push(audioBuffer)
+        console.log('chunk from client')
       }
     }
     catch (error) {
@@ -132,6 +135,7 @@ wss.on('connection', function connection(ws) {
   }
 
   ws.on('close', async () => {
+    console.log(`client ${clientData.uid} disconnected`)
     if (clientData.intervalHandle) {
       clearInterval(clientData.intervalHandle)
     }
