@@ -19,10 +19,10 @@ export const Live = () => {
 
     ws.onmessage = event => {
       const data = JSON.parse(event.data)
+      console.log(data)
       if (data.text) {
-        setTranscription(currentTranscription => currentTranscription + data.text)
+        setTranscription(data.text)
       }
-      if (data.uid !== uuid) return
       if (data.status === 'READY') {
         setIsServerReady(true)
       }

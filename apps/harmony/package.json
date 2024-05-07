@@ -57,6 +57,7 @@
     "ollama": "^0.5.0",
     "openai": "^4.38.5",
     "pocketbase": "^0.21.2",
+    "string-similarity": "^4.0.4",
     "wav": "^1.0.2",
     "ws": "^8.17.0",
     "youtube-transcript": "^1.2.1"
