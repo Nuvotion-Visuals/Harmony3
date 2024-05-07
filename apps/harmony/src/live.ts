@@ -30,7 +30,8 @@ interface ClientData {
   lastProcessedTime: number
   transcripts: string[]
   finalTranscript: string
-  confirmedTranscript: string  // Added to track parts of the transcript that are confirmed
+  confirmedTranscript: string
+  newChunksReceived: boolean
 }
 
 const clients = new Map<string, ClientData>()
@@ -86,7 +87,8 @@ wss.on('connection', function connection(ws) {
           lastProcessedTime: Date.now(),
           transcripts: [],
           finalTranscript: '',
-          confirmedTranscript: ''
+          confirmedTranscript: '',
+          newChunksReceived: false // Flag to check new audio chunks
         }
         clients.set(data.uid, clientData)
         clientData.bufferStartTime = Date.now() + 500
@@ -95,6 +97,7 @@ wss.on('connection', function connection(ws) {
       else if (data.audioChunk) {
         const audioBuffer = Buffer.from(data.audioChunk, 'base64')
         clientData.audioChunks.push(audioBuffer)
+        clientData.newChunksReceived = true // Set the flag when a new chunk is received
         console.log('chunk from client')
       }
     }
@@ -105,8 +108,10 @@ wss.on('connection', function connection(ws) {
 
   if (!clientData.intervalHandle) {
     clientData.intervalHandle = setInterval(async () => {
-      if (clientData.bufferStartTime && Date.now() > clientData.bufferStartTime && !clientData.processingStarted) {
+      // Check if new audio chunks have been received
+      if (clientData.newChunksReceived && clientData.bufferStartTime && Date.now() > clientData.bufferStartTime && !clientData.processingStarted) {
         clientData.processingStarted = true
+        clientData.newChunksReceived = false // Reset the flag after starting processing
         
         const writer = new FileWriter(clientData.filePath, {
           sampleRate: 16000,
