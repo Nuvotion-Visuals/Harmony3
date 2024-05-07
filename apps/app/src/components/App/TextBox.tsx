@@ -7,6 +7,7 @@ import { usePersonas_activePersona, usePersonas_activePersonaId, usePersonas_per
 import { useNavigate } from 'react-router-dom'
 import { Voice } from './Voice'
 import { Transcribe } from './Transcribe'
+import { LiveTranscribe } from './LiveTranscribe'
 // import { Transcription, useHearing } from 'components/App/Transcription'
 
 interface Props {
@@ -219,10 +220,9 @@ export const TextBox = memo(({
         />
         <S.Absolute>
           <Box>
-            <Transcribe
+            <LiveTranscribe
               onTranscription={val => {
                 setText(val)
-                sendMessage(val)
               }}
             />
             {

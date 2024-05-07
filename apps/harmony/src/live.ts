@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import { unlink } from 'fs/promises'
 import * as path from 'path'
 import { promisify } from 'util'
 import { createServer } from 'http'
@@ -21,6 +21,7 @@ const wssServer = createServer(server)
 const wss = new WebSocket.Server({ server: wssServer })
 
 interface ClientData {
+  uid: string,
   audioChunks: Buffer[]
   intervalHandle: NodeJS.Timeout | null
   processingStarted: boolean
@@ -32,7 +33,7 @@ interface ClientData {
   confirmedTranscript: string  // Added to track parts of the transcript that are confirmed
 }
 
-const clients = new Map<number, ClientData>()
+const clients = new Map<string, ClientData>()
 
 function mergeTranscripts(clientData: ClientData, newTranscript: string): string {
   const wordsConfirmed = clientData.confirmedTranscript.split(' ')
@@ -66,26 +67,27 @@ function mergeTranscripts(clientData: ClientData, newTranscript: string): string
 }
 
 wss.on('connection', function connection(ws) {
-  const id = Date.now()
-  const clientData: ClientData = {
-    audioChunks: [],
-    intervalHandle: null,
-    processingStarted: false,
-    filePath: path.join(__dirname, `audio_${id}.wav`),
-    bufferStartTime: null,
-    lastProcessedTime: Date.now(),
-    transcripts: [],
-    finalTranscript: '',
-    confirmedTranscript: ''
-  }
-  clients.set(id, clientData)
+  let clientData = { } as ClientData
 
   ws.on('message', function incoming(message) {
     const messageData = message.toString('utf8')
     try {
       const data = JSON.parse(messageData)
       if (data.status === 'INIT') {
-        clientData.bufferStartTime = Date.now() + 500 // Initial delay
+        clientData = {
+          uid: data.uid,
+          audioChunks: [],
+          intervalHandle: null,
+          processingStarted: false,
+          filePath: path.join(__dirname, `audio_${data.uid}.wav`),
+          bufferStartTime: null,
+          lastProcessedTime: Date.now(),
+          transcripts: [],
+          finalTranscript: '',
+          confirmedTranscript: ''
+        }
+        clients.set(data.uid, clientData)
+        clientData.bufferStartTime = Date.now() + 500
         ws.send(JSON.stringify({ uid: data.uid, status: 'READY' }))
       }
       else if (data.audioChunk) {
@@ -102,7 +104,7 @@ wss.on('connection', function connection(ws) {
     clientData.intervalHandle = setInterval(async () => {
       if (clientData.bufferStartTime && Date.now() > clientData.bufferStartTime && !clientData.processingStarted) {
         clientData.processingStarted = true
-  
+        
         const writer = new FileWriter(clientData.filePath, {
           sampleRate: 16000,
           channels: 1,
@@ -129,11 +131,12 @@ wss.on('connection', function connection(ws) {
     }, 500)
   }
 
-  ws.on('close', () => {
+  ws.on('close', async () => {
     if (clientData.intervalHandle) {
       clearInterval(clientData.intervalHandle)
     }
-    clients.delete(id)
+    clients.delete(clientData.uid)
+    await unlink(clientData.filePath)
   })
 })
 

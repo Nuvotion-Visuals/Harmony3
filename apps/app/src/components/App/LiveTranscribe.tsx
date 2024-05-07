@@ -1,7 +1,15 @@
-import { generateUUID } from '@avsync.live/formation'
-import React, { useState, useEffect } from 'react'
+import { Button, generateUUID } from "@avsync.live/formation"
+import { useEffect, useState } from "react"
 
-export const Live = () => {
+interface Props {
+  onTranscription: (text: string) => void
+  compact?: boolean
+}
+
+export const LiveTranscribe = ({
+  onTranscription,
+  compact
+}: Props) => {
   const [audioContext, setAudioContext] = useState(null)
   const [mediaStream, setMediaStream] = useState(null)
   const [socket, setSocket] = useState(null)
@@ -21,6 +29,7 @@ export const Live = () => {
       const data = JSON.parse(event.data)
       console.log(data)
       if (data.text) {
+        onTranscription(data.text)
         setTranscription(data.text)
       }
       if (data.status === 'READY') {
@@ -39,8 +48,6 @@ export const Live = () => {
 
   useEffect(() => {
     setUuid(generateUUID())
-
-    connectWebSocket()
 
     const initAudio = async () => {
       const context = new AudioContext()
@@ -99,14 +106,20 @@ export const Live = () => {
     return resampledData
   }
 
-  return (
-    <div>
-      <h1>Live Audio Processing</h1>
-      <p>Status: {isServerReady ? 'Server Ready' : 'Connecting...'}</p>
-      <p>{transcription}</p>
-      <button onClick={connectWebSocket}>Reconnect</button>
-      <button onClick={disconnectWebSocket}>Disconnect</button>
-      <button onClick={() => setTranscription('')}>Clear</button>
-    </div>
-  )
+  return (<Button
+    icon='microphone'
+    iconPrefix='fas'
+    circle
+    compact={compact}
+    minimal
+    blink={isServerReady}
+    onClick={() => {
+      if (isServerReady) {
+        disconnectWebSocket()
+      }
+      else {
+        connectWebSocket()
+      }
+    }}
+  />)
 }

@@ -7,7 +7,6 @@ import { TextBox } from 'components/App/TextBox'
 import { useSpaces_activeChannel, useSpaces_activeGroup, useSpaces_activeSpace, useSpaces_activeThread, useSpaces_currentUser, useSpaces_currentUserId, useSpaces_usersById } from 'redux-tk/spaces/hooks'
 import { usePersonas_activePersona } from 'redux-tk/personas/hooks'
 import useDynamicHeight from 'components/Hooks/useDynamicHeight'
-import { Live } from '../Live'
 
 const Message = memo(({
   role,
@@ -223,7 +222,7 @@ export const QuickChat = () => {
           />
         }
       </Gap>
-      <Live />
+      {/* <Live /> */}
       <div id='quickchat_bottom'></div>
     </S.Content>
 
