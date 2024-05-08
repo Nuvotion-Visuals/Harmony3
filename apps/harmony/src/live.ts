@@ -16,14 +16,13 @@ const whisperAsync = promisify(require(whisperPath).whisper)
 
 import WebSocket from 'ws'
 import { FileWriter } from 'wav'
-
+import { promises as fsPromises } from 'fs'
 const wssServer = createServer(server)
 const wss = new WebSocket.Server({ server: wssServer })
 
 interface ClientData {
-  uid: string,
+  uid: string
   audioChunks: Buffer[]
-  intervalHandle: NodeJS.Timeout | null
   processingStarted: boolean
   filePath: string
   bufferStartTime: number | null
@@ -41,36 +40,43 @@ function mergeTranscripts(clientData: ClientData, newTranscript: string): string
   const wordsNew = newTranscript.split(' ')
   let commonEndIndex = 0
 
-  // Check if the entire new transcript is already appended
   if (clientData.confirmedTranscript.trim() === newTranscript.trim()) {
-    return clientData.confirmedTranscript  // Return as is, no changes needed
+    return clientData.confirmedTranscript
   }
 
-  // Try to find overlap between confirmed transcript and new transcript
   for (let i = 1; i <= wordsConfirmed.length; i++) {
     const confirmedEnd = wordsConfirmed.slice(-i).join(' ')
     const newStart = wordsNew.slice(0, i).join(' ')
     if (confirmedEnd === newStart) {
       commonEndIndex = i
-      break  // Stop at the first match
+      break
     }
   }
 
-  // Update the confirmed part if fully matched, append new information otherwise
   if (commonEndIndex > 0) {
     clientData.confirmedTranscript += ' ' + wordsNew.slice(commonEndIndex).join(' ')
-  } 
-  else {
-    clientData.confirmedTranscript = newTranscript  // Reset if no overlap
+  } else {
+    clientData.confirmedTranscript = newTranscript
   }
 
   return clientData.confirmedTranscript.trim().replace(/\s{2,}/g, ' ')
 }
 
 wss.on('connection', function connection(ws) {
-  let clientData = { } as ClientData
+  let clientData: ClientData = {
+    uid: '',
+    audioChunks: [],
+    processingStarted: false,
+    filePath: '',
+    bufferStartTime: null,
+    lastProcessedTime: 0,
+    transcripts: [],
+    finalTranscript: '',
+    confirmedTranscript: '',
+    newChunksReceived: false
+  }
 
-  ws.on('message', function incoming(message) {
+  ws.on('message', async function incoming(message) {
     const messageData = message.toString('utf8')
     try {
       const data = JSON.parse(messageData)
@@ -80,74 +86,68 @@ wss.on('connection', function connection(ws) {
         clientData = {
           uid: data.uid,
           audioChunks: [],
-          intervalHandle: null,
           processingStarted: false,
-          filePath: path.join(__dirname, `audio_${data.uid}.wav`),
-          bufferStartTime: null,
+          filePath: `audio_${data.uid}.wav`,
+          bufferStartTime: Date.now() + 1000,
           lastProcessedTime: Date.now(),
           transcripts: [],
           finalTranscript: '',
           confirmedTranscript: '',
-          newChunksReceived: false // Flag to check new audio chunks
+          newChunksReceived: false
         }
         clients.set(data.uid, clientData)
-        clientData.bufferStartTime = Date.now() + 500
         ws.send(JSON.stringify({ uid: data.uid, status: 'READY' }))
-      }
+      } 
       else if (data.audioChunk) {
         const audioBuffer = Buffer.from(data.audioChunk, 'base64')
         clientData.audioChunks.push(audioBuffer)
-        clientData.newChunksReceived = true // Set the flag when a new chunk is received
-        console.log('chunk from client')
+        clientData.newChunksReceived = true
+
+        if (!clientData.processingStarted) {
+          processAudioChunks(clientData, ws)
+        }
       }
-    }
-    catch (error) {
+    } catch (error) {
       ws.send(JSON.stringify({ error: 'Error processing your message. Please send valid JSON.' }))
     }
   })
 
-  if (!clientData.intervalHandle) {
-    clientData.intervalHandle = setInterval(async () => {
-      // Check if new audio chunks have been received
-      if (clientData.newChunksReceived && clientData.bufferStartTime && Date.now() > clientData.bufferStartTime && !clientData.processingStarted) {
-        clientData.processingStarted = true
-        clientData.newChunksReceived = false // Reset the flag after starting processing
-        
-        const writer = new FileWriter(clientData.filePath, {
-          sampleRate: 16000,
-          channels: 1,
-          bitDepth: 16
-        })
-  
-        clientData.audioChunks.forEach(chunk => writer.write(chunk))
-        writer.end()
-  
-        const result = await whisperAsync({
-          language: 'en',
-          model: modelPath,
-          fname_inp: clientData.filePath,
-          use_gpu: true,
-          no_timestamps: true
-        })
-        const newTranscript = result?.[0]?.[2] || ''
-        if (newTranscript) {
-          clientData.finalTranscript = mergeTranscripts(clientData, newTranscript)
-          ws.send(JSON.stringify({ text: clientData.finalTranscript }))
-        }
-        clientData.processingStarted = false
-      }
-    }, 500)
-  }
-
   ws.on('close', async () => {
     console.log(`client ${clientData.uid} disconnected`)
-    if (clientData.intervalHandle) {
-      clearInterval(clientData.intervalHandle)
-    }
     clients.delete(clientData.uid)
-    await unlink(clientData.filePath)
+    await fsPromises.unlink(clientData.filePath)
   })
 })
+
+async function processAudioChunks(clientData: ClientData, ws: WebSocket) {
+  if (clientData.newChunksReceived && clientData.bufferStartTime && Date.now() > clientData.bufferStartTime) {
+    clientData.processingStarted = true
+    clientData.newChunksReceived = false
+
+    const writer = new FileWriter(clientData.filePath, {
+      sampleRate: 16000,
+      channels: 1,
+      bitDepth: 16
+    })
+
+    clientData.audioChunks.forEach(chunk => writer.write(chunk))
+    writer.end()
+
+    const result = await whisperAsync({
+      language: 'en',
+      model: modelPath,
+      fname_inp: clientData.filePath,
+      use_gpu: true,
+      no_timestamps: true
+    })
+    const newTranscript = result?.[0]?.[2] || ''
+    if (newTranscript) {
+      clientData.finalTranscript = mergeTranscripts(clientData, newTranscript)
+      ws.send(JSON.stringify({ text: clientData.finalTranscript }))
+    }
+    clientData.processingStarted = false
+  }
+}
 
 export const initLive = () => {
   wssServer.listen(1615, () => {
