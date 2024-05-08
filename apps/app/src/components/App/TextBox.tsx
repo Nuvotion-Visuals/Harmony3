@@ -220,7 +220,7 @@ export const TextBox = memo(({
         />
         <S.Absolute>
           <Box>
-            <LiveTranscribe
+            <Transcribe
               onTranscription={val => {
                 setText(val)
               }}

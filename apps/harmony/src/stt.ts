@@ -20,10 +20,20 @@ export const stt = async (inputAudioPath: string) => {
   const modelPath = path.join(basePath, 'whisper', 'models', 'ggml-base.en.bin')
   const tempDirPath = path.join(__dirname, 'temp')
   const outputAudioPath = path.join(tempDirPath, `transcript-output-${Math.random().toString(36).substring(2, 15)}.wav`)
-  if (!fs.existsSync(tempDirPath)) {
-    fs.mkdirSync(tempDirPath)
-  }
+
   try {
+    await new Promise((resolve, reject) => {
+      ffmpeg()
+        .input(inputAudioPath)
+        .audioCodec('pcm_s16le')
+        .audioFrequency(16000)
+        .audioChannels(1)
+        .format('wav')
+        .on('error', (err: any) => reject(new Error('An error occurred: ' + err.message)))
+        .on('end', resolve)
+        .save(outputAudioPath)
+    })
+
     const { whisper } = require(whisperPath)
     const whisperAsync = promisify(whisper)
   
