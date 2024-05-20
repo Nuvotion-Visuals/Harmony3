@@ -16,81 +16,88 @@ type ModelCollection = Record<string, LanguageModel[]>
 export const languageModels: ModelCollection = {
   "OpenAI": [
     {
+      "name": "gpt-4o",
+      "description": "Our most advanced, multimodal flagship model that’s cheaper and faster than GPT-4 Turbo. Currently points to gpt-4o-2024-05-13.",
+      "contextWindow": 128000,
+      "trainingData": "Up to Dec 2023",
+      cost: { input: 5.00, output: 15.00 }
+    },
+    {
       "name": "gpt-4-turbo",
       "description": "The latest GPT-4 Turbo model with vision capabilities. Vision requests can now use JSON mode and function calling. Currently points to gpt-4-turbo-2024-04-09.",
       "contextWindow": 128000,
       "trainingData": "Up to Dec 2023",
-      cost: { input: 30.00, output: 60.00 }
+      cost: { input: 10.00, output: 30.00 }
     },
     {
       "name": "gpt-4-turbo-2024-04-09",
       "description": "GPT-4 Turbo with Vision model. Vision requests can now use JSON mode and function calling. gpt-4-turbo currently points to this version.",
       "contextWindow": 128000,
       "trainingData": "Up to Dec 2023",
-      cost: { input: 30.00, output: 60.00 }
+      cost: { input: 10.00, output: 30.00 }
     },
     {
       "name": "gpt-4-turbo-preview",
       "description": "GPT-4 Turbo preview model. Currently points to gpt-4-0125-preview.",
       "contextWindow": 128000,
       "trainingData": "Up to Dec 2023",
-      cost: { input: 30.00, output: 60.00 }
+      cost: { input: 10.00, output: 30.00 }
     },
     {
       "name": "gpt-4-0125-preview",
       "description": "GPT-4 Turbo preview model intended to reduce cases of “laziness” where the model doesn’t complete a task. Returns a maximum of 4,096 output tokens.",
       "contextWindow": 128000,
       "trainingData": "Up to Dec 2023",
-      cost: { input: 30.00, output: 60.00 }
+      cost: { input: 10.00, output: 30.00 }
     },
     {
       "name": "gpt-4-1106-preview",
       "description": "GPT-4 Turbo preview model featuring improved instruction following, JSON mode, reproducible outputs, parallel function calling, and more. Returns a maximum of 4,096 output tokens. This is a preview model.",
       "contextWindow": 128000,
       "trainingData": "Up to Apr 2023",
-      cost: { input: 30.00, output: 60.00 }
+      cost: { input: 10.00, output: 30.00 }
     },
     {
       "name": "gpt-4-vision-preview",
       "description": "GPT-4 model with the ability to understand images, in addition to all other GPT-4 Turbo capabilities. This is a preview model, we recommend developers to now use gpt-4-turbo which includes vision capabilities. Currently points to gpt-4-1106-vision-preview.",
       "contextWindow": 128000,
       "trainingData": "Up to Apr 2023",
-      cost: { input: 30.00, output: 60.00 }
+      cost: { input: 10.00, output: 30.00 }
     },
     {
       "name": "gpt-4-1106-vision-preview",
       "description": "GPT-4 model with the ability to understand images, in addition to all other GPT-4 Turbo capabilities. This is a preview model, we recommend developers to now use gpt-4-turbo which includes vision capabilities. Returns a maximum of 4,096 output tokens.",
       "contextWindow": 128000,
       "trainingData": "Up to Apr 2023",
-      cost: { input: 30.00, output: 60.00 }
+      cost: { input: 10.00, output: 30.00 }
     },
     {
       "name": "gpt-4",
       "description": "Currently points to gpt-4-0613. See continuous model upgrades.",
       "contextWindow": 8192,
       "trainingData": "Up to Sep 2021",
-      cost: { input: 30.00, output: 60.00 }
+      cost: { input: 10.00, output: 30.00 }
     },
     {
       "name": "gpt-4-0613",
       "description": "Snapshot of gpt-4 from June 13th 2023 with improved function calling support.",
       "contextWindow": 8192,
       "trainingData": "Up to Sep 2021",
-      cost: { input: 30.00, output: 60.00 }
+      cost: { input: 10.00, output: 30.00 }
     },
     {
       "name": "gpt-4-32k",
       "description": "Currently points to gpt-4-32k-0613. See continuous model upgrades. This model was never rolled out widely in favor of GPT-4 Turbo.",
       "contextWindow": 32768,
       "trainingData": "Up to Sep 2021",
-      cost: { input: 30.00, output: 60.00 }
+      cost: { input: 10.00, output: 30.00 }
     },
     {
       "name": "gpt-4-32k-0613",
       "description": "Snapshot of gpt-4-32k from June 13th 2023 with improved function calling support. This model was never rolled out widely in favor of GPT-4 Turbo.",
       "contextWindow": 32768,
       "trainingData": "Up to Sep 2021",
-      cost: { input: 30.00, output: 60.00 }
+      cost: { input: 10.00, output: 30.00 }
     },
     {
       "name": "gpt-3.5-turbo-0125",

@@ -223,6 +223,7 @@ export const TextBox = memo(({
             <Transcribe
               onTranscription={val => {
                 setText(val)
+                sendMessage(val)
               }}
             />
             {
